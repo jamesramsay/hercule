@@ -1,0 +1,38 @@
+{
+  "name": "md-transclude",
+  "version": "0.0.1",
+  "description": "Markdown transcluder",
+  "main": "./lib/main",
+  "scripts": {
+    "test": "mocha test --reporter spec",
+    "watch": "coffee --output lib -cw src/*"
+  },
+  "bin": {
+    "md-transclude": "./bin/transclude"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamesramsay/md-transclude.git"
+  },
+  "keywords": [
+    "markdown",
+    "transclude"
+  ],
+  "author": {
+    "name": "James Ramsay",
+    "url": "http://jramsay.com.au"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamesramsay/md-transclude/issues"
+  },
+  "homepage": "https://github.com/jamesramsay/md-transclude",
+  "dependencies": {
+    "async": "^0.9.0",
+    "dashdash": "^1.7.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.7.0",
+    "mocha": "^2.0.1"
+  }
+}
