@@ -11,7 +11,7 @@
       it('should whitespace on the first line of a file', function() {
         var document;
         document = "\t{{test}}";
-        return md.detectDependencies(document, null, function(err, placeholders, dependencies) {
+        return md.detectDependencies(document, "", null, function(err, placeholders, dependencies) {
           return assert.equal(dependencies.test.whitespace, "\t");
         });
       });
@@ -27,7 +27,7 @@
           whitespace = whitespaceScenarios[scenario];
           document += "" + whitespace + "{{" + scenario + "}}\n";
         }
-        return md.detectDependencies(document, null, function(err, placeholders, dependencies) {
+        return md.detectDependencies(document, "", null, function(err, placeholders, dependencies) {
           var _results;
           _results = [];
           for (scenario in whitespaceScenarios) {
@@ -38,19 +38,6 @@
         });
       });
     });
-    describe('substituteParameters', function() {
-      return it('should substitute placeholders with filenames', function() {
-        var document, parameters;
-        document = "# Heading 1\n{{fruit}}\n{{footer}}";
-        parameters = {
-          fruit: "apple.md",
-          footer: "common/footer.md"
-        };
-        return md.substituteParameters(document, parameters, null, function(err, substitutedDocument) {
-          return assert.equal(substitutedDocument, "# Heading 1\n{{apple.md}}\n{{common/footer.md}}");
-        });
-      });
-    });
     return describe('parseParameters', function() {
       it('should parse parameters', function() {
         var expectedParams, parameterScenario;
@@ -58,20 +45,29 @@
         expectedParams = {
           placeholder: "filename.md"
         };
-        return md.parseParameters(parameterScenario, null, function(err, parsedParameters) {
+        return md.parseParameters(parameterScenario, "", null, function(err, parsedParameters) {
           return assert.deepEqual(parsedParameters, expectedParams);
         });
       });
-      return it('should parse multiple parameters', function() {
+      it('should parse multiple parameters', function() {
         var expectedParams, parameterScenario;
         parameterScenario = ["placeholder:filename.md", "legal:legal/common.md"];
         expectedParams = {
           placeholder: "filename.md",
           legal: "legal/common.md"
         };
-        return md.parseParameters(parameterScenario, null, function(err, parsedParameters) {
+        return md.parseParameters(parameterScenario, "", null, function(err, parsedParameters) {
           return assert.deepEqual(parsedParameters, expectedParams);
         });
+      });
+      return it('should parse parameters relative where is was specified', function() {
+        var documendDirectory, expectedParams, parameterScenario;
+        parameterScenario = ["fruit:apple.md", "footer:../common/footer.md"];
+        documendDirectory = "customer/farmers-market";
+        return expectedParams = {
+          placeholder: "apple.md",
+          footer: "common/footer.md"
+        };
       });
     });
   });
