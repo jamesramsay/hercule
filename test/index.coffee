@@ -1,7 +1,7 @@
 assert = require 'assert'
 md = require '../lib/transclude'
 
-describe 'markdown transclude', ->
+describe 'hercule', ->
   describe 'detectDependencies', ->
     it 'should whitespace on the first line of a file', ->
       document = "\t{{test}}"
@@ -46,3 +46,6 @@ describe 'markdown transclude', ->
       expectedParams =
         placeholder: "apple.md"
         footer: "common/footer.md"
+
+      md.parseParameters parameterScenario, "", null, (err, parsedParameters) ->
+        assert.deepEqual parsedParameters, expectedParams

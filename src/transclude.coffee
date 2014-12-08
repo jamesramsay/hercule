@@ -38,7 +38,7 @@ detectDependencies = (document, relativePath, verbose, cb) ->
     [filename, parameters...] = placeholder.split " "
 
     dependencies[placeholder] =
-      filename: path.join relativePath, filename
+      path: path.join relativePath, filename
       whitespace: whitespace
       parameters: parseParameters parameters, relativePath, verbose
 
@@ -47,12 +47,21 @@ detectDependencies = (document, relativePath, verbose, cb) ->
   cb null, placeholders, dependencies
 
 
+# Coffeescript object merge
+# gist.github.com/sheldonh/6089299
+merge = (xs...) ->
+  if xs?.length > 0
+    tap {}, (m) -> m[k] = v for k, v of x for x in xs
+
+tap = (o, fn) -> fn(o); o
+
+
 transclude = (file, parents = [], parameters, verbose, cb) ->
   # Recursively transclude the specified plain text file.
   #
   # file         : the name of the file to be transcluded
   # parents      : used for circular dependency checking
-  # parameters   : parameterized dependencies
+  # parameters   : parameterized dependencies {placeholder: filename, placeholder:filename}
 
   if verbose then console.error "Transcluding #{file}"
   relativePath = path.dirname file
@@ -80,12 +89,15 @@ transclude = (file, parents = [], parameters, verbose, cb) ->
       async.eachSeries placeholders, (placeholder, cb) ->
         dependency = dependencies[placeholder]
 
+        # Parameter is tried first, otherwise assumed direct file include
         if parameters?[placeholder]?
-          dependencyPath = parameters[placeholder]
-        else
-          dependencyPath = dependency.filename
+          dependency.path = parameters[placeholder]
 
-        transclude dependencyPath, parents[..], dependency.parameters, verbose, (err, output) ->
+        # Pass parent parameters through. Most recently referenced takes precendence.
+        if parameters is not null
+          dependency.parameters = merge parameters[..], dependency.parameters[..]
+
+        transclude dependency.path, parents[..], dependency.parameters, verbose, (err, output) ->
           if err then return cb err
 
           if dependency.whitespace
