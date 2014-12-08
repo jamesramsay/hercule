@@ -3,16 +3,17 @@
 > A simple document transclusion tool ideal for Markdown documents.
 
 [![Build Status](https://travis-ci.org/jamesramsay/hercule.svg)](https://travis-ci.org/jamesramsay/hercule)
+[![Dependency Status](https://david-dm.org/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
+
+[![NPM](https://nodei.co/npm/hercule.png)](https://nodei.co/npm/hercule/)
 
 ```bash
 hercule src/document.md -o document.md
 ```
 
-## Todo
-
-- Coveralls
-- NPM dependencies
-- Nesting placeholder context
+Hercule was written to make writing the [Adslot's](http://adslot.com) API documentation easier.
+Adslot use [Apiary](http://apiary.io) to document our APIs, and
+[Dredd](https://github.com/apiaryio/dredd) to make sure our APIs match the documentation.
 
 ## Writing documents
 
