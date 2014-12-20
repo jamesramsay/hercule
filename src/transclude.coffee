@@ -1,61 +1,59 @@
 async = require 'async'
 fs = require 'fs'
 path = require 'path'
-merge = require 'lodash.merge'
+_ = require 'lodash'
 
+placeholderRegExp = new RegExp(/([\t ]*)?{{(.+?)}}/g)
 WHITESPACE_GROUP = 1
-FILE_GROUP = 2
+PLACEHOLDER_GROUP = 2
+EOL_GROUP = 3
 
-parse = (parameters, dir, verbose) ->
-  if not parameters then return null
+parse = (overrideStrings, dir, verbose) ->
+  if not overrideStrings then return null
 
-  parsed = {}
+  overrides = []
 
-  for [placeholder, filename] in (p.split ":" for p in parameters)
-    if not filename
-      console.error "Malformed reference #{placeholder}. Expected placeholder:filename"
-    else
-      parsed[placeholder] = path.join dir, filename
+  for [placeholder, filename] in (o.split ":" for o in overrideStrings)
+    override =
+      placeholder: placeholder
 
-  return parsed
+    if filename isnt ''
+      override.file = path.join dir, filename
+
+    overrides.push override
+
+  if verbose and overrides.length > 0
+    console.error "     Parse: #{overrides.length} overrides found"
+
+  return overrides
 
 
-scan = (document, dir, verbose, cb) ->
-  references = {}
+scan = (document, file, verbose, cb) ->
+  dir = path.dirname file
 
-  # Analyse references and leading whitespace
-  # - Whitespace detection: ([^|\n]{1}[\t ]*)?
-  #     Locate whitespace from the start of the file or line
-  #     if immediately preceeding the reference.
-  # - References: ({{(.+?)}})
-  #     References are wrapped in double curly braces.
+  references = []
 
-  detect = new RegExp(/([^|\n]{1}[\t ]*)?{{(.+?)}}/g)
+  while (match = placeholderRegExp.exec document)
+    [filename, overrides...] = match[PLACEHOLDER_GROUP].split " "
 
-  placeholders = while (reference = detect.exec document)
+    ref =
+      file: path.join dir, filename
+      placeholder: match[PLACEHOLDER_GROUP]
+      overrides: parse overrides, dir, verbose
+      index: match.index
 
-    placeholder = reference[FILE_GROUP]
-    whitespace = reference[WHITESPACE_GROUP]
-    [filename, parameters...] = placeholder.split " "
+    if match[WHITESPACE_GROUP]?
+      ref.whitespace = match[WHITESPACE_GROUP]
 
-    references[placeholder] =
-      filepath: path.join dir, filename
-      whitespace: whitespace
-      parameters: parse parameters, dir, verbose
+    if document[match.index + match[0].length] is "\n"
+      ref.endOfLine = true
 
-    placeholder
+    references.push ref
 
-  cb null, placeholders, references
+  if verbose and references.length > 0
+    console.error "      Scan: #{references.length} references found"
 
-circularReferences = (file, parents = [], parameters = {}, cb) ->
-  # TODO: verbose output
-  # a.md -> b.md -> c.md -> d.md -> b.md
-  #         ^^^^
-
-  if file in parents
-    return cb "Error 1: Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
-
-  cb null
+  cb null, references
 
 
 readFile = (filename, cb) ->
@@ -63,53 +61,69 @@ readFile = (filename, cb) ->
     if err
       if err.type = 'ENOENT'
         console.error "#{filename} not found."
-        return cb null, ''
+        return cb null, null
+
       return cb err
 
     cb null, document.toString()
 
 
-transclude = (file, parents = [], parameters = {}, verbose, cb) ->
+apply = (file, placeholder, overrides, verbose) ->
+  [p, ...] = _.filter overrides, (o) -> return o?.placeholder is placeholder
+
+  if p?
+    if verbose then console.error "  Override: #{placeholder} >> #{p.file}"
+    return p.file
+
+  return file
+
+
+transclude = (file, parents = [], placeholderOverrides = [], verbose, cb) ->
   # Recursively transclude the specified plain text file.
-  #
-  # file         : the name of the file to be transcluded
-  # parents      : used for circular dependency checking
-  # parameters   : parameterized dependencies {placeholder: filename, placeholder:filename}
+  # file                 : the name of the file to be transcluded
+  # parents              : used for circular dependency checking
+  # placeholderOverrides : override a placeholder with an alternative dependency {{extend}} -> {{common.md}}
 
-  if verbose then console.error "Transcluding #{file}\n\tparents: #{JSON.stringify parents}\n\tparameters: #{JSON.stringify parameters}"
-  relativePath = path.dirname file
+  if verbose
+    console.error "Transclude: #{file} into #{parents[-1..][0]}"
 
-  circularReferences file, parents, parameters, (err) ->
-    if err then return cb err
+  # Simple loop checking
+  if file in parents then return cb "Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
 
   readFile file, (err, document) ->
     if err then return cb err
+    #if document is null then return cb null, document
 
-    scan document, relativePath, verbose, (err, placeholders, dependencies) ->
+    scan document, file, verbose, (err, references) ->
       if err then return cb err
 
-      if placeholders is [] then return cb null, document
+      # No references, then we're done!
+      if references.length < 1 then return cb null, document
 
-      async.eachSeries placeholders, (placeholder, cb) ->
-        dependency = dependencies[placeholder]
+      parents.push file
 
-        dependencyFilepath = if parameters[placeholder]? then parameters[placeholder] else dependency.filepath
-        dependencyParameters = merge parameters, dependency.parameters
+      async.eachSeries references, (reference, cb) ->
+        reference.file = apply reference.file, reference.placeholder, placeholderOverrides, verbose
+        reference.overrides = _.merge placeholderOverrides, reference.overrides
 
-        transclude dependencyFilepath, parents.concat([file]), dependencyParameters, verbose, (err, output) ->
+        transclude reference.file, parents[..], reference.overrides, verbose, (err, output) ->
           if err then return cb err
 
-          if dependency.whitespace
-            output = output.replace /\n/g, "\n#{dependency.whitespace}"
+          if output?
+            if reference.whitespace
+              # Allows indentation to be preserved
+              output = output.replace /\n/g, "\n#{reference.whitespace}"
 
-          insertionPoint = new RegExp("{{#{placeholder}}}", "g")
-          document = document.replace insertionPoint, output
+            if not reference.endOfLine
+              # Allows inline replacement by removing new line at EOF
+              output = output.replace /\n $/, ""
+
+            refRegExp = new RegExp("{{#{reference.placeholder}}}", "g")
+            document = document.replace refRegExp, output
 
           cb null
 
       , (err) ->
-        if err then return cb err
-
         cb null, document
 
 
@@ -117,5 +131,5 @@ module.exports = {
   transclude
   scan
   parse
-  circularReferences
+  apply
 }
