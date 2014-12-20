@@ -1,103 +1,108 @@
 async = require 'async'
 fs = require 'fs'
 path = require 'path'
+merge = require 'lodash.merge'
 
 WHITESPACE_GROUP = 1
 FILE_GROUP = 2
 
-parseParameters = (parameters, relativePath, verbose) ->
-  cb null, null if not parameters
+parse = (parameters, dir, verbose) ->
+  if not parameters then cb null, null
 
-  parsedParameters = {}
+  parsed = {}
 
   for [placeholder, filename] in (p.split ":" for p in parameters)
     if not filename
-      console.error "Malformed parameter #{placeholder}. Expected placeholder:filename"
-
+      console.error "Malformed reference #{placeholder}. Expected placeholder:filename"
     else
-      parsedParameters[placeholder] = path.join relativePath, filename
+      parsed[placeholder] = path.join dir, filename
 
-  return parsedParameters
+  return parsed
 
 
-detectDependencies = (document, relativePath, verbose, cb) ->
-  dependencies = {}
+scan = (document, dir, verbose, cb) ->
+  references = {}
 
-  # Detect dependencies and leading whitespace
+  # Analyse references and leading whitespace
   # - Whitespace detection: ([^|\n]{1}[\t ]*)?
   #     Locate whitespace from the start of the file or line
-  #     if immediately preceeding the dependency.
-  # - Dependency detection: ({{(.+?)}})
-  #     Dependecies are wrapped in double curly braces.
+  #     if immediately preceeding the reference.
+  # - References: ({{(.+?)}})
+  #     References are wrapped in double curly braces.
+
   detect = new RegExp(/([^|\n]{1}[\t ]*)?{{(.+?)}}/g)
 
-  placeholders = while (dependency = detect.exec document)
+  placeholders = while (reference = detect.exec document)
 
-    placeholder = dependency[FILE_GROUP]
-    whitespace = dependency[WHITESPACE_GROUP]
+    placeholder = reference[FILE_GROUP]
+    whitespace = reference[WHITESPACE_GROUP]
     [filename, parameters...] = placeholder.split " "
 
-    dependencies[placeholder] =
-      path: path.join relativePath, filename
+    references[placeholder] =
+      filepath: path.join dir, filename
       whitespace: whitespace
-      parameters: parseParameters parameters, relativePath, verbose
+      parameters: parse parameters, dir, verbose
 
     placeholder
 
-  cb null, placeholders, dependencies
+  cb null, placeholders, references
+
+circularReferences = (file, parents = [], parameters = {}, cb) ->
+  # TODO: verbose output
+  # a.md -> b.md -> c.md -> d.md -> b.md
+  #         ^^^^
+
+  if file in parents
+    return cb "Error 1: Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
+
+  for placeholder, reference of parameters
+    if reference == file
+      return cb "Error 2: Circular parameter reference detected. #{file} is included as a reference: #{placeholder}:#{reference}"
+
+  cb null
 
 
-# Coffeescript object merge
-# gist.github.com/sheldonh/6089299
-merge = (xs...) ->
-  if xs?.length > 0
-    tap {}, (m) -> m[k] = v for k, v of x for x in xs
+readFile = (filename, cb) ->
+  fs.readFile filename, (err, document) ->
+    if err
+      if err.type = 'ENOENT'
+        console.error "#{filename} not found."
+        return cb null, ''
+      return cb err
 
-tap = (o, fn) -> fn(o); o
+    cb null, document.toString()
 
 
-transclude = (file, parents = [], parameters, verbose, cb) ->
+transclude = (file, parents = [], parameters = {}, verbose, cb) ->
   # Recursively transclude the specified plain text file.
   #
   # file         : the name of the file to be transcluded
   # parents      : used for circular dependency checking
   # parameters   : parameterized dependencies {placeholder: filename, placeholder:filename}
 
-  if verbose then console.error "Transcluding #{file}"
+  if verbose then console.error "Transcluding #{file}\n\tparents: #{JSON.stringify parents}\n\tparameters: #{JSON.stringify parameters}"
   relativePath = path.dirname file
 
-  # Circular dependency checking
-  if file in parents then cb "circular dependencies detected"
+  circularReferences file, parents, parameters, (err) ->
+    if err then return cb err
+
   parents.push file
 
-  # Read file
-  fs.readFile file, (err, document) ->
-    if err
-      if err.type = 'ENOENT'
-        console.error "#{file} not found."
-        return cb null, ''
-      return cb err
+  readFile file, (err, document) ->
+    if err then return cb err
 
-    document = document.toString()
-
-    detectDependencies document, relativePath, verbose, (err, placeholders, dependencies) ->
+    scan document, relativePath, verbose, (err, placeholders, dependencies) ->
       if err then return cb err
 
-      if placeholders is []
-        return cb null, document
+      if placeholders is [] then return cb null, document
 
       async.eachSeries placeholders, (placeholder, cb) ->
         dependency = dependencies[placeholder]
 
-        # Parameter is tried first, otherwise assumed direct file include
-        if parameters?[placeholder]?
-          dependency.path = parameters[placeholder]
+        dependencyFilepath = if parameters[placeholder]? then parameters[placeholder] else dependency.filepath
+        dependencyParameters = merge parameters, dependency.parameters
 
-        # Pass parent parameters through. Most recently referenced takes precendence.
-        if parameters is not null
-          dependency.parameters = merge parameters[..], dependency.parameters[..]
-
-        transclude dependency.path, parents[..], dependency.parameters, verbose, (err, output) ->
+        transclude dependencyFilepath, parents[..], dependencyParameters, verbose, (err, output) ->
           if err then return cb err
 
           if dependency.whitespace
@@ -114,6 +119,7 @@ transclude = (file, parents = [], parameters, verbose, cb) ->
 
 module.exports = {
   transclude
-  detectDependencies
-  parseParameters
+  scan
+  parse
+  circularReferences
 }
