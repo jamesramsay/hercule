@@ -7,7 +7,7 @@ WHITESPACE_GROUP = 1
 FILE_GROUP = 2
 
 parse = (parameters, dir, verbose) ->
-  if not parameters then cb null, null
+  if not parameters then return null
 
   parsed = {}
 
@@ -55,10 +55,6 @@ circularReferences = (file, parents = [], parameters = {}, cb) ->
   if file in parents
     return cb "Error 1: Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
 
-  for placeholder, reference of parameters
-    if reference == file
-      return cb "Error 2: Circular parameter reference detected. #{file} is included as a reference: #{placeholder}:#{reference}"
-
   cb null
 
 
@@ -86,8 +82,6 @@ transclude = (file, parents = [], parameters = {}, verbose, cb) ->
   circularReferences file, parents, parameters, (err) ->
     if err then return cb err
 
-  parents.push file
-
   readFile file, (err, document) ->
     if err then return cb err
 
@@ -102,7 +96,7 @@ transclude = (file, parents = [], parameters = {}, verbose, cb) ->
         dependencyFilepath = if parameters[placeholder]? then parameters[placeholder] else dependency.filepath
         dependencyParameters = merge parameters, dependency.parameters
 
-        transclude dependencyFilepath, parents[..], dependencyParameters, verbose, (err, output) ->
+        transclude dependencyFilepath, parents.concat([file]), dependencyParameters, verbose, (err, output) ->
           if err then return cb err
 
           if dependency.whitespace
@@ -114,6 +108,8 @@ transclude = (file, parents = [], parameters = {}, verbose, cb) ->
           cb null
 
       , (err) ->
+        if err then return cb err
+
         cb null, document
 
 
