@@ -8,14 +8,50 @@
 
   describe('hercule', function() {
     describe('scan', function() {
-      it('should detect whitespace on the first line of a file', function() {
+      it('should not detect non-existant placeholders', function(done) {
+        var document;
+        document = "Test document\nwith no placeholders.";
+        hercule.scan(document, "", null, function(err, references) {
+          return assert.deepEqual(references, []);
+        });
+        return done();
+      });
+      it('should detect placeholders', function(done) {
+        var document;
+        document = "Test document\nwith {{one}} placeholder.";
+        hercule.scan(document, "", null, function(err, references) {
+          assert.equal(references.length, 1);
+          return assert.equal(references[0].endOfLine, null);
+        });
+        return done();
+      });
+      it('should detect multiple placeholders', function(done) {
+        var document;
+        document = "Test {{document}}\nwith {{two}} placeholders.";
+        hercule.scan(document, "", null, function(err, references) {
+          assert.equal(references.length, 2);
+          assert.equal(references[0].endOfLine, true);
+          return assert.equal(references[1].endOfLine, null);
+        });
+        return done();
+      });
+      it('should not detect non-existant leading whitespace', function(done) {
+        var document;
+        document = "word{{test.md}}word";
+        hercule.scan(document, "", null, function(err, references) {
+          return assert.equal(references[0].whitespace, null);
+        });
+        return done();
+      });
+      it('should detect whitespace on the first line of a file', function(done) {
         var document;
         document = "\t{{test}}";
-        return hercule.scan(document, "", null, function(err, placeholders, dependencies) {
-          return assert.equal(dependencies.test.whitespace, "\t");
+        hercule.scan(document, "", null, function(err, references) {
+          return assert.equal(references[0].whitespace, "\t");
         });
+        return done();
       });
-      return it('should detect different types of leading whitespace', function() {
+      it('should detect different types of leading whitespace', function(done) {
         var document, scenario, whitespace, whitespaceScenarios;
         document = "# Heading 1\n";
         whitespaceScenarios = {
@@ -27,75 +63,146 @@
           whitespace = whitespaceScenarios[scenario];
           document += "" + whitespace + "{{" + scenario + "}}\n";
         }
-        return hercule.scan(document, "", null, function(err, placeholders, dependencies) {
-          var _results;
+        hercule.scan(document, "", null, function(err, references) {
+          var reference, _i, _len, _results;
           _results = [];
-          for (scenario in whitespaceScenarios) {
-            whitespace = whitespaceScenarios[scenario];
-            _results.push(assert.equal(dependencies[scenario].whitespace, "" + whitespace));
+          for (_i = 0, _len = references.length; _i < _len; _i++) {
+            reference = references[_i];
+            _results.push(assert.equal(reference.whitespace, whitespaceScenarios[reference.placeholder]));
           }
           return _results;
         });
+        return done();
+      });
+      return it('should detect the placeholder index', function(done) {
+        var document;
+        document = "{{test}} test\n d {{test2}}";
+        hercule.scan(document, "", null, function(err, references) {
+          assert.equal(references[0].index, 0);
+          return assert.equal(references[1].index, 16);
+        });
+        return done();
       });
     });
     describe('parse', function() {
-      it('should parse references', function() {
-        var expectedParameters, parameterScenario;
-        parameterScenario = ["placeholder:filename.md"];
-        expectedParameters = {
-          placeholder: "filename.md"
-        };
-        return hercule.parse(parameterScenario, "", null, function(err, parsedParameters) {
-          return assert.deepEqual(parsedParameters, expectedParameters);
-        });
+      it('should return null if is nothing to parse', function(done) {
+        var parsed;
+        parsed = hercule.parse(null, null, null);
+        assert.equal(parsed, null);
+        return done();
       });
-      it('should parse multiple references', function() {
-        var expectedParameters, parameterScenario;
-        parameterScenario = ["placeholder:filename.md", "legal:legal/common.md"];
-        expectedParameters = {
-          placeholder: "filename.md",
-          legal: "legal/common.md"
-        };
-        return hercule.parse(parameterScenario, "", null, function(err, parsedParameters) {
-          return assert.deepEqual(parsedParameters, expectedParameters);
-        });
+      it('should parse a single reference', function(done) {
+        var parsed;
+        parsed = hercule.parse(["placeholder:filename.md"], "", null);
+        assert.deepEqual(parsed, [
+          {
+            placeholder: "placeholder",
+            file: "filename.md"
+          }
+        ]);
+        return done();
       });
-      return it('should parse references relative to the parent', function() {
-        var documendDirectory, expectedParameters, parameterScenario;
-        parameterScenario = ["fruit:apple.md", "footer:../common/footer.md"];
-        documendDirectory = "customer/farmers-market";
-        expectedParameters = {
-          placeholder: "apple.md",
-          footer: "common/footer.md"
-        };
-        return hercule.parse(parameterScenario, "", null, function(err, parsedParameters) {
-          return assert.deepEqual(parsedParameters, expectedParameters);
-        });
+      it('should parse special reference', function(done) {
+        var parsed;
+        parsed = hercule.parse(["extend:"], "", null);
+        assert.deepEqual(parsed, [
+          {
+            placeholder: "extend"
+          }
+        ]);
+        return done();
+      });
+      return it('should parse multiples references', function(done) {
+        var dir, expected, overrideStrings, parsed;
+        overrideStrings = ["fruit:apple.md", "footer:../common/footer.md"];
+        dir = "customer/farmers-market";
+        expected = [
+          {
+            placeholder: "fruit",
+            file: "customer/farmers-market/apple.md"
+          }, {
+            placeholder: "footer",
+            file: "customer/common/footer.md"
+          }
+        ];
+        parsed = hercule.parse(overrideStrings, dir, null);
+        assert.deepEqual(parsed, expected);
+        return done();
       });
     });
-    return describe('circularReferences', function() {
-      it('should not be found when there are no references', function() {
-        return hercule.circularReferences("file.md", null, null, function(err) {
-          return assert.equal(err, null);
+    describe('apply', function() {
+      it('should not change the placeholder when there are no overrides', function(done) {
+        var placeholder;
+        placeholder = hercule.apply("file.md", "file.md", []);
+        assert.equal(placeholder, "file.md");
+        return done();
+      });
+      it('should not change the placeholder when there are no matching overrides', function(done) {
+        var placeholder;
+        placeholder = hercule.apply("file.md", "file.md", [
+          {
+            placeholder: "footer",
+            file: "footer.md"
+          }
+        ]);
+        assert.equal(placeholder, "file.md");
+        return done();
+      });
+      return it('should change the placeholder when there is a matching override', function(done) {
+        var placeholder;
+        placeholder = hercule.apply("test.md", "footer", [
+          {
+            placeholder: "footer",
+            file: "footer.md"
+          }
+        ]);
+        assert.equal(placeholder, "footer.md");
+        return done();
+      });
+    });
+    return describe('transclude', function() {
+      it('should not change a file without references', function(done) {
+        var inputFile;
+        inputFile = __dirname + "/fixtures/test-base/fox.md";
+        return hercule.transclude(inputFile, null, null, false, function(err, document) {
+          if (err) {
+            return cb(err);
+          }
+          assert.equal(document, 'The quick brown fox jumps over the lazy dog.\n');
+          return done();
         });
       });
-      it('should detect circular references', function() {
-        var parents;
-        parents = ["document.md", "contents.md", "file.md"];
-        return hercule.circularReferences("file.md", parents, null, function(err) {
-          return assert.notEqual(err, null);
+      it('should not change a file without valid references', function(done) {
+        var inputFile;
+        inputFile = __dirname + "/fixtures/test-invalid/fox.md";
+        return hercule.transclude(inputFile, null, null, false, function(err, document) {
+          if (err) {
+            return cb(err);
+          }
+          assert.equal(document, 'The quick brown fox {{jumps}} over the lazy dog.\n');
+          return done();
         });
       });
-      return it('should prevent circular parameterised references', function() {
-        var parameters, parents;
-        parents = ["contents.md"];
-        parameters = {
-          header: "header.md",
-          footer: "footer.md",
-          extend: "file.md"
-        };
-        return hercule.circularReferences("file.md", parents, parameters, function(err) {
-          return assert.notEqual(err, null);
+      it('should transclude files with valid references', function(done) {
+        var inputFile;
+        inputFile = __dirname + "/fixtures/test-basic/jackdaw.md";
+        return hercule.transclude(inputFile, null, null, false, function(err, document) {
+          if (err) {
+            return cb(err);
+          }
+          assert.equal(document, 'Jackdaws love my big sphinx of quartz.\n');
+          return done();
+        });
+      });
+      return it('should transclude files with valid references and overrides', function(done) {
+        var inputFile;
+        inputFile = __dirname + "/fixtures/test-extend/fox.md";
+        return hercule.transclude(inputFile, null, null, false, function(err, document) {
+          if (err) {
+            return cb(err);
+          }
+          assert.equal(document, "The quick brown fox jumps over the lazy dog\n  .\n");
+          return done();
         });
       });
     });
