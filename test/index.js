@@ -20,8 +20,7 @@
         var document;
         document = "Test document\nwith {{one}} placeholder.";
         hercule.scan(document, "", null, function(err, references) {
-          assert.equal(references.length, 1);
-          return assert.equal(references[0].endOfLine, null);
+          return assert.equal(references.length, 1);
         });
         return done();
       });
@@ -29,9 +28,7 @@
         var document;
         document = "Test {{document}}\nwith {{two}} placeholders.";
         hercule.scan(document, "", null, function(err, references) {
-          assert.equal(references.length, 2);
-          assert.equal(references[0].endOfLine, true);
-          return assert.equal(references[1].endOfLine, null);
+          return assert.equal(references.length, 2);
         });
         return done();
       });
@@ -201,7 +198,7 @@
           if (err) {
             return cb(err);
           }
-          assert.equal(document, "The quick brown fox jumps over the lazy dog\n  .\n");
+          assert.equal(document, "The quick brown fox jumps over the lazy dog.\n");
           return done();
         });
       });
