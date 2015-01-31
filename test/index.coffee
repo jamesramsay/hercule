@@ -16,7 +16,6 @@ describe 'hercule', ->
 
       hercule.scan document, "", null, (err, references) ->
         assert.equal references.length, 1
-        assert.equal references[0].endOfLine, null
 
       done()
 
@@ -25,8 +24,6 @@ describe 'hercule', ->
 
       hercule.scan document, "", null, (err, references) ->
         assert.equal references.length, 2
-        assert.equal references[0].endOfLine, true
-        assert.equal references[1].endOfLine, null
 
       done()
 
@@ -163,6 +160,6 @@ describe 'hercule', ->
 
       hercule.transclude inputFile, null, null, false, (err, document) ->
         if err then return cb err
-        assert.equal document, "The quick brown fox jumps over the lazy dog\n  .\n"
+        assert.equal document, "The quick brown fox jumps over the lazy dog.\n"
 
         done()

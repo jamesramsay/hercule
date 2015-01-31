@@ -45,9 +45,6 @@ scan = (document, file, verbose, cb) ->
     if match[WHITESPACE_GROUP]?
       ref.whitespace = match[WHITESPACE_GROUP]
 
-    if document[match.index + match[0].length] is "\n"
-      ref.endOfLine = true
-
     references.push ref
 
   if verbose and references.length > 0
@@ -111,13 +108,13 @@ transclude = (file, parents = [], placeholderOverrides = [], verbose, cb) ->
 
           if output?
             if reference.whitespace
-              # Allows indentation to be preserved
+              # Preserve indentation if transclude is not preceded by content
               output = output.replace /\n/g, "\n#{reference.whitespace}"
 
-            if not reference.endOfLine
-              # Allows inline replacement by removing new line at EOF
-              output = output.replace /\n $/, ""
+            # Remove new lines at EOF which cause unexpected paragraphs and breaks
+            output = output.replace /\n $/, ""
 
+            if verbose then console.error "    Output:#{JSON.stringify output}"
             refRegExp = new RegExp("{{#{reference.placeholder}}}", "g")
             document = document.replace refRegExp, output
 
