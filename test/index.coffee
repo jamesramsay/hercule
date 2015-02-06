@@ -1,3 +1,4 @@
+fs = require 'fs'
 assert = require 'assert'
 hercule = require '../lib/transclude'
 
@@ -28,7 +29,7 @@ describe 'hercule', ->
       done()
 
     it 'should not detect non-existant leading whitespace', (done) ->
-      document = "word{{test.md}}word"
+      document = "word {{test.md}}word"
 
       hercule.scan document, "", null, (err, references) ->
         assert.equal references[0].whitespace, null
@@ -64,7 +65,7 @@ describe 'hercule', ->
 
       hercule.scan document, "", null, (err, references) ->
         assert.equal references[0].index, 0
-        assert.equal references[1].index, 16
+        assert.equal references[1].index, 17
 
       done()
 
@@ -161,5 +162,15 @@ describe 'hercule', ->
       hercule.transclude inputFile, null, null, false, (err, document) ->
         if err then return cb err
         assert.equal document, "The quick brown fox jumps over the lazy dog.\n"
+
+        done()
+
+    it 'should transcule without introducing shit whitespace', (done) ->
+      inputFile = __dirname + "/fixtures/test-multiline/jabberwocky.md"
+      expectFile = __dirname + "/fixtures/test-multiline/expected.md"
+
+      hercule.transclude inputFile, null, null, false, (err, document) ->
+        if err then return cb err
+        assert.equal document,  (fs.readFileSync expectFile).toString()
 
         done()

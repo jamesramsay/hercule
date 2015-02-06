@@ -3,10 +3,9 @@ fs = require 'fs'
 path = require 'path'
 _ = require 'lodash'
 
-placeholderRegExp = new RegExp(/([\t ]*)?{{(.+?)}}/g)
+placeholderRegExp = new RegExp(/(^[\t ]*)?{{(.+?)}}/gm)
 WHITESPACE_GROUP = 1
 PLACEHOLDER_GROUP = 2
-EOL_GROUP = 3
 
 parse = (overrideStrings, dir, verbose) ->
   if not overrideStrings then return null
@@ -44,6 +43,7 @@ scan = (document, file, verbose, cb) ->
 
     if match[WHITESPACE_GROUP]?
       ref.whitespace = match[WHITESPACE_GROUP]
+      if verbose then console.error "Whitespace: '#{JSON.stringify ref.whitespace}' leading whitespace"
 
     references.push ref
 
@@ -112,7 +112,7 @@ transclude = (file, parents = [], placeholderOverrides = [], verbose, cb) ->
               output = output.replace /\n/g, "\n#{reference.whitespace}"
 
             # Remove new lines at EOF which cause unexpected paragraphs and breaks
-            output = output.replace /\n $/, ""
+            output = output.replace /\n$/, ""
 
             if verbose then console.error "    Output:#{JSON.stringify output}"
             refRegExp = new RegExp("{{#{reference.placeholder}}}", "g")
