@@ -2,30 +2,34 @@ async = require 'async'
 fs = require 'fs'
 path = require 'path'
 _ = require 'lodash'
+peg = require 'pegjs'
+
+grammar = require './grammar'
+placeholderParser = peg.buildParser grammar.transcludeGrammar
 
 placeholderRegExp = new RegExp(/([\t ]*)?{{(.+?)}}/g)
 WHITESPACE_GROUP = 1
 PLACEHOLDER_GROUP = 2
 EOL_GROUP = 3
 
-parse = (overrideStrings, dir, verbose) ->
-  if not overrideStrings then return null
 
-  overrides = []
+parse = (placeholder, whitespace, dir, verbose) ->
+  ref = placeholderParser.parse placeholder
+  ref.file = path.join dir, ref.file
+  ref.placeholder = placeholder
 
-  for [placeholder, filename] in (o.split ":" for o in overrideStrings)
-    override =
-      placeholder: placeholder
+  # Overrides are relative
+  for o in ref.overrides
+    if o.type is "file"
+      o.value = path.join dir, o.value
 
-    if filename isnt ''
-      override.file = path.join dir, filename
+  if whitespace?
+    ref.whitespace = whitespace
 
-    overrides.push override
+  if verbose and ref.overrides.length
+    console.error "     Parse: #{ref.overrides.length} overrides found"
 
-  if verbose and overrides.length > 0
-    console.error "     Parse: #{overrides.length} overrides found"
-
-  return overrides
+  return ref
 
 
 scan = (document, file, verbose, cb) ->
@@ -34,16 +38,7 @@ scan = (document, file, verbose, cb) ->
   references = []
 
   while (match = placeholderRegExp.exec document)
-    [filename, overrides...] = match[PLACEHOLDER_GROUP].split " "
-
-    ref =
-      file: path.join dir, filename
-      placeholder: match[PLACEHOLDER_GROUP]
-      overrides: parse overrides, dir, verbose
-      index: match.index
-
-    if match[WHITESPACE_GROUP]?
-      ref.whitespace = match[WHITESPACE_GROUP]
+    ref = parse match[PLACEHOLDER_GROUP], match[WHITESPACE_GROUP], dir, verbose
 
     references.push ref
 
@@ -69,8 +64,8 @@ apply = (file, placeholder, overrides, verbose) ->
   [p, ...] = _.filter overrides, (o) -> return o?.placeholder is placeholder
 
   if p?
-    if verbose then console.error "  Override: #{placeholder} >> #{p.file}"
-    return p.file
+    if verbose then console.error "  Override: #{placeholder} >> #{p.value}"
+    return p.value
 
   return file
 

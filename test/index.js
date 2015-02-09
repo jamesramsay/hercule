@@ -48,7 +48,7 @@
         });
         return done();
       });
-      it('should detect different types of leading whitespace', function(done) {
+      return it('should detect different types of leading whitespace', function(done) {
         var document, scenario, whitespace, whitespaceScenarios;
         document = "# Heading 1\n";
         whitespaceScenarios = {
@@ -71,59 +71,66 @@
         });
         return done();
       });
-      return it('should detect the placeholder index', function(done) {
-        var document;
-        document = "{{test}} test\n d {{test2}}";
-        hercule.scan(document, "", null, function(err, references) {
-          assert.equal(references[0].index, 0);
-          return assert.equal(references[1].index, 16);
+    });
+    describe('parse', function() {
+      it('should parse a single file reference', function(done) {
+        var parsed, testPlaceholder;
+        testPlaceholder = "file placeholder:filename.md";
+        parsed = hercule.parse(testPlaceholder, null, "", null);
+        assert.deepEqual(parsed, {
+          file: "file",
+          placeholder: testPlaceholder,
+          overrides: [
+            {
+              placeholder: "placeholder",
+              type: "file",
+              value: "filename.md"
+            }
+          ]
         });
         return done();
       });
-    });
-    describe('parse', function() {
-      it('should return null if is nothing to parse', function(done) {
-        var parsed;
-        parsed = hercule.parse(null, null, null);
-        assert.equal(parsed, null);
-        return done();
-      });
-      it('should parse a single reference', function(done) {
-        var parsed;
-        parsed = hercule.parse(["placeholder:filename.md"], "", null);
-        assert.deepEqual(parsed, [
-          {
-            placeholder: "placeholder",
-            file: "filename.md"
-          }
-        ]);
-        return done();
-      });
-      it('should parse special reference', function(done) {
-        var parsed;
-        parsed = hercule.parse(["extend:"], "", null);
-        assert.deepEqual(parsed, [
-          {
-            placeholder: "extend"
-          }
-        ]);
+      it('should parse a special reference', function(done) {
+        var parsed, testPlaceholder;
+        testPlaceholder = "file extend:";
+        parsed = hercule.parse(testPlaceholder, null, "", null);
+        assert.deepEqual(parsed, {
+          file: "file",
+          placeholder: testPlaceholder,
+          overrides: [
+            {
+              placeholder: "extend",
+              type: "string",
+              value: ""
+            }
+          ]
+        });
         return done();
       });
       return it('should parse multiples references', function(done) {
-        var dir, expected, overrideStrings, parsed;
-        overrideStrings = ["fruit:apple.md", "footer:../common/footer.md"];
+        var dir, parsed, testPlaceholder;
+        testPlaceholder = "file fruit:apple.md footer:../common/footer.md copyright:\"Copyright 2014 (c)\"";
         dir = "customer/farmers-market";
-        expected = [
-          {
-            placeholder: "fruit",
-            file: "customer/farmers-market/apple.md"
-          }, {
-            placeholder: "footer",
-            file: "customer/common/footer.md"
-          }
-        ];
-        parsed = hercule.parse(overrideStrings, dir, null);
-        assert.deepEqual(parsed, expected);
+        parsed = hercule.parse(testPlaceholder, null, dir, null);
+        assert.deepEqual(parsed, {
+          file: "customer/farmers-market/file",
+          placeholder: testPlaceholder,
+          overrides: [
+            {
+              placeholder: "fruit",
+              type: "file",
+              value: "customer/farmers-market/apple.md"
+            }, {
+              placeholder: "footer",
+              type: "file",
+              value: "customer/common/footer.md"
+            }, {
+              placeholder: "copyright",
+              type: "string",
+              value: "Copyright 2014 (c)"
+            }
+          ]
+        });
         return done();
       });
     });
@@ -139,7 +146,8 @@
         placeholder = hercule.apply("file.md", "file.md", [
           {
             placeholder: "footer",
-            file: "footer.md"
+            type: "file",
+            value: "footer.md"
           }
         ]);
         assert.equal(placeholder, "file.md");
@@ -150,7 +158,8 @@
         placeholder = hercule.apply("test.md", "footer", [
           {
             placeholder: "footer",
-            file: "footer.md"
+            type: "file",
+            value: "footer.md"
           }
         ]);
         assert.equal(placeholder, "footer.md");

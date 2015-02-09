@@ -59,51 +59,59 @@ describe 'hercule', ->
 
       done()
 
-    it 'should detect the placeholder index', (done) ->
-      document = "{{test}} test\n d {{test2}}"
-
-      hercule.scan document, "", null, (err, references) ->
-        assert.equal references[0].index, 0
-        assert.equal references[1].index, 16
-
-      done()
-
 
   describe 'parse', ->
-    it 'should return null if is nothing to parse', (done) ->
-      parsed = hercule.parse null, null, null
-      assert.equal parsed, null
+    it 'should parse a single file reference', (done) ->
+      testPlaceholder = "file placeholder:filename.md"
+      parsed = hercule.parse testPlaceholder, null, "", null
+      assert.deepEqual parsed, {
+        file: "file"
+        placeholder: testPlaceholder
+        overrides: [
+          placeholder: "placeholder"
+          type: "file"
+          value: "filename.md"
+        ]
+      }
 
       done()
 
-    it 'should parse a single reference', (done) ->
-      parsed = hercule.parse ["placeholder:filename.md"], "", null
-      assert.deepEqual parsed, [{placeholder: "placeholder", file: "filename.md"}]
-
-      done()
-
-    it 'should parse special reference', (done) ->
-      parsed = hercule.parse ["extend:"], "", null
-      assert.deepEqual parsed, [{placeholder: "extend"}]
+    it 'should parse a special reference', (done) ->
+      testPlaceholder = "file extend:"
+      parsed = hercule.parse testPlaceholder, null, "", null
+      assert.deepEqual parsed, {
+        file: "file"
+        placeholder: testPlaceholder
+        overrides: [
+          placeholder: "extend"
+          type: "string"
+          value: ""
+        ]
+      }
 
       done()
 
     it 'should parse multiples references', (done) ->
-      overrideStrings = [
-        "fruit:apple.md"
-        "footer:../common/footer.md"
-      ]
+      testPlaceholder = "file fruit:apple.md footer:../common/footer.md copyright:\"Copyright 2014 (c)\""
       dir = "customer/farmers-market"
-      expected = [
+      parsed = hercule.parse testPlaceholder, null, dir, null
+      assert.deepEqual parsed, {
+        file: "customer/farmers-market/file"
+        placeholder: testPlaceholder
+        overrides: [
           placeholder: "fruit"
-          file: "customer/farmers-market/apple.md"
+          type: "file"
+          value: "customer/farmers-market/apple.md"
         ,
           placeholder: "footer"
-          file: "customer/common/footer.md"
+          type: "file"
+          value: "customer/common/footer.md"
+        ,
+          placeholder:"copyright"
+          type:"string"
+          value:"Copyright 2014 (c)"
         ]
-
-      parsed = hercule.parse overrideStrings, dir, null
-      assert.deepEqual parsed, expected
+      }
 
       done()
 
@@ -115,13 +123,13 @@ describe 'hercule', ->
       done()
 
     it 'should not change the placeholder when there are no matching overrides', (done) ->
-      placeholder = hercule.apply "file.md", "file.md", [{placeholder: "footer", file: "footer.md"}]
+      placeholder = hercule.apply "file.md", "file.md", [{placeholder: "footer", type: "file", value: "footer.md"}]
       assert.equal placeholder, "file.md"
 
       done()
 
     it 'should change the placeholder when there is a matching override', (done) ->
-      placeholder = hercule.apply "test.md", "footer", [{placeholder: "footer", file: "footer.md"}]
+      placeholder = hercule.apply "test.md", "footer", [{placeholder: "footer", type: "file", value: "footer.md"}]
       assert.equal placeholder, "footer.md"
 
       done()
