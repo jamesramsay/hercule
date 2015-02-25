@@ -1,21 +1,102 @@
-# Hercule
-
-> A simple document transclusion tool ideal for Markdown documents.
+# Hercule – Markdown Transclusion Tool
 
 [![Build Status](https://travis-ci.org/jamesramsay/hercule.svg)](https://travis-ci.org/jamesramsay/hercule)
 [![Dependency Status](https://david-dm.org/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
 [![NPM](https://nodei.co/npm/hercule.png)](https://nodei.co/npm/hercule/)
 
-```bash
-hercule src/document.md -o document.md
+Write large markdown documents, including API Blueprints, while keeping things DRY (don't repeat yourself).
+
+Hercule is a command-line tool for transcluding markdown documents, including API documentation written in [API Blueprint](http://apiblueprint.org) format. With Hercule you can easily break complex documents into smaller logical documents, preventing repetition and improving consistency.
+
+## Installation
+
+[Node.js](http://nodejs.org) and [NPM](http://npmjs.org) is required.
+
+```
+$ npm install -g hercule
 ```
 
-Hercule was written to make writing the [Adslot's](http://adslot.com) API documentation easier.
-Adslot use [Apiary](http://apiary.io) to document our APIs, and
-[Dredd](https://github.com/apiaryio/dredd) to make sure our APIs match the documentation.
+## Example: API Blueprint
 
-## Writing documents
+Borrowing from the Apiary [Gist Fox Tutorial example](http://apiary.io/blueprint), API Blueprint documents can be split into logical files and share common elements.
+
+This example uses a different file for `gists` and `gists/{id}`, and shares a common file `gist.json`.
+
+```
+$ hercule gist-fox.source.apib -o gist-fox.apib
+```
+
+Hercule accepts a single source file, in this example `gist-fox.source.apib`.
+
+```markdown
+FORMAT: 1A
+
+# Gist Fox API
+Gist Fox API is a **pastes service** similar to [GitHub's Gist](http://gist.github.com).
+
+{{blueprint/gist.md}}
+{{blueprint/gists.md}}
+```
+
+Each resource is being stored in its own file, `gist.md` and `gists.md` respectively.
+
+```markdown
+## Gist [/gists/{id}]
+A single Gist object.
+The Gist resource is the central resource in the Gist Fox API.
+It represents one paste - a single text note.
+
++ Parameters
+  + id (string) ... ID of the Gist in the form of a hash.
+
++ Model
+
+    + Body
+
+          {{gist.json}}
+
+### Retrieve a Single Gist [GET]
+
++ Response 200
+
+  [Gist][]
+```
+
+```markdown
+## Gists Collection [/gists{?since}]
+Collection of all Gists.
+
++ Model
+
+    + Body
+
+          {
+            "gists": [
+              {{gist.json}}
+            ]
+          }
+
+
+### List All Gists [GET]
+
++ Response 200
+
+  [Gists Collection][]
+```
+
+The common JSON body is stored in `gist.json`.
+
+```json
+{
+  "id": "42",
+  "created_at": "2014-04-14T02:15:15Z",
+  "description": "Description of Gist",
+  "content": "String contents"
+}
+```
+
+## Example: Technical documents
 
 Writing long documents, particularly technical documents, may require repetition of certain information.
 Hercule helps reduce repetition in line with DRY–don't repeat yourself–principles.
