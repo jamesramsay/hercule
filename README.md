@@ -1,6 +1,7 @@
 # Hercule – Markdown Transclusion Tool
 
 [![Build Status](https://travis-ci.org/jamesramsay/hercule.svg)](https://travis-ci.org/jamesramsay/hercule)
+[![Coverage Status](https://coveralls.io/repos/jamesramsay/hercule/badge.svg)](https://coveralls.io/r/jamesramsay/hercule)
 [![Dependency Status](https://david-dm.org/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
 [![NPM](https://nodei.co/npm/hercule.png)](https://nodei.co/npm/hercule/)
