@@ -4,9 +4,17 @@
   "description": "Markdown transcluder",
   "main": "./lib/main",
   "scripts": {
-    "test": "mocha test --reporter spec",
+    "test": "./node_modules/.bin/mocha test --reporter spec",
+    "coverage": "./node_modules/.bin/mocha --require blanket --reporter html-cov > coverage.html && open coverage.html",
+    "coveralls": "./node_modules/.bin/mocha --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js",
     "watch": "coffee --output lib -cw src/*",
     "watch-tests": "coffee --output test -cw test/*.coffee"
+  },
+  "config": {
+    "blanket": {
+      "pattern": "lib",
+      "data-cover-never": "node_modules"
+    }
   },
   "bin": {
     "hercule": "./bin/transclude"
@@ -34,10 +42,13 @@
     "async": "^0.9.0",
     "dashdash": "^1.7.0",
     "lodash": "^3.0.0",
-    "pegjs": "^0.8.0"
+    "pegjs": "^0.8.0",
+    "blanket": "^1.1.6",
+    "coveralls": "^2.11.2"
   },
   "devDependencies": {
     "coffee-script": "^1.7.0",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+    "mocha-lcov-reporter": "0.0.2"
   }
 }
