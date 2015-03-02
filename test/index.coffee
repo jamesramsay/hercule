@@ -59,6 +59,13 @@ describe 'hercule', ->
 
       done()
 
+    it 'should detect alternate link syntax', (done) ->
+      document = "Test :[document](document)\nwith :[two](two) placeholders."
+      hercule.scan document, "", null, (err, references) ->
+        assert.equal references.length, 2
+
+      done();
+
 
   describe 'parse', ->
     it 'should parse a single file reference', (done) ->
@@ -156,6 +163,15 @@ describe 'hercule', ->
 
     it 'should transclude files with valid references', (done) ->
       inputFile = __dirname + "/fixtures/test-basic/jackdaw.md"
+
+      hercule.transclude inputFile, null, null, false, (err, document) ->
+        if err then return cb err
+        assert.equal document, 'Jackdaws love my big sphinx of quartz.\n'
+
+        done()
+
+    it 'should transclude files with valid references with alternate syntax', (done) ->
+      inputFile = __dirname + "/fixtures/test-link-syntax/jackdaw.md"
 
       hercule.transclude inputFile, null, null, false, (err, document) ->
         if err then return cb err
