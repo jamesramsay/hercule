@@ -1,0 +1,10 @@
+FORMAT: 1A
+
+# Gist Fox API
+Gist Fox API is a **pastes service** similar to [GitHub's Gist](http://gist.github.com).
+
+# Group Gist
+
+:[Gist](blueprint/gist.md)
+
+:[Gists](blueprint/gists.md)

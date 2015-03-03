@@ -1,1 +1,1 @@
-jumps over the {{state}} {{animal}}
+jumps over the :[state](state) :[animal](animal)

@@ -4,48 +4,42 @@ path = require 'path'
 _ = require 'lodash'
 peg = require 'pegjs'
 
-grammar = require './grammar'
-placeholderParser = peg.buildParser grammar.transcludeGrammar
+VERBOSE = false
 
-placeholderRegExp = new RegExp(/([\t ]*)?{{(.+?)}}/g)
+# Link detection (including leading whitespace)
+linkRegExp = new RegExp(/(^[\t ]*)?(\:\[.*?\]\(.*?\))/gm)
 WHITESPACE_GROUP = 1
-PLACEHOLDER_GROUP = 2
-EOL_GROUP = 3
+LINK_GROUP = 2
+
+# Link parser (using pegjs)
+grammar = require './grammar'
+linkParser = peg.buildParser grammar.transcludeGrammar
 
 
-parse = (placeholder, whitespace, dir, verbose) ->
-  ref = placeholderParser.parse placeholder
-  ref.file = path.join dir, ref.file
-  ref.placeholder = placeholder
+parse = (link, dir = "") ->
+  parsed = linkParser.parse link.placeholder
+  logger "Parse: #{parsed.references.length} references found"
 
-  # Overrides are relative
-  for o in ref.overrides
-    if o.type is "file"
-      o.value = path.join dir, o.value
+  # Links are relative to the document they are declared
+  parsed.references.forEach (ref) ->
+    if ref.type is "file"
+      ref.value = path.join dir, ref.value
 
-  if whitespace?
-    ref.whitespace = whitespace
-
-  if verbose and ref.overrides.length
-    console.error "     Parse: #{ref.overrides.length} overrides found"
-
-  return ref
+  return _.merge link, parsed
 
 
-scan = (document, file, verbose, cb) ->
-  dir = path.dirname file
+scan = (document) ->
+  links = []
 
-  references = []
+  while (match = linkRegExp.exec document)
+    links.push {
+      placeholder: match[LINK_GROUP]
+      whitespace: if match[WHITESPACE_GROUP] then match[WHITESPACE_GROUP] else ""
+    }
 
-  while (match = placeholderRegExp.exec document)
-    ref = parse match[PLACEHOLDER_GROUP], match[WHITESPACE_GROUP], dir, verbose
+  logger "Scan: #{links.length} links found"
 
-    references.push ref
-
-  if verbose and references.length > 0
-    console.error "      Scan: #{references.length} references found"
-
-  cb null, references
+  return links
 
 
 readFile = (filename, cb) ->
@@ -60,68 +54,65 @@ readFile = (filename, cb) ->
     cb null, document.toString()
 
 
-apply = (file, placeholder, overrides, verbose) ->
-  [p, ...] = _.filter overrides, (o) -> return o?.placeholder is placeholder
+expand = (file, references, dir = "") ->
+  # :[something](FILE) >> :[something](content.md)
+  [p, ...] = _.filter references, (ref) -> return ref?.placeholder is file
 
   if p?
-    if verbose then console.error "  Override: #{placeholder} >> #{p.value}"
-    return p.value
+    logger "Expanding: #{file} >> #{p.value}"
+    file = p.value
+  else
+    file = path.join dir, file
 
   return file
 
+logger = (message) ->
+  if VERBOSE then console.error message
 
-transclude = (file, parents = [], placeholderOverrides = [], verbose, cb) ->
-  # Recursively transclude the specified plain text file.
-  # file                 : the name of the file to be transcluded
-  # parents              : used for circular dependency checking
-  # placeholderOverrides : override a placeholder with an alternative dependency {{extend}} -> {{common.md}}
+transclude = (file, dir = "", parents = [], references = [], cb) ->
+  file = expand file, references, dir
+  dir = path.dirname file
 
-  if verbose
-    console.error "Transclude: #{file} into #{parents[-1..][0]}"
+  if file in parents
+    return cb "Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
 
-  # Simple loop checking
-  if file in parents then return cb "Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
+  parents.push file
+  logger "Transclude: #{file} into #{parents[-1..][0]}"
 
   readFile file, (err, document) ->
     if err then return cb err
-    #if document is null then return cb null, document
 
-    scan document, file, verbose, (err, references) ->
-      if err then return cb err
+    links = _.forEach (scan document), (link) -> return link = parse link, dir
+    if links.length < 1
+      return cb null, document
 
-      # No references, then we're done!
-      if references.length < 1 then return cb null, document
+    async.eachSeries links, (link, cb) ->
+      link.references = _.merge references, link.references
 
-      parents.push file
+      transclude link.file, dir, parents[..], link.references, (err, output) ->
+        if err then return cb err
 
-      async.eachSeries references, (reference, cb) ->
-        reference.file = apply reference.file, reference.placeholder, placeholderOverrides, verbose
-        reference.overrides = _.merge placeholderOverrides, reference.overrides
+        if output?
+          # Preserve indentation if transclude is not preceded by content
+          output = output.replace /\n/g, "\n#{link.whitespace}"
 
-        transclude reference.file, parents[..], reference.overrides, verbose, (err, output) ->
-          if err then return cb err
+          # Remove new lines at EOF which cause unexpected paragraphs and breaks
+          output = output.replace /\n$/, ""
 
-          if output?
-            if reference.whitespace
-              # Preserve indentation if transclude is not preceded by content
-              output = output.replace /\n/g, "\n#{reference.whitespace}"
+          document = document.replace "#{link.placeholder}", output
+          logger "Replaced: \"#{link.placeholder}\"\n    with: #{JSON.stringify output}"
 
-            # Remove new lines at EOF which cause unexpected paragraphs and breaks
-            output = output.replace /\n $/, ""
+        cb null
 
-            if verbose then console.error "    Output:#{JSON.stringify output}"
-            refRegExp = new RegExp("{{#{reference.placeholder}}}", "g")
-            document = document.replace refRegExp, output
-
-          cb null
-
-      , (err) ->
-        cb null, document
+    , (err) ->
+      cb err, document
 
 
 module.exports = {
   transclude
   scan
   parse
-  apply
+  expand
+  readFile
+  VERBOSE
 }
