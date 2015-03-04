@@ -38,7 +38,8 @@ main = ->
   output = ""
 
   async.eachSeries opts._args, (input, cb) ->
-    md.transclude input, null, null, opts.verbose, (err, document) ->
+    md.VERBOSE = opts.verbose
+    md.transclude input, null, null, null, (err, document) ->
       if err then return cb err
       output += document
       cb null

@@ -1,9 +1,10 @@
 transcludeGrammar = """
 start
-  = f:file ' '? o:arg* {
+  = ':' '[' n:placeholder? ']' '(' f:filename? ' '? o:arg* ')' {
       return {
-        "file": f.value,
-        "overrides": o
+        "file": f,
+        "name": n,
+        "references": o
       };
     }
 
@@ -21,14 +22,19 @@ placeholder
       return p.join("");
     }
 
+filename
+  = f:[^ ()\"]+ {
+      return f.join("");
+    }
+
 override
   = file / string / reset
 
 file
-  = f:[^ \"]+ {
+  = f:filename {
       return {
         "type": "file",
-        "value": f.join("")
+        "value": f
       };
     }
 
