@@ -1,7 +1,16 @@
 language: node_js
 node_js:
-  - "0.10"
+  - '0.10'
+script: npm run travis
 before_script:
   - npm run compile
 after_success:
   - npm run coveralls
+deploy:
+  provider: npm
+  email: git@jwr.vc
+  api_key:
+    secure: Hbd6eYtt4GiBLwru4GetULUTn49pudkDzo3Eof0/FkR7id8eONuPxbl4Wsf/ZB6C0VWBqbY2od/tCCeiUEa5sbEaZT79NQQCnygtZVjC1N/Aynt0Tzq3jjaBP7wOiq5rDzQPVESCloYD6cc0+O+siVz88EzwLzicl0W1tPAwM6o=
+  on:
+    tags: true
+    repo: jamesramsay/hercule
