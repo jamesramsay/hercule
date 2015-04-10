@@ -2,7 +2,8 @@
 # A simple markdown transclusion tool
 # Author: james ramsay
 
-blanket = require 'blanket'
+
+blanket = require 'blanket' if process.env.COVERAGE
 md = require './transclude'
 dashdash = require 'dashdash'
 fs = require 'fs'
