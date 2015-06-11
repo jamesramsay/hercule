@@ -61,17 +61,22 @@ expand = (file, references, dir = "") ->
   if p?
     logger "Expanding: #{file} >> #{p.value}"
     file = p.value
+    type = p.type
   else
     file = path.join dir, file
+    type = "file"
 
-  return file
+  return {file: file, type: type}
 
 logger = (message) ->
   if VERBOSE then console.error message
 
 transclude = (file, dir = "", parents = [], references = [], cb) ->
-  file = expand file, references, dir
+  {file, type} = expand file, references, dir
   dir = path.dirname file
+
+  if type is "string"
+    return cb null, file
 
   if file in parents
     return cb "Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"

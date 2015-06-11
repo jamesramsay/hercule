@@ -138,8 +138,8 @@ describe 'hercule', ->
     it 'should not change the link when there are no references', (done) ->
       file = "file.md"
 
-      expandedFile = hercule.expand file, []
-      assert.deepEqual expandedFile, file
+      expanded = hercule.expand file, []
+      assert.deepEqual expanded, {file: file, type: "file"}
 
       done()
 
@@ -151,8 +151,8 @@ describe 'hercule', ->
         value: "footer.md"
       ]
 
-      expandedFile = hercule.expand file, references
-      assert.deepEqual expandedFile, file
+      expanded = hercule.expand file, references
+      assert.deepEqual expanded, {file: file, type: "file"}
 
       done()
 
@@ -164,8 +164,21 @@ describe 'hercule', ->
         value: "common/footer.md"
       ]
 
-      expandedFile = hercule.expand file, references
-      assert.deepEqual expandedFile, "common/footer.md"
+      expanded = hercule.expand file, references
+      assert.deepEqual expanded, {file: "common/footer.md", type: "file"}
+
+      done()
+
+    it 'should change the link when there is a matching references', (done) ->
+      file = "canine"
+      references = [
+        placeholder: "canine"
+        type: "string"
+        value: "dog"
+      ]
+
+      expanded = hercule.expand file, references
+      assert.deepEqual expanded, {file: "dog", type: "string"}
 
       done()
 
@@ -235,6 +248,15 @@ describe 'hercule', ->
 
     it 'should transclude files with valid links and references', (done) ->
       inputFile = __dirname + "/fixtures/test-extend/fox.md"
+
+      hercule.transclude inputFile, null, null, null, (err, document) ->
+        if err then return cb err
+        assert.equal document, "The quick brown fox jumps over the lazy dog.\n"
+
+        done()
+
+    it 'should transclude files with valid links, references and string substitutions', (done) ->
+      inputFile = __dirname + "/fixtures/test-string-extend/fox.md"
 
       hercule.transclude inputFile, null, null, null, (err, document) ->
         if err then return cb err
