@@ -24,31 +24,39 @@ parser = dashdash.createParser options: [
   helpArg: 'FILE'
 ]
 
+
 try
   opts = parser.parse process.argv;
 catch e
-  console.error "md-transclude: error: #{e.message}"
+  console.error "hercule: error: #{e.message}"
   process.exit 1
 
 if opts.help
   help = parser.help({includeEnv: true}).trimRight()
-  console.log "usage: md-transclude [OPTIONS]\noptions:\n#{help}"
+  console.log "usage: hercule [OPTIONS]\noptions:\n#{help}"
   process.exit()
 
-main = ->
-  output = ""
 
+main = ->
+  md.VERBOSE = opts.verbose
+  transcludedOutput = ""
+
+  # Supports multiple input files?
+  # e.g. hercule -o output.md file1.md file2.md file3.md
+  # Each file will be processed sequentially and appended to output
   async.eachSeries opts._args, (input, cb) ->
-    md.VERBOSE = opts.verbose
-    md.transclude input, null, null, null, (err, document) ->
+    dir = path.dirname input
+    input = fs.readFileSync()
+
+    md.transclude input, dir, null, null, (err, output) ->
       if err then return cb err
-      output += document
+      transcludedOutput += output
       cb null
 
   , (err) ->
     throw err if err
     if opts.output
-      fs.writeFile opts.output, output, (err) ->
+      fs.writeFile opts.output, transcludedOutput, (err) ->
         throw err if err
     else
       console.log output

@@ -73,6 +73,20 @@ describe 'hercule', ->
   describe 'parse', ->
     it 'should parse a single file reference', (done) ->
       reference =
+        placeholder: ":[name](file)"
+
+      parsed = hercule.parse reference, ""
+      assert.deepEqual parsed, {
+        file: "file"
+        name: "name"
+        placeholder: reference.placeholder
+        references: []
+      }
+
+      done()
+
+    it 'should parse a single file reference with reference', (done) ->
+      reference =
         placeholder: ":[name](file placeholder:filename.md)"
 
       parsed = hercule.parse reference, ""
@@ -134,11 +148,29 @@ describe 'hercule', ->
 
       done()
 
-  describe 'expand', ->
+  describe 'linksFromInput', ->
+    it 'should return a parsed set of links for input', (done) ->
+      placeholder = ":[test](speed.md)"
+      input = "The #{placeholder} brown fox..."
+
+      links = hercule.linksFromInput input, ""
+      assert.deepEqual links, [
+        {
+          placeholder: placeholder
+          file: "speed.md"
+          name: "test"
+          whitespace: ""
+          references: []
+        }
+      ]
+
+      done()
+
+  describe 'substitute', ->
     it 'should not change the link when there are no references', (done) ->
       file = "file.md"
 
-      expanded = hercule.expand file, []
+      expanded = hercule.substitute file, []
       assert.deepEqual expanded, {file: file, type: "file"}
 
       done()
@@ -151,7 +183,7 @@ describe 'hercule', ->
         value: "footer.md"
       ]
 
-      expanded = hercule.expand file, references
+      expanded = hercule.substitute file, references
       assert.deepEqual expanded, {file: file, type: "file"}
 
       done()
@@ -164,7 +196,7 @@ describe 'hercule', ->
         value: "common/footer.md"
       ]
 
-      expanded = hercule.expand file, references
+      expanded = hercule.substitute file, references
       assert.deepEqual expanded, {file: "common/footer.md", type: "file"}
 
       done()
@@ -177,7 +209,7 @@ describe 'hercule', ->
         value: "dog"
       ]
 
-      expanded = hercule.expand file, references
+      expanded = hercule.substitute file, references
       assert.deepEqual expanded, {file: "dog", type: "string"}
 
       done()
@@ -186,18 +218,18 @@ describe 'hercule', ->
     it 'should not throw an error for missing files', (done) ->
       inputFile = __dirname + "/fixtures/missing.md"
 
-      hercule.readFile 'missing.md', (err, document) ->
-        assert.equal err, null
+      content = hercule.readFile 'missing.md'
+      assert.equal content, null
 
-        done()
+      done()
 
     it 'should read files which exist', (done) ->
       inputFile = __dirname + "/fixtures/test-base/fox.md"
 
-      hercule.readFile inputFile, (err, document) ->
-        assert.equal document, 'The quick brown fox jumps over the lazy dog.\n'
+      content = hercule.readFile inputFile
+      assert.equal content, 'The quick brown fox jumps over the lazy dog.\n'
 
-        done()
+      done()
 
 
   describe 'transclude', ->
