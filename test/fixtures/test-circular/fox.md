@@ -1,1 +1,1 @@
-The quick brown :[](fox.md) jumps over the lazy dog.
+The quick brown :[](animal.md) jumps over the lazy dog.

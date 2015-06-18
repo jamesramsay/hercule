@@ -1,9 +1,8 @@
 require 'coffee-script/register'
 assert = require 'assert-diff'
 hercule = require '../lib/transclude'
-
-# TODO: add circular dependency test
-# TODO: add file not found test
+fs = require 'fs'
+path = require 'path'
 
 describe 'hercule', ->
   describe 'scan', ->
@@ -73,9 +72,26 @@ describe 'hercule', ->
   describe 'parse', ->
     it 'should parse a single file reference', (done) ->
       reference =
-        placeholder: ":[name](file placeholder:filename.md)"
+        placeholder: ":[name](file)"
+        relativePath: ""
 
-      parsed = hercule.parse reference, ""
+      parsed = hercule.parse reference
+      assert.deepEqual parsed, {
+        file: "file"
+        name: "name"
+        placeholder: reference.placeholder
+        references: []
+        relativePath: ""
+      }
+
+      done()
+
+    it 'should parse a single file reference with reference', (done) ->
+      reference =
+        placeholder: ":[name](file placeholder:filename.md)"
+        relativePath: ""
+
+      parsed = hercule.parse reference
       assert.deepEqual parsed, {
         file: "file"
         name: "name"
@@ -85,6 +101,7 @@ describe 'hercule', ->
           type: "file"
           value: "filename.md"
         ]
+        relativePath: ""
       }
 
       done()
@@ -92,8 +109,9 @@ describe 'hercule', ->
     it 'should parse a special reference', (done) ->
       reference =
         placeholder: ":[](file extend:)"
+        relativePath: ""
 
-      parsed = hercule.parse reference, null
+      parsed = hercule.parse reference
       assert.deepEqual parsed, {
         file: "file"
         name: null
@@ -103,6 +121,7 @@ describe 'hercule', ->
           type: "string"
           value: ""
         ]
+        relativePath: ""
       }
 
       done()
@@ -110,9 +129,9 @@ describe 'hercule', ->
     it 'should parse multiples references', (done) ->
       reference =
         placeholder: ":[](file fruit:apple.md footer:../common/footer.md copyright:\"Copyright 2014 (c)\")"
-      dir = "customer/farmers-market"
+        relativePath: "customer/farmers-market"
 
-      parsed = hercule.parse reference, dir
+      parsed = hercule.parse reference
       assert.deepEqual parsed, {
         file: "file"
         name: null
@@ -130,15 +149,36 @@ describe 'hercule', ->
           type:"string"
           value:"Copyright 2014 (c)"
         ]
+        relativePath: "customer/farmers-market"
       }
 
       done()
 
-  describe 'expand', ->
+  describe 'linksFromInput', ->
+    it 'should return a parsed set of links for input', (done) ->
+      placeholder = ":[test](speed.md)"
+      input = "The #{placeholder} brown fox..."
+
+      links = hercule.linksFromInput input, [], ""
+      assert.deepEqual links, [
+        {
+          placeholder: placeholder
+          file: "speed.md"
+          name: "test"
+          whitespace: ""
+          references: []
+          relativePath: ""
+          parents: []
+        }
+      ]
+
+      done()
+
+  describe 'substitute', ->
     it 'should not change the link when there are no references', (done) ->
       file = "file.md"
 
-      expanded = hercule.expand file, []
+      expanded = hercule.substitute file, []
       assert.deepEqual expanded, {file: file, type: "file"}
 
       done()
@@ -151,7 +191,7 @@ describe 'hercule', ->
         value: "footer.md"
       ]
 
-      expanded = hercule.expand file, references
+      expanded = hercule.substitute file, references
       assert.deepEqual expanded, {file: file, type: "file"}
 
       done()
@@ -164,7 +204,7 @@ describe 'hercule', ->
         value: "common/footer.md"
       ]
 
-      expanded = hercule.expand file, references
+      expanded = hercule.substitute file, references
       assert.deepEqual expanded, {file: "common/footer.md", type: "file"}
 
       done()
@@ -177,7 +217,7 @@ describe 'hercule', ->
         value: "dog"
       ]
 
-      expanded = hercule.expand file, references
+      expanded = hercule.substitute file, references
       assert.deepEqual expanded, {file: "dog", type: "string"}
 
       done()
@@ -186,19 +226,40 @@ describe 'hercule', ->
     it 'should not throw an error for missing files', (done) ->
       inputFile = __dirname + "/fixtures/missing.md"
 
-      hercule.readFile 'missing.md', (err, document) ->
-        assert.equal err, null
+      content = hercule.readFile 'missing.md'
+      assert.equal content, null
 
-        done()
+      done()
 
     it 'should read files which exist', (done) ->
       inputFile = __dirname + "/fixtures/test-base/fox.md"
 
-      hercule.readFile inputFile, (err, document) ->
-        assert.equal document, 'The quick brown fox jumps over the lazy dog.\n'
+      content = hercule.readFile inputFile
+      assert.equal content, 'The quick brown fox jumps over the lazy dog.\n'
+
+      done()
+
+
+  describe 'transcludeString', ->
+    it 'should transclude files with valid links', (done) ->
+      input = "Jackdaws love my big sphinx of quartz."
+
+      hercule.transcludeString input, null, null, null, (err, document) ->
+        if err then return cb err
+        assert.equal document, 'Jackdaws love my big sphinx of quartz.'
 
         done()
 
+    it 'should transclude files with valid links', (done) ->
+      file = __dirname + "/fixtures/test-basic/jackdaw.md"
+      input = (fs.readFileSync file).toString()
+      dir = path.dirname file
+
+      hercule.transcludeString input, dir, null, null, (err, document) ->
+        if err then return cb err
+        assert.equal document, 'Jackdaws love my big sphinx of quartz.\n'
+
+        done()
 
   describe 'transclude', ->
     it 'should exit if a circular link exists', (done) ->

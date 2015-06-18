@@ -4,57 +4,75 @@ path = require 'path'
 _ = require 'lodash'
 peg = require 'pegjs'
 
-VERBOSE = false
+{logger, VERBOSE} = require './log'
 
 # Link detection (including leading whitespace)
 linkRegExp = new RegExp(/(^[\t ]*)?(\:\[.*?\]\(.*?\))/gm)
 WHITESPACE_GROUP = 1
 LINK_GROUP = 2
 
-# Link parser (using pegjs)
+# Build the link parser once
 grammar = require './grammar'
 linkParser = peg.buildParser grammar.transcludeGrammar
 
 
-parse = (link, dir = "") ->
-  parsed = linkParser.parse link.placeholder
-  logger "Parse: #{parsed.references.length} references found"
+linksFromInput = (input, parents, dir) ->
+  rawLinks = scan input
 
-  # Links are relative to the document they are declared
-  parsed.references.forEach (ref) ->
-    if ref.type is "file"
-      ref.value = path.join dir, ref.value
+  links = _.forEach rawLinks, (rawLink) ->
+    rawLink.relativePath = dir
+    rawLink.parents = parents[..]
 
-  return _.merge link, parsed
-
-
-scan = (document) ->
-  links = []
-
-  while (match = linkRegExp.exec document)
-    links.push {
-      placeholder: match[LINK_GROUP]
-      whitespace: if match[WHITESPACE_GROUP] then match[WHITESPACE_GROUP] else ""
-    }
-
-  logger "Scan: #{links.length} links found"
+    return parse rawLink
 
   return links
 
 
-readFile = (filename, cb) ->
-  fs.readFile filename, (err, document) ->
-    if err
-      if err.type = 'ENOENT'
-        console.error "#{filename} not found."
-        return cb null, null
+# Parse a link using pegjs
+# link: ':[name](path/to/file extendFile:another/file header:"String")'
+#  dir: directory of the input containing the link
+parse = (rawLink) ->
+  parsedLink = linkParser.parse rawLink.placeholder
+  logger "Parse: #{parsedLink.references.length} references found"
 
-      return cb err
+  # References are relative to the document where declared
+  parsedLink.references.forEach (ref) ->
+    if ref.type is "file"
+      ref.value = path.join rawLink.relativePath, ref.value
 
-    cb null, document.toString()
+  return _.merge rawLink, parsedLink
 
 
-expand = (file, references, dir = "") ->
+# Scan a document string for links
+scan = (input) ->
+  links = []
+
+  while (match = linkRegExp.exec input)
+    links.push
+      placeholder: match[LINK_GROUP]
+      whitespace: if match[WHITESPACE_GROUP] then match[WHITESPACE_GROUP] else ""
+
+  logger "Scan: #{links.length} links found"
+  return links
+
+
+# Read file to string
+readFile = (filename) ->
+  try
+    content = (fs.readFileSync filename).toString()
+    return content
+
+  catch err
+    if err.code = 'ENOENT'
+      logger "#{filename} not found."
+    else
+      throw err
+
+  return null
+
+
+# Substitute a placeholder link with the appropriate reference
+substitute = (file, references, dir = "") ->
   # :[something](FILE) >> :[something](content.md)
   [p, ...] = _.filter references, (ref) -> return ref?.placeholder is file
 
@@ -66,58 +84,73 @@ expand = (file, references, dir = "") ->
     file = path.join dir, file
     type = "file"
 
-  return {file: file, type: type}
+  return {file, type}
 
-logger = (message) ->
-  if VERBOSE then console.error message
 
+# File transclude for backwards compatibility
 transclude = (file, dir = "", parents = [], references = [], cb) ->
-  {file, type} = expand file, references, dir
-  dir = path.dirname file
-
-  if type is "string"
-    return cb null, file
-
-  if file in parents
-    return cb "Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
-
   parents.push file
-  logger "Transclude: #{file} into #{parents[-1..][0]}"
+  dir = path.dirname file
+  input = (fs.readFileSync file).toString()
 
-  readFile file, (err, document) ->
-    if err then return cb err
+  transcludeString input, dir, parents, references, (err, output) ->
+    if (err) then return cb err
+    cb err, output
 
-    links = _.forEach (scan document), (link) -> return link = parse link, dir
-    if links.length < 1
-      return cb null, document
 
-    async.eachSeries links, (link, cb) ->
-      link.references = _.merge references, link.references
+#    input: input string containing transclude links
+#      dir: input directory (because links are relative)
+# filename: used for circular reference detection
+#  parents: list of parents for circular reference detection
+transcludeString = (input, relativePath = "", parents = [], parentRefs = [], cb) ->
 
-      transclude link.file, dir, parents[..], link.references, (err, output) ->
-        if err then return cb err
+  links = linksFromInput input, parents, relativePath
+  if links.length < 1 then return cb null, input
 
-        if output?
-          # Preserve indentation if transclude is not preceded by content
-          output = output.replace /\n/g, "\n#{link.whitespace}"
+  async.eachSeries links, ({file, references, parents, whitespace, placeholder}, cb) ->
 
-          # Remove new lines at EOF which cause unexpected paragraphs and breaks
-          output = output.replace /\n$/, ""
+    references = _.merge parentRefs, references
+    substitution = substitute file, references, relativePath
 
-          document = document.replace "#{link.placeholder}", output
-          logger "Replaced: \"#{link.placeholder}\"\n    with: #{JSON.stringify output}"
+    if substitution.file in parents
+      return cb "Circular reference detected. #{file} is in parents:\n#{JSON.stringify parents}"
 
-        cb null
+    if substitution.type is "string"
+      content = substitution.file
+    else
+      content = readFile substitution.file
 
-    , (err) ->
-      cb err, document
+    parents.push substitution.file
+    dir = path.dirname substitution.file
+
+    logger "Transclude: #{substitution.file} into #{parents[-1..][0]}"
+
+    transcludeString content, dir, parents, references, (err, output) ->
+      if err then return cb err
+
+      if output?
+        # Preserve indentation if transclude is not preceded by content
+        output = output.replace /\n/g, "\n#{whitespace}"
+
+        # Remove new lines at EOF which cause unexpected paragraphs and breaks
+        output = output.replace /\n$/, ""
+
+        input = input.replace "#{placeholder}", output
+        logger "Replaced: \"#{placeholder}\"\n    with: #{JSON.stringify output}"
+
+      cb null
+
+  , (err) ->
+    cb err, input
 
 
 module.exports = {
   transclude
+  transcludeString
   scan
   parse
-  expand
+  substitute
   readFile
+  linksFromInput
   VERBOSE
 }
