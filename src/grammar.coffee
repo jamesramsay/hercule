@@ -1,9 +1,8 @@
 transcludeGrammar = """
 start
-  = ':' '[' n:placeholder? ']' '(' f:filename? ' '? o:arg* ')' {
+  = ':' '[' placeholder? ']' '(' f:filename? ' '? o:arg* ')' {
       return {
-        "file": f,
-        "name": n,
+        "link": f,
         "references": o
       };
     }

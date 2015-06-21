@@ -2,12 +2,10 @@
 # A simple markdown transclusion tool
 # Author: james ramsay
 
-
-blanket = require 'blanket' if process.env.COVERAGE
-md = require './transclude'
+hercule = require './hercule'
 dashdash = require 'dashdash'
 fs = require 'fs'
-async = require 'async'
+path = require 'path'
 
 parser = dashdash.createParser options: [
   names: ['help', 'h']
@@ -38,27 +36,15 @@ if opts.help
 
 
 main = ->
-  md.VERBOSE = opts.verbose
   transcludedOutput = ""
 
-  # Supports multiple input files?
-  # e.g. hercule -o output.md file1.md file2.md file3.md
-  # Each file will be processed sequentially and appended to output
-  async.eachSeries opts._args, (input, cb) ->
-    dir = path.dirname input
-    input = fs.readFileSync()
+  opts._args.forEach (input) ->
+    transcludedOutput += hercule.transcludeFile input, null, null, null
 
-    md.transclude input, dir, null, null, (err, output) ->
-      if err then return cb err
-      transcludedOutput += output
-      cb null
-
-  , (err) ->
-    throw err if err
-    if opts.output
-      fs.writeFile opts.output, transcludedOutput, (err) ->
-        throw err if err
-    else
-      console.log output
+  if opts.output
+    fs.writeFile opts.output, transcludedOutput, (err) ->
+      throw err if err
+  else
+    console.log transcludedOutput
 
 main()
