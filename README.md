@@ -227,3 +227,10 @@ This is also useful for nesting lists or including paragraphs within a list.
 - Pear
   :[Pear variety information](pear-varieties.md)
 ```
+
+----
+
+## Related projects
+
+- [Grunt Hercule](https://github.com/chesleybrown/grunt-hercule): a Grunt task that wraps hercule
+ 
