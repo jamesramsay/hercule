@@ -46,10 +46,10 @@
   },
   "devDependencies": {
     "coffee-script": "^1.7.0",
-    "mocha": "2.1.0",
+    "mocha": "^2.2.5",
     "mocha-lcov-reporter": "^0.0.2",
     "assert-diff": "^1.0.1",
-    "blanket": "^1.1.6",
+    "blanket": "^1.1.7",
     "coveralls": "^2.11.2"
   }
 }
