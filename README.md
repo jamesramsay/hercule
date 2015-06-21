@@ -10,13 +10,19 @@
 
 Write large markdown documents, including API Blueprints, while keeping things DRY (don't repeat yourself).
 
-Hercule is a command-line tool for transcluding markdown documents, including API documentation written in [API Blueprint](http://apiblueprint.org) format. With Hercule you can easily break complex documents into smaller logical documents, preventing repetition and improving consistency.
+```bash
+hercule src/document.md -o document.md
+```
+
+Hercule is a command-line tool and library for transcluding markdown documents, including API documentation written in [API Blueprint](http://apiblueprint.org) format. With Hercule you can easily break complex documents into smaller logical documents, preventing repetition and improving consistency using transclusion links `:[abstract](src/abstract.md)`.
 
 -----
 
 [![Adslot](http://l.jwr.vc/1asBO+)](http://adslot.com/)
 
 Hercule is used by [Adslot](http://adslot.com) to help document our APIs in [API Blueprint](http://apiblueprint.org) more efficiently and more accurately. We also use [Apiary](http://apiary.io) to distribute our API documentation and [DREDD](https://github.com/apiaryio/dredd) (a tool by [Apiary](http://apiary.io)) to validate the documentation against implementation.
+
+-----
 
 ## Installation
 
@@ -25,6 +31,8 @@ Hercule is used by [Adslot](http://adslot.com) to help document our APIs in [API
 ```
 $ npm install -g hercule
 ```
+
+Use
 
 ## Example: API Blueprint
 
