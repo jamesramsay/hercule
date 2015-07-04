@@ -154,20 +154,20 @@ describe 'utils', ->
 
   describe 'inflate', ->
     it 'should return strings', (done) ->
-      output = utils.inflate 'dog', 'string'
-      assert.equal output, 'dog'
+      utils.inflate 'dog', 'string', (output) ->
+        assert.equal output, 'dog'
 
-      done()
+        done()
 
     it 'should return contents of files', (done) ->
       file = __dirname + "/fixtures/test-base/fox.md"
-      output = utils.inflate file, 'file'
-      assert.equal output, 'The quick brown fox jumps over the lazy dog.\n'
+      utils.inflate file, 'file', (output) ->
+         assert.equal output, 'The quick brown fox jumps over the lazy dog.\n'
 
-      done()
+         done()
 
     it 'should return empty string for unsupported types', (done) ->
-      output = utils.inflate '', 'http'
-      assert.equal output, ''
+      utils.inflate '', 'http', (output) ->
+        assert.equal output, ''
 
-      done()
+        done()

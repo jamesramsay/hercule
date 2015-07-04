@@ -17,7 +17,7 @@ arg
     }
 
 placeholder
-  = p:[a-zA-Z0-9]+ {
+  = p:[a-zA-Z0-9 ]+ {
       return p.join("");
     }
 

@@ -63,14 +63,14 @@ find = (link, references) ->
   return matches[0]
 
 
-inflate = (link, linkType) ->
+inflate = (link, linkType, cb) ->
   switch linkType
     when "string"
-      return link
+      return cb link
     when "file"
-      return readFile link
+      return cb (readFile link)
     else
-      return ""
+      return cb ""
 
 module.exports = {
   scan
