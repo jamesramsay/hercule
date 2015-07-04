@@ -43,7 +43,9 @@ Or use as a library:
 ```javascript
 var hercule = require('hercule');
 
-var output = hercule.transcludeString("# Title\n\n:[abstract](abstract.md)");
+hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", null, null, null, function(output) {
+  return console.log(output);
+});
 ```
 
 ## Basic use: file transclusion
