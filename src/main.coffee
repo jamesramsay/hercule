@@ -39,7 +39,8 @@ main = ->
   transcludedOutput = ""
 
   opts._args.forEach (input) ->
-    transcludedOutput += hercule.transcludeFile input, null, null, null
+    hercule.transcludeFile input, null, null, null, (output) ->
+      transcludedOutput += output
 
   if opts.output
     fs.writeFile opts.output, transcludedOutput, (err) ->

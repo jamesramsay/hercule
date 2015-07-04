@@ -4,7 +4,7 @@ path = require 'path'
 _ = require 'lodash'
 utils = require './utils'
 
-log = (message) -> return
+#log = (message) -> return
 
 processInput = (input, parents, dir) ->
   rawLinks = utils.scan input
@@ -22,10 +22,10 @@ processInput = (input, parents, dir) ->
   return links
 
 
-transclude = (input, relativePath, parents, parentRefs) ->
+transclude = (input, relativePath, parents, parentRefs, cb) ->
   # TODO: rename processInput...
   links = processInput input, parents, relativePath
-  if links.length < 1 then return input
+  if links.length < 1 then return cb input
 
   links.forEach ({link, file, references, parents, whitespace, placeholder}) ->
     references = _.merge parentRefs, references
@@ -44,36 +44,38 @@ transclude = (input, relativePath, parents, parentRefs) ->
       throw new Error("Circular reference detected")
 
     #log "Transclude: #{link} into #{parents[-1..][0]}"
-    content = utils.inflate link, linkType
     parents.push link
     dir = path.dirname link
 
-    output = transclude content, dir, parents, references
+    utils.inflate link, linkType, (content) ->
 
-    if output?
-      # Preserve indentation if transclude is not preceded by content
-      # Remove new lines at EOF which cause unexpected paragraphs and breaks
-      output = output
-        .replace /\n/g, "\n#{whitespace}"
-        .replace /\n$/, ""
+      transclude content, dir, parents, references, (output) ->
+        if output?
+          # Preserve indentation if transclude is not preceded by content
+          # Remove new lines at EOF which cause unexpected paragraphs and breaks
+          output = output
+            .replace /\n/g, "\n#{whitespace}"
+            .replace /\n$/, ""
 
-      input = input.replace "#{placeholder}", output
-      log "Replaced: \"#{placeholder}\"\n    with: #{JSON.stringify output}"
+          input = input.replace "#{placeholder}", output
+          #log "Replaced: \"#{placeholder}\"\n    with: #{JSON.stringify output}"
 
-  return input
+  return cb input
 
 
-transcludeString = (input, relativePath = "", parents = [], parentRefs = []) ->
-    return transclude input, relativePath, parents, parentRefs
+transcludeString = (input, relativePath = "", parents = [], parentRefs = [], cb) ->
+    transclude input, relativePath, parents, parentRefs, (output) ->
+      return cb output
 
-transcludeFile = (file, relativePath = "", parents = [], parentRefs = []) ->
+transcludeFile = (file, relativePath = "", parents = [], parentRefs = [], cb) ->
     fullFilePath = path.join relativePath, file
     fullRelativePath = path.dirname fullFilePath
 
     parents.push fullFilePath
     content = utils.readFile fullFilePath
 
-    return transclude content, fullRelativePath, parents, parentRefs
+    transclude content, fullRelativePath, parents, parentRefs, (output) ->
+      return cb output
 
 
 module.exports = {transcludeString, transcludeFile}
