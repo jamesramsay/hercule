@@ -42,12 +42,15 @@
   "dependencies": {
     "dashdash": "^1.7.0",
     "lodash": "^3.0.0",
-    "pegjs": "^0.8.0"
+    "pegjs": "^0.8.0",
+    "request": "^2.58.0",
+    "deasync": "^0.1.0"
   },
   "devDependencies": {
     "coffee-script": "^1.7.0",
     "mocha": "^2.2.5",
     "mocha-lcov-reporter": "^0.0.2",
+    "nock": "^2.7.0",
     "assert-diff": "^1.0.1",
     "blanket": "^1.1.7",
     "coveralls": "^2.11.2"
