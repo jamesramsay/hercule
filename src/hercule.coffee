@@ -3,6 +3,7 @@ blanket = require 'blanket' if process.env.COVERAGE
 path = require 'path'
 _ = require 'lodash'
 utils = require './utils'
+validUrlRegex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/
 
 #log = (message) -> return
 
@@ -36,7 +37,7 @@ transclude = (input, relativePath, parents, parentRefs, cb) ->
       #log "Expanding: #{link} -> #{match.value}"
       link = match.value
       linkType = match.type
-    else
+    else if !match? && !validUrlRegex.test(link)
       link = path.join relativePath, link
 
     if _.contains parents, link

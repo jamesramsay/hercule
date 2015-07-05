@@ -53,13 +53,15 @@ hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", null, null, null
 Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
 
 ```markdown
-This is an :[example link](example.md).
+This is an :[example link](example.md).  
+And this is an :[example link](https://raw.githubusercontent.com/jamesramsay/hercule/master/examples/example.md), too.
 ```
 
 Output from `hercule examples/basic.md`:
 
 ```
 This is an example transclusion.
+And this is an example transclusion, too.
 ```
 
 Extending the standard Markdown link syntax means that most other markdown parsers will treat them as normal links.

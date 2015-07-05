@@ -1,7 +1,7 @@
 require 'coffee-script/register'
 assert = require 'assert-diff'
 utils = require '../src/utils'
-
+nock = require 'nock'
 
 describe 'utils', ->
 
@@ -148,6 +148,16 @@ describe 'utils', ->
 
       content = utils.readFile inputFile
       assert.equal content, 'The quick brown fox jumps over the lazy dog.\n'
+
+      done()
+
+    it 'should read remote file if path is a valid URL', (done) ->
+      inputFile = 'http://www.google.com'
+      expectedContent = '{ "content": "" }'
+      file = nock(inputFile).get('/').reply(200, expectedContent)
+      content = utils.readFile inputFile
+
+      assert.equal content, expectedContent
 
       done()
 

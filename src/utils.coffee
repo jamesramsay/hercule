@@ -2,6 +2,8 @@ fs = require 'fs'
 path = require 'path'
 peg = require 'pegjs'
 _ = require 'lodash'
+request = require 'request'
+deasync = require 'deasync'
 
 
 # Link detection (including leading whitespace)
@@ -42,12 +44,26 @@ parse = (rawLink) ->
 # Read file to string
 readFile = (filename) ->
   try
-    content = (fs.readFileSync filename).toString()
-    return content
+    validUrlRegex = /(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/
+    if validUrlRegex.test(filename)
+      done = false
+      content = null
+      request(filename, (error, response, body) ->
+        if !error && response.statusCode == 200
+          content = body
+          done = true
+        else
+          done = true
+      )
+      # makes it non-blocking and synchronous.
+      require('deasync').loopWhile( -> !done)
+      return content
+    else
+      return content = (fs.readFileSync filename).toString()
 
   catch err
     if err.code = 'ENOENT'
-      console.error "File not found."
+      console.error err.message
 
   return null
 
