@@ -2,12 +2,14 @@ fs = require 'fs'
 path = require 'path'
 peg = require 'pegjs'
 _ = require 'lodash'
+request = require 'request'
 
 
 # Link detection (including leading whitespace)
-linkRegExp = new RegExp(/(^[\t ]*)?(\:\[.*?\]\(.*?\))/gm)
+linkRegExp = new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))/gm)
 WHITESPACE_GROUP = 1
-LINK_GROUP = 2
+PLACEHOLDER_GROUP = 2
+LINK_GROUP = 3
 
 
 # Build the link parser once
@@ -21,7 +23,8 @@ scan = (input) ->
 
   while (match = linkRegExp.exec input)
     links.push
-      placeholder: match[LINK_GROUP]
+      placeholder: match[PLACEHOLDER_GROUP]
+      link: match[LINK_GROUP]
       whitespace: if match[WHITESPACE_GROUP] then match[WHITESPACE_GROUP] else ""
 
   return links
@@ -29,7 +32,7 @@ scan = (input) ->
 
 # Parse a transclude link
 parse = (rawLink) ->
-  parsedLink = linkParser.parse rawLink.placeholder
+  parsedLink = linkParser.parse rawLink.link
 
   # References are relative to the document where declared
   parsedLink.references.forEach (ref) ->
@@ -47,9 +50,19 @@ readFile = (filename) ->
 
   catch err
     if err.code = 'ENOENT'
-      console.error "File not found."
+      console.error "File (#{filename}) not found."
 
   return null
+
+
+# Read URI contents to string
+readUri = (link, cb) ->
+  request link, (err, res, body) ->
+    if (err) or not (res.statusCode is 200)
+      console.error "Remote file (#{link}) could not be retrieved."
+      return cb null
+
+    return cb body
 
 
 find = (link, references) ->
@@ -69,13 +82,17 @@ inflate = (link, linkType, cb) ->
       return cb link
     when "file"
       return cb (readFile link)
+    when "http"
+      readUri link, (content) -> return cb content
     else
       return cb ""
+
 
 module.exports = {
   scan
   parse
   readFile
+  readUri
   find
   inflate
 }

@@ -1,0 +1,20 @@
+#!/usr/bin/env bats
+
+@test "transcluding remote http files" {
+  result="$(./bin/hercule ./test/fixtures/test-http-live/jackdaw.md)"
+  expected="Jackdaws love my big sphinx of quartz."
+  [ "$result" == "$expected" ]
+}
+
+
+@test "transcluding local files" {
+  result="$(./bin/hercule ./test/fixtures/test-basic/jackdaw.md)"
+  expected="Jackdaws love my big sphinx of quartz."
+  [ "$result" == "$expected" ]
+}
+
+@test "transcluding complex local files" {
+  result="$(./bin/hercule ./test/fixtures/test-extend/fox.md)"
+  expected="The quick brown fox jumps over the lazy dog."
+  [ "$result" == "$expected" ]
+}
