@@ -43,7 +43,7 @@ Or use as a library:
 ```javascript
 var hercule = require('hercule');
 
-hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", null, null, null, function(output) {
+hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", function(output) {
   return console.log(output);
 });
 ```

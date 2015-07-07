@@ -18,28 +18,25 @@ linkParser = peg.buildParser grammar.transcludeGrammar
 
 
 # Scan a document string for links
-scan = (input) ->
+scan = (input, relativePath = "", parents = []) ->
   links = []
-
   while (match = linkRegExp.exec input)
     links.push
       placeholder: match[PLACEHOLDER_GROUP]
-      link: match[LINK_GROUP]
+      href: match[LINK_GROUP]
       whitespace: if match[WHITESPACE_GROUP] then match[WHITESPACE_GROUP] else ""
-
+      relativePath: relativePath
+      parents: parents[..]
   return links
 
 
 # Parse a transclude link
-parse = (rawLink) ->
-  parsedLink = linkParser.parse rawLink.link
-
-  # References are relative to the document where declared
+parse = (link) ->
+  parsedLink = linkParser.parse link.href
   parsedLink.references.forEach (ref) ->
-    if ref.type is "file"
-      ref.value = path.join rawLink.relativePath, ref.value
-
-  return _.merge rawLink, parsedLink
+    if ref.hrefType is "file"
+      ref.href = path.join link.relativePath, ref.href
+  return _.merge link, parsedLink
 
 
 # Read file to string
@@ -47,43 +44,31 @@ readFile = (filename) ->
   try
     content = (fs.readFileSync filename).toString()
     return content
-
   catch err
     if err.code = 'ENOENT'
-      console.error "File (#{filename}) not found."
-
+      console.error "Error: File (#{filename}) not found."
   return null
 
 
 # Read URI contents to string
-readUri = (link, cb) ->
-  request link, (err, res, body) ->
+readUri = (uri, cb) ->
+  request uri, (err, res, body) ->
     if (err) or not (res.statusCode is 200)
-      console.error "Remote file (#{link}) could not be retrieved."
+      console.error "Error: Remote file (#{uri}) could not be retrieved."
       return cb null
-
     return cb body
 
 
-find = (link, references) ->
-  matches = _.filter references, (ref) ->
-    return ref?.placeholder is link
-
-  if matches.length > 1
-    console.error "Multiple matching references found for #{link}."
-    #log.error "Multiple matching references found for #{link}.", {matches}
-
-  return matches[0]
-
-
-inflate = (link, linkType, cb) ->
-  switch linkType
+inflate = (href, hrefType, cb) ->
+  switch hrefType
     when "string"
-      return cb link
+      return cb href
     when "file"
-      return cb (readFile link)
+      content = readFile href
+      return cb content
     when "http"
-      readUri link, (content) -> return cb content
+      readUri href, (content) ->
+        return cb content
     else
       return cb ""
 
@@ -93,6 +78,5 @@ module.exports = {
   parse
   readFile
   readUri
-  find
   inflate
 }

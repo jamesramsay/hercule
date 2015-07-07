@@ -13,10 +13,10 @@
 # }
 
 transcludeGrammar = """
-start = f:link? ' '? o:reference* {
+start = l:link? ' '? o:reference* {
   return {
-    "link": f.value,
-    "type": f.type,
+    "href": l.href,
+    "hrefType": l.hrefType,
     "references": o
   };
 }
@@ -24,8 +24,8 @@ start = f:link? ' '? o:reference* {
 reference = p:placeholder ':' l:link ' '? {
   return {
     "placeholder": p,
-    "type": l.type,
-    "value": l.value
+    "href": l.href,
+    "hrefType": l.hrefType
   };
 }
 
@@ -37,29 +37,29 @@ link = httpLink / fileLink / string / reset
 
 fileLink = f:[^ ()\"]+ {
   return {
-    "type": "file",
-    "value": f.join("")
+    "hrefType": "file",
+    "href": f.join("")
   };
 }
 
 httpLink = left:("http://" / "https://") right:[^ ()]+ {
   return {
-    "type": "http",
-    "value": left + right.join("")
+    "hrefType": "http",
+    "href": left + right.join("")
   };
 }
 
 string = '\"' s:([^\"]+) '\"' {
   return {
-    "type": "string",
-    "value": s.join("")
+    "hrefType": "string",
+    "href": s.join("")
   };
 }
 
 reset = {
   return {
-    "type": "string",
-    "value": ""
+    "hrefType": "string",
+    "href": ""
   };
 }
 """
