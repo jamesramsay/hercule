@@ -1,57 +1,67 @@
+# Parses transclusion links
+#
+# :[example transclude link](file.md common:file.md)
+#
+# {
+#  link: file.md
+#  type: file
+#  references: [
+#     placeholder: common
+#     type: file
+#     value: file.md
+#   ]
+# }
+
 transcludeGrammar = """
-start
-  = ':' '[' placeholder? ']' '(' f:filename? ' '? o:arg* ')' {
-      return {
-        "link": f,
-        "references": o
-      };
-    }
+start = f:link? ' '? o:reference* {
+  return {
+    "link": f.value,
+    "type": f.type,
+    "references": o
+  };
+}
 
-arg
-  = left:placeholder ':' right:override ' '? {
-      return {
-        "placeholder": left,
-        "type": right.type,
-        "value": right.value
-      };
-    }
+reference = p:placeholder ':' l:link ' '? {
+  return {
+    "placeholder": p,
+    "type": l.type,
+    "value": l.value
+  };
+}
 
-placeholder
-  = p:[a-zA-Z0-9 ]+ {
-      return p.join("");
-    }
+placeholder = p:[a-zA-Z0-9]+ {
+  return p.join("");
+}
 
-filename
-  = f:[^ ()\"]+ {
-      return f.join("");
-    }
+link = httpLink / fileLink / string / reset
 
-override
-  = file / string / reset
+fileLink = f:[^ ()\"]+ {
+  return {
+    "type": "file",
+    "value": f.join("")
+  };
+}
 
-file
-  = f:filename {
-      return {
-        "type": "file",
-        "value": f
-      };
-    }
+httpLink = left:("http://" / "https://") right:[^ ()]+ {
+  return {
+    "type": "http",
+    "value": left + right.join("")
+  };
+}
 
-string
-  = '\"' s:([^\"]+) '\"' {
-      return {
-        "type": "string",
-        "value": s.join("")
-      };
-    }
+string = '\"' s:([^\"]+) '\"' {
+  return {
+    "type": "string",
+    "value": s.join("")
+  };
+}
 
-reset
-  = {
-      return {
-        "type": "string",
-        "value": ""
-      };
-    }
+reset = {
+  return {
+    "type": "string",
+    "value": ""
+  };
+}
 """
 
 module.exports = {

@@ -6,6 +6,7 @@ hercule = require './hercule'
 dashdash = require 'dashdash'
 fs = require 'fs'
 path = require 'path'
+async = require 'async'
 
 parser = dashdash.createParser options: [
   names: ['help', 'h']
@@ -38,14 +39,16 @@ if opts.help
 main = ->
   transcludedOutput = ""
 
-  opts._args.forEach (input) ->
+  async.eachSeries opts._args, (input, done) ->
     hercule.transcludeFile input, null, null, null, (output) ->
       transcludedOutput += output
+      return done()
 
-  if opts.output
-    fs.writeFile opts.output, transcludedOutput, (err) ->
-      throw err if err
-  else
-    console.log transcludedOutput
+  , ->  
+    if opts.output
+      fs.writeFile opts.output, transcludedOutput, (err) ->
+        throw err if err
+    else
+      console.log transcludedOutput
 
 main()

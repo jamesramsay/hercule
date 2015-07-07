@@ -65,6 +65,21 @@ This is an example transclusion.
 Extending the standard Markdown link syntax means that most other markdown parsers will treat them as normal links.
 For example, Github handles transclusion links in this manner.
 
+## Basic use: remote file (http) transclusion
+
+Hercule is able to transclude HTTP references also.
+This done by simply providing the URL as the link.
+
+```markdown
+Jackdaws love my :[size](https://gist.githubusercontent.com/jamesramsay/e869c0164a187cc756d4/raw/5e6052f67b6bf87c6862e3e17e1a646cf31cbe16/size.md) sphinx of quartz.
+```
+
+Output from `hercule test/fixtures/test-http-live/jackdaw.md`:
+
+```
+Jackdaws love my big sphinx of quartz.
+```
+
 ## Advanced use: placeholders and references
 
 In addition to basic file transclusion, Hercule supports placeholders and references.

@@ -3,8 +3,9 @@ blanket = require 'blanket' if process.env.COVERAGE
 path = require 'path'
 _ = require 'lodash'
 utils = require './utils'
+async = require 'async'
 
-#log = (message) -> return
+#log = (message) -> console.error "#{message}"
 
 processInput = (input, parents, dir) ->
   rawLinks = utils.scan input
@@ -24,19 +25,21 @@ processInput = (input, parents, dir) ->
 
 transclude = (input, relativePath, parents, parentRefs, cb) ->
   # TODO: rename processInput...
+  # log "Scanning: #{input}"
   links = processInput input, parents, relativePath
   if links.length < 1 then return cb input
 
-  links.forEach ({link, file, references, parents, whitespace, placeholder}) ->
+  async.eachSeries links, ({link, type, file, references, parents, whitespace, placeholder}, done) ->
+    linkType = type
+
     references = _.merge parentRefs, references
     match = utils.find link, references
 
-    linkType = "file"
     if match?
       #log "Expanding: #{link} -> #{match.value}"
       link = match.value
       linkType = match.type
-    else
+    else if linkType is "file"
       link = path.join relativePath, link
 
     if _.contains parents, link
@@ -59,8 +62,9 @@ transclude = (input, relativePath, parents, parentRefs, cb) ->
 
           input = input.replace "#{placeholder}", output
           #log "Replaced: \"#{placeholder}\"\n    with: #{JSON.stringify output}"
-
-  return cb input
+          return done()
+  , ->
+    return cb input
 
 
 transcludeString = (input, relativePath = "", parents = [], parentRefs = [], cb) ->

@@ -3,12 +3,13 @@ assert = require 'assert-diff'
 hercule = require '../src/hercule'
 fs = require 'fs'
 path = require 'path'
+nock = require 'nock'
 
 describe 'hercule', ->
 
   describe 'transcludeString', ->
 
-    it 'should transclude files with valid links', (done) ->
+    it 'should transclude strings', (done) ->
       input = "Jackdaws love my big sphinx of quartz."
 
       hercule.transcludeString input, null, null, null, (output) ->
@@ -16,7 +17,7 @@ describe 'hercule', ->
 
         done()
 
-    it 'should transclude files with valid links', (done) ->
+    it 'should transclude strings with valid links', (done) ->
       file = __dirname + "/fixtures/test-basic/jackdaw.md"
       input = (fs.readFileSync file).toString()
       dir = path.dirname file
@@ -24,6 +25,23 @@ describe 'hercule', ->
       hercule.transcludeString input, dir, null, null, (output) ->
         assert.equal output, 'Jackdaws love my big sphinx of quartz.\n'
 
+        done()
+
+    it 'should transclude strings with valid remote http links', (done) ->
+      url  = "http://github.com"
+      file = "/size.md"
+      size  = "big\n"
+
+      mock = nock url
+        .get file
+        .reply 200, size
+
+      file = __dirname + "/fixtures/test-http/jackdaw.md"
+      input = (fs.readFileSync file).toString()
+      dir = path.dirname file
+
+      hercule.transcludeString input, dir, null, null, (output) ->
+        assert.equal output, 'Jackdaws love my big sphinx of quartz.\n'
         done()
 
   describe 'transcludeFile', ->
