@@ -1,15 +1,18 @@
 language: node_js
 node_js:
   - '0.12'
+sudo: false
 before_install:
-  - sudo add-apt-repository ppa:duggan/bats --yes
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq bats
+  - mkdir ./test/modules
+  - git clone https://github.com/sstephenson/bats.git ./test/modules-src/bats
+  - cd test/modules-src/bats
+  - ./install.sh ../../modules
+  - cd -
 before_script:
   - npm run compile
 script:
   - npm run travis
-  - bats test/bats
+  - ./test/modules/bin/bats test/bats
 after_success:
   - npm run coveralls
 deploy:
