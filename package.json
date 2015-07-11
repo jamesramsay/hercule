@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
