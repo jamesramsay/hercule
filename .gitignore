@@ -2,5 +2,5 @@ node_modules
 lib
 .coveralls.yml
 coverage.html
-npm-debug.log
+*.log
 test/modules*

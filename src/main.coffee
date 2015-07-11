@@ -8,6 +8,9 @@ fs = require 'fs'
 path = require 'path'
 async = require 'async'
 
+_VERBOSE = false
+_DEBUG = false
+
 parser = dashdash.createParser options: [
   names: ['help', 'h']
   type: 'bool'
@@ -35,16 +38,20 @@ if opts.help
   console.log "usage: hercule [OPTIONS]\noptions:\n#{help}"
   process.exit()
 
+logger = (message) ->
+  if _VERBOSE then console.error "#{message}"
 
 main = ->
   transcludedOutput = ""
 
+  if opts.verbose then _VERBOSE = true
+
   async.eachSeries opts._args, (input, done) ->
-    hercule.transcludeFile input, null, null, null, (output) ->
+    hercule.transcludeFile input, logger, (output) ->
       transcludedOutput += output
       return done()
 
-  , ->  
+  , ->
     if opts.output
       fs.writeFile opts.output, transcludedOutput, (err) ->
         throw err if err

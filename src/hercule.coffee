@@ -5,81 +5,117 @@ _ = require 'lodash'
 utils = require './utils'
 async = require 'async'
 
-#log = (message) -> console.error "#{message}"
 
-processInput = (input, parents, dir) ->
-  rawLinks = utils.scan input
-  #log "Scan: #{rawLinks.length} links found"
-
+transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
+  rawLinks = utils.scan input, relativePath, parents
   links = _.forEach rawLinks, (rawLink) ->
-    rawLink.relativePath = dir
-    rawLink.parents = parents[..]
+    utils.parse rawLink
 
-    parsedLink = utils.parse rawLink
-    #log "Parse: #{parsedLink.references.length} references found"
-
-    return parsedLink
-
-  return links
-
-
-transclude = (input, relativePath, parents, parentRefs, cb) ->
-  # TODO: rename processInput...
-  # log "Scanning: #{input}"
-  links = processInput input, parents, relativePath
+  logger "Links found: #{links.length}"
   if links.length < 1 then return cb input
 
-  async.eachSeries links, ({link, type, file, references, parents, whitespace, placeholder}, done) ->
-    linkType = type
+  async.eachSeries links, (link, done) ->
+    {href, hrefType, references, parents, whitespace, placeholder} = link
 
-    references = _.merge parentRefs, references
-    match = utils.find link, references
+    matchingReferences = parentRefs.filter (ref) -> "#{ref.placeholder}" is "#{href}"
+    if matchingReferences[0]?
+      overridingReference = matchingReferences[0]
+      logger "Overriding reference: #{JSON.stringify overridingReference}"
 
-    if match?
-      #log "Expanding: #{link} -> #{match.value}"
-      link = match.value
-      linkType = match.type
-    else if linkType is "file"
-      link = path.join relativePath, link
+    if not matchingReferences[0]? and hrefType is "file"
+      href = path.join relativePath, href
 
-    if _.contains parents, link
-      # #{link} is in parents:\n#{JSON.stringify parents}
+    href = overridingReference?.href || href
+    hrefType = overridingReference?.hrefType || hrefType
+
+    if _.contains parents, href
+      logger "#{href} is in parents:\n#{JSON.stringify parents}"
       throw new Error("Circular reference detected")
 
-    #log "Transclude: #{link} into #{parents[-1..][0]}"
-    parents.push link
-    dir = path.dirname link
+    parents.push href
+    dir = path.dirname href
+    references = _.merge parentRefs, references
 
-    utils.inflate link, linkType, (content) ->
-
-      transclude content, dir, parents, references, (output) ->
+    utils.inflate href, hrefType, (content) ->
+      logger "Transcluding: #{href} (#{hrefType}) into #{parents[-1..][0]}"
+      transclude content, dir, parents, references, logger, (output) ->
         if output?
-          # Preserve indentation if transclude is not preceded by content
-          # Remove new lines at EOF which cause unexpected paragraphs and breaks
+          # Preserve leading whitespace and trim excess new lines at EOF
           output = output
             .replace /\n/g, "\n#{whitespace}"
             .replace /\n$/, ""
 
           input = input.replace "#{placeholder}", output
-          #log "Replaced: \"#{placeholder}\"\n    with: #{JSON.stringify output}"
           return done()
   , ->
     return cb input
 
 
-transcludeString = (input, relativePath = "", parents = [], parentRefs = [], cb) ->
-    transclude input, relativePath, parents, parentRefs, (output) ->
-      return cb output
+validateOptionalArgs = (args) ->
+  OPTION_LOGGER = 0
+  OPTION_OPTIONS = 1
 
-transcludeFile = (file, relativePath = "", parents = [], parentRefs = [], cb) ->
-    fullFilePath = path.join relativePath, file
-    fullRelativePath = path.dirname fullFilePath
+  defaultOptions =
+    relativePath: ""
+    parents: []
+    parentRefs: []
 
-    parents.push fullFilePath
-    content = utils.readFile fullFilePath
+  logger = (message) -> return true
 
-    transclude content, fullRelativePath, parents, parentRefs, (output) ->
-      return cb output
+  [input, optionalArgs..., cb] = args
+
+  if not (typeof cb is 'function')
+    throw new Error("Argument error: 'callback' should be a function")
+
+  if not (typeof input is 'string')
+    throw new Error("Argument error: 'input' should be a string")
+
+  if typeof optionalArgs[OPTION_LOGGER] is 'function'
+    logger = optionalArgs[OPTION_LOGGER]
+
+  {relativePath, parents, parentRefs} = _.merge defaultOptions, optionalArgs[OPTION_OPTIONS]
+
+  return {input, relativePath, parents, parentRefs, logger, cb}
+
+
+# transcludeString(input, [logger], [options], callback)
+#
+# Arguments:
+#  1. input (string): The input string which will be processed for transclusion links
+#  2. [log (function)]: Logging function accepting a string as the input
+#  3. [options (Object)]: todo
+#  4. callback (function): Function returns through the callback
+#
+# Returns: (string): Transcluded string
+transcludeString = (args...) ->
+  {input, relativePath, parents, parentRefs, logger, cb} = validateOptionalArgs args
+
+  logger "Transcluding string..."
+  transclude input, relativePath, parents, parentRefs, logger, (output) ->
+    return cb output
+
+
+# transcludeFile(input, [logger], [options], callback)
+#
+# Arguments:
+#  1. filepath (string): The location of the local file which will be processed for transclusion links
+#  2. [log (function)]: Logging function accepting a string as the input
+#  3. [options (Object)]: todo
+#  4. callback (function): Function returns through the callback
+#
+# Returns: (string): Transcluded string
+transcludeFile = (args...) ->
+  {input, relativePath, parents, parentRefs, logger, cb} = validateOptionalArgs args
+
+  logger "Transcluding file... #{input}"
+  fullFilePath = path.join relativePath, input
+  fullRelativePath = path.dirname fullFilePath
+
+  parents.push fullFilePath
+  content = utils.readFile fullFilePath
+
+  transclude content, fullRelativePath, parents, parentRefs, logger, (output) ->
+    return cb output
 
 
 module.exports = {transcludeString, transcludeFile}

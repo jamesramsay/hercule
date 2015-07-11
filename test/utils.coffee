@@ -53,15 +53,15 @@ describe 'utils', ->
     it 'should parse simple local links', (done) ->
       file = "file.md"
       link =
-        link: file
+        href: file
         placeholder: ":[simple](#{file})"
         relativePath: ""
 
       parsedLink = utils.parse link
 
       assert.deepEqual parsedLink, {
-        link: "file.md"
-        type: "file"
+        href: "file.md"
+        hrefType: "file"
         placeholder: link.placeholder
         references: []
         relativePath: ""
@@ -72,15 +72,15 @@ describe 'utils', ->
     it 'should parse remote http links', (done) ->
       url = "http://github.com/example.md"
       link =
-        link: url
+        href: url
         placeholder: ":[remote http link](#{url})"
         relativePath: ""
 
       parsedLink = utils.parse link
 
       assert.deepEqual parsedLink, {
-        link: "http://github.com/example.md"
-        type: "http"
+        href: "http://github.com/example.md"
+        hrefType: "http"
         placeholder: link.placeholder
         references: []
         relativePath: ""
@@ -91,77 +91,35 @@ describe 'utils', ->
     it 'should parse complex links', (done) ->
       mixedLink = "file.md fruit:apple.md header: footer:../common/footer.md copyright:\"Copyright 2014 (c)\""
       link =
-        link: mixedLink
+        href: mixedLink
         placeholder: ":[](#{mixedLink})"
         relativePath: "customer/farmers-market"
 
       parsedLink = utils.parse link
 
       assert.deepEqual parsedLink, {
-        link: "file.md"
-        type: "file"
+        href: "file.md"
+        hrefType: "file"
         placeholder: link.placeholder
         references: [
           placeholder: "fruit"
-          type: "file"
-          value: "customer/farmers-market/apple.md"
+          hrefType: "file"
+          href: "customer/farmers-market/apple.md"
         ,
           placeholder: "header"
-          type: "string"
-          value: ""
+          hrefType: "string"
+          href: ""
         ,
           placeholder: "footer"
-          type: "file"
-          value: "customer/common/footer.md"
+          hrefType: "file"
+          href: "customer/common/footer.md"
         ,
           placeholder:"copyright"
-          type:"string"
-          value:"Copyright 2014 (c)"
+          hrefType:"string"
+          href:"Copyright 2014 (c)"
         ]
         relativePath: "customer/farmers-market"
       }
-
-      done()
-
-
-  describe 'find', ->
-    it 'should not find a match when no references provided', (done) ->
-      link = "file.md"
-      references = []
-
-      match = utils.find link, references
-      assert.deepEqual match, undefined
-
-      done()
-
-    it 'should not find a match when there are no matching references', (done) ->
-      link = "file.md"
-      references = [
-        placeholder: "footer"
-        type: "file"
-        value: "footer.md"
-      ]
-
-      match = utils.find link, references
-      assert.deepEqual match, undefined
-
-      done()
-
-    it 'should find matching references', (done) ->
-      link = "footer"
-      type = "file"
-      references = [
-        placeholder: "footer"
-        type: "file"
-        value: "common/footer.md"
-      ,
-        placeholder: "footer"
-        type: "file"
-        value: "other/footer.md"
-      ]
-
-      match = utils.find link, references
-      assert.deepEqual match, references[0]
 
       done()
 
