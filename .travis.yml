@@ -2,17 +2,12 @@ language: node_js
 node_js:
   - '0.12'
 sudo: false
+cache:
+  directories:
+    - node_modules
+    - test/modules
 before_install:
-  - mkdir ./test/modules
-  - git clone https://github.com/sstephenson/bats.git ./test/modules-src/bats
-  - cd test/modules-src/bats
-  - ./install.sh ../../modules
-  - cd -
-before_script:
-  - npm run compile
-script:
-  - npm run travis
-  - ./test/modules/bin/bats test/bats
+  - npm run install-bats
 after_success:
   - npm run coveralls
 deploy:
