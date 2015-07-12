@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ ! -f ./test/modules/bin/bats ]
+then
+  mkdir ./test/modules
+  git clone https://github.com/sstephenson/bats.git ./test/modules-src/bats
+  cd test/modules-src/bats
+  ./install.sh ../../modules
+  cd -
+fi

@@ -4,11 +4,14 @@
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
-    "test": "NODE_ENV=test ./node_modules/.bin/mocha test --compilers coffee:coffee-script/register --reporter spec",
+    "test": "npm run unit-tests && npm run integration-tests",
+    "unit-tests": "NODE_ENV=test ./node_modules/.bin/mocha test --compilers coffee:coffee-script/register --reporter spec",
+    "integration-tests": "npm run compile && ./test/modules/bin/bats test/bats",
     "coverage": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require blanket --reporter html-cov > coverage.html && open coverage.html",
-    "travis": "npm run test && NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js",
+    "coveralls": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js",
     "compile": "coffee --output lib -c src/*",
-    "watch": "coffee --output lib -cw src/*"
+    "watch": "coffee --output lib -cw src/*",
+    "install-bats": "./scripts/install-bats"
   },
   "config": {
     "blanket": {
