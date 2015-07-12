@@ -51,7 +51,7 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
     return cb input
 
 
-validateOptionalArgs = (args) ->
+validateOptionalArgs = ([input, optionalArgs..., cb]) ->
   OPTION_LOGGER = 0
   OPTION_OPTIONS = 1
 
@@ -59,10 +59,7 @@ validateOptionalArgs = (args) ->
     relativePath: ""
     parents: []
     parentRefs: []
-
   logger = (message) -> return true
-
-  [input, optionalArgs..., cb] = args
 
   if not (typeof cb is 'function')
     throw new Error("Argument error: 'callback' should be a function")
