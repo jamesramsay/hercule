@@ -1,23 +1,28 @@
 # Parses transclusion links
 #
-# :[example transclude link](file.md common:file.md)
+# :[example transclude link](file.md || "default value" common:file.md)
 #
 # {
-#  link: file.md
-#  type: file
+#  href: file.md
+#  hrefType: file
 #  references: [
 #     placeholder: common
 #     type: file
 #     value: file.md
 #   ]
+#  default: {
+#   type: string
+#   value: default value
+#  }
 # }
 
 transcludeGrammar = """
-start = l:link? ' '? o:reference* {
+start = l:link? ' || '? d:default? ' '? o:reference* {
   return {
     "href": l.href,
     "hrefType": l.hrefType,
-    "references": o
+    "references": o,
+    "default": d
   };
 }
 
@@ -32,6 +37,8 @@ reference = p:placeholder ':' l:link ' '? {
 placeholder = p:[a-zA-Z0-9]+ {
   return p.join("");
 }
+
+default = string
 
 link = httpLink / fileLink / string / reset
 

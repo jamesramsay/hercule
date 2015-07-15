@@ -64,6 +64,7 @@ describe 'utils', ->
         hrefType: "file"
         placeholder: link.placeholder
         references: []
+        default: null
         relativePath: ""
       }
 
@@ -83,6 +84,7 @@ describe 'utils', ->
         hrefType: "http"
         placeholder: link.placeholder
         references: []
+        default: null
         relativePath: ""
       }
 
@@ -118,10 +120,74 @@ describe 'utils', ->
           hrefType:"string"
           href:"Copyright 2014 (c)"
         ]
+        default: null
         relativePath: "customer/farmers-market"
       }
 
       done()
+
+    it 'should parse links with default', (done) ->
+      href = "file-which-does-not-exist.md || \"default value\""
+      link =
+        href: href
+        placeholder: ":[simple](#{href})"
+        relativePath: ""
+
+      parsedLink = utils.parse link
+
+      assert.deepEqual parsedLink, {
+        href: "file-which-does-not-exist.md"
+        hrefType: "file"
+        placeholder: link.placeholder
+        references: []
+        default: {
+          hrefType: "string"
+          href: "default value"
+        }
+        relativePath: ""
+      }
+
+      done()
+
+    it 'should parse complex links with default', (done) ->
+      mixedLink = "file.md || \"Nope\" fruit:apple.md header: footer:../common/footer.md copyright:\"Copyright 2014 (c)\""
+      link =
+        href: mixedLink
+        placeholder: ":[](#{mixedLink})"
+        relativePath: "customer/farmers-market"
+
+      parsedLink = utils.parse link
+
+      assert.deepEqual parsedLink, {
+        href: "file.md"
+        hrefType: "file"
+        placeholder: link.placeholder
+        references: [
+          placeholder: "fruit"
+          hrefType: "file"
+          href: "customer/farmers-market/apple.md"
+        ,
+          placeholder: "header"
+          hrefType: "string"
+          href: ""
+        ,
+          placeholder: "footer"
+          hrefType: "file"
+          href: "customer/common/footer.md"
+        ,
+          placeholder:"copyright"
+          hrefType:"string"
+          href:"Copyright 2014 (c)"
+        ]
+        default: {
+          hrefType: "string"
+          href: "Nope"
+        }
+        relativePath: "customer/farmers-market"
+      }
+
+      done()
+
 
 
   describe 'readFile', ->

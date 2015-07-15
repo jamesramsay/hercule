@@ -69,6 +69,25 @@ describe 'hercule', ->
         assert.equal output, 'Jackdaws love my big sphinx of quartz.\n'
         done()
 
+    it 'should transclude strings with invalid links but a default', (done) ->
+      file = __dirname + "/fixtures/test-default/invalid-link.md"
+      input = (fs.readFileSync file).toString()
+      dir = path.dirname file
+
+      hercule.transcludeString input, null, {relativePath: dir}, (output) ->
+        assert.equal output, 'Jackdaws love my imagined sphinx of quartz.\n'
+        done()
+
+    it 'should transclude strings with undefined placeholders but a default', (done) ->
+      file = __dirname + "/fixtures/test-default/undefined-placeholder.md"
+      input = (fs.readFileSync file).toString()
+      dir = path.dirname file
+
+      hercule.transcludeString input, null, {relativePath: dir}, (output) ->
+        assert.equal output, 'Jackdaws love my imagined sphinx of quartz.\n'
+        done()
+
+
   describe 'transcludeFile', ->
 
     beforeEach ->
@@ -137,3 +156,18 @@ describe 'hercule', ->
       hercule.transcludeFile inputFile, (output) ->
         assert.equal output, "The quick brown fox jumps over the lazy dog.\n"
         done()
+
+    it 'should transclude files with invalid links but a default', (done) ->
+      inputFile = __dirname + "/fixtures/test-default/invalid-link.md"
+
+      hercule.transcludeFile inputFile, (output) ->
+        assert.equal output, 'Jackdaws love my imagined sphinx of quartz.\n'
+        done()
+
+    it 'should transclude files with undefined placeholder but a default', (done) ->
+      inputFile = __dirname + "/fixtures/test-default/undefined-placeholder.md"
+
+      hercule.transcludeFile inputFile, (output) ->
+        assert.equal output, 'Jackdaws love my imagined sphinx of quartz.\n'
+        done()
+
