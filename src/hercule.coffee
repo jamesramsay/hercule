@@ -25,8 +25,8 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
     if not matchingReferences[0]? and hrefType is "file"
       href = path.join relativePath, href
 
-    href = overridingReference?.href || href
-    hrefType = overridingReference?.hrefType || hrefType
+    href = overridingReference.href if overridingReference?
+    hrefType = overridingReference.hrefType if overridingReference?
 
     if _.contains parents, href
       logger "#{href} is in parents:\n#{JSON.stringify parents}"
