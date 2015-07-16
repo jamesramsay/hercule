@@ -188,6 +188,29 @@ describe 'utils', ->
 
       done()
 
+    it 'should parse links with an empty default', (done) ->
+      href = "file-which-does-not-exist.md || \"\""
+      link =
+        href: href
+        placeholder: ":[simple](#{href})"
+        relativePath: ""
+
+      parsedLink = utils.parse link
+
+      assert.deepEqual parsedLink, {
+        href: "file-which-does-not-exist.md"
+        hrefType: "file"
+        placeholder: link.placeholder
+        references: []
+        default: {
+          hrefType: "string"
+          href: ""
+        }
+        relativePath: ""
+      }
+
+      done()
+
 
 
   describe 'readFile', ->

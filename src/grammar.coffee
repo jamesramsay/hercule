@@ -38,7 +38,7 @@ placeholder = p:[a-zA-Z0-9]+ {
   return p.join("");
 }
 
-default = string
+default = emptyString / string
 
 link = httpLink / fileLink / string / reset
 
@@ -55,6 +55,14 @@ httpLink = left:("http://" / "https://") right:[^ ()]+ {
     "href": left + right.join("")
   };
 }
+
+emptyString = '\"' '\"' {
+  return {
+    "hrefType": "string",
+    "href": ""
+  };
+}
+
 
 string = '\"' s:([^\"]+) '\"' {
   return {
