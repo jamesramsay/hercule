@@ -53,10 +53,10 @@ hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", function(output)
 Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
 
 ```markdown
-This is an :[example link](example.md).
+This is an :[example link](foo.md).
 ```
 
-Output from `hercule examples/basic.md`:
+Output from `hercule examples/basic/main.md`:
 
 ```
 This is an example transclusion.
@@ -82,26 +82,63 @@ Jackdaws love my big sphinx of quartz.
 
 ## Advanced use: placeholders and references
 
-In addition to basic file transclusion, Hercule supports placeholders and references.
+As well as basic file transclusion, Hercule supports placeholders and references.
 Placeholders and references may be useful for increasing the _'dryness'_ of your source documents.
 
-`foo.md`
+Example placeholder link in `examples/advanced/foo.md`:
 
 ```markdown
 is an :[example placeholder](bar)
 ```
 
-In the example file `foo.md`, `bar` is being used as a placeholder.
-When we transclude `foo.md` into our document, the placeholder can be targeted to specify a file or string.
+In this example `bar` is being used as a placeholder link.
+When transcluding `foo.md`, the placeholder can be targeted by a reference file or string.
 
 ```markdown
-This document :[example link with references](foo.md bar:"example foobar!")
+This document :[example link with string reference](foo.md bar:"example foobar!")
 ```
 
-Output from `hercule examples/basic.md`:
+Output from `hercule examples/advanced/main.md`:
 
 ```
 This document is an example foobar!
+```
+
+References are passed down to any nested transclusion links.
+
+## Advanced use: default placeholders
+
+Sometimes a file might be used in multiple contexts, some contexts requiring references and others not.
+Default placeholders help handle this situation more conveniently.
+
+The following example uses Apiary's [Markdown Syntax for Object Notation (MSON)](https://github.com/apiaryio/mson).
+
+```markdown
+## Properties
+
+- id: 1 (number, required)
+- name: Cucumber (string, required)
+- description: Essential for tzatziki (string, :[is required](required || "optional"))
+```
+
+Output from `hercule examples/default/main.md` without reference `required`:
+
+```markdown
+## Properties
+
+- id: 1 (number, required)
+- name: Cucumber (string, required)
+- description: Essential for tzatziki (string, optional)
+```
+
+Output from `hercule examples/default/main-override.md` with reference `required`:
+
+```markdown
+## Properties
+
+- id: 1 (number, required)
+- name: Cucumber (string, required)
+- description: Essential for tzatziki (string, required)
 ```
 
 ## Whitespace sensitivity
@@ -120,6 +157,13 @@ Each line of `snippet.c` will be indented with the whitespace preceding it.
 
 ----
 
-## Related projects
+## Acknowledgments
+
+Special thanks:
+
+- [@zdne](https://github.com/zdne) for your feedback and ideas, particularly on syntax
+- [@MichaelHirn](https://github.com/MichaelHirn) for contributions including the default link behaviour
+
+Related projects:
 
 - [Grunt Hercule](https://github.com/chesleybrown/grunt-hercule): a Grunt task that wraps hercule
