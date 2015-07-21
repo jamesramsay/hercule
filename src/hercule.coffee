@@ -18,15 +18,14 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
     {href, hrefType, references, parents, whitespace, placeholder} = link
 
     matchingReferences = parentRefs.filter (ref) -> "#{ref.placeholder}" is "#{href}"
-    if matchingReferences[0]?
-      overridingReference = matchingReferences[0]
-      logger "Overriding reference: #{JSON.stringify overridingReference}"
-
-    if not matchingReferences[0]? and hrefType is "file"
-      href = path.join relativePath, href
-
+    overridingReference = matchingReferences[0] || link.default
     href = overridingReference.href if overridingReference?
     hrefType = overridingReference.hrefType if overridingReference?
+
+    if overridingReference?
+      logger "Overriding reference: #{JSON.stringify overridingReference}"
+    else if hrefType is "file"
+      href = path.join relativePath, href
 
     if _.contains parents, href
       logger "#{href} is in parents:\n#{JSON.stringify parents}"
@@ -38,8 +37,6 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
 
     utils.inflate href, hrefType, (content) ->
       logger "Transcluding: #{href} (#{hrefType}) into #{parents[-1..][0]}"
-      if content is null && link.default
-        content = link.default.href
       transclude content, dir, parents, references, logger, (output) ->
         if output?
           # Preserve leading whitespace and trim excess new lines at EOF
