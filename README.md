@@ -53,10 +53,10 @@ hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", function(output)
 Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
 
 ```markdown
-This is an :[example link](example.md).
+This is an :[example link](foo.md).
 ```
 
-Output from `hercule examples/basic.md`:
+Output from `hercule examples/basic/main.md`:
 
 ```
 This is an example transclusion.
@@ -85,7 +85,7 @@ Jackdaws love my big sphinx of quartz.
 As well as basic file transclusion, Hercule supports placeholders and references.
 Placeholders and references may be useful for increasing the _'dryness'_ of your source documents.
 
-Example placeholder link in `examples/foo.md`:
+Example placeholder link in `examples/advanced/foo.md`:
 
 ```markdown
 is an :[example placeholder](bar)
@@ -98,7 +98,7 @@ When transcluding `foo.md`, the placeholder can be targeted by a reference file 
 This document :[example link with string reference](foo.md bar:"example foobar!")
 ```
 
-Output from `hercule examples/advanced.md`:
+Output from `hercule examples/advanced/main.md`:
 
 ```
 This document is an example foobar!
@@ -121,7 +121,7 @@ The following example uses Apiary's [Markdown Syntax for Object Notation (MSON)]
 - description: Essential for tzatziki (string, :[is required](required || "optional"))
 ```
 
-Transcluding without reference `required` yields (`hercule examples/default.md`):
+Output from `hercule examples/default/main.md` without reference `required`:
 
 ```markdown
 ## Properties
@@ -131,7 +131,7 @@ Transcluding without reference `required` yields (`hercule examples/default.md`)
 - description: Essential for tzatziki (string, optional)
 ```
 
-Transcluding with reference `required` yields (`hercule examples/default-override.md`):
+Output from `hercule examples/default/main-override.md` with reference `required`:
 
 ```markdown
 ## Properties
