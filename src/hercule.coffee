@@ -38,6 +38,8 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
 
     utils.inflate href, hrefType, (content) ->
       logger "Transcluding: #{href} (#{hrefType}) into #{parents[-1..][0]}"
+      if content is null && link.default
+        content = link.default.href
       transclude content, dir, parents, references, logger, (output) ->
         if output?
           # Preserve leading whitespace and trim excess new lines at EOF
