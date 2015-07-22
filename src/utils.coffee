@@ -1,8 +1,13 @@
 fs = require 'fs'
 path = require 'path'
-peg = require 'pegjs'
 _ = require 'lodash'
 request = require 'request'
+
+try
+  linkParser = require './transclude-parser'
+catch ex
+  peg = require 'pegjs'
+  linkParser = peg.buildParser (fs.readFileSync './src/transclude.pegjs', {encoding: 'utf8'})
 
 
 # Link detection (including leading whitespace)
@@ -10,11 +15,6 @@ linkRegExp = new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))/gm)
 WHITESPACE_GROUP = 1
 PLACEHOLDER_GROUP = 2
 LINK_GROUP = 3
-
-
-# Build the link parser once
-grammar = require './grammar'
-linkParser = peg.buildParser grammar.transcludeGrammar
 
 
 # Scan a document string for links

@@ -171,3 +171,19 @@ describe 'hercule', ->
         assert.equal output, 'Jackdaws love my imagined sphinx of quartz.\n'
         done()
 
+    it 'should transclude files with escaped quotes within strings', (done) ->
+      inputFile = __dirname + "/fixtures/test-quotes/main.md"
+
+      hercule.transcludeFile inputFile, (output) ->
+        assert.equal output, """
+        ```
+        {
+          "bar": null
+        },
+        {
+          "bar": "green"
+        }
+        ```
+
+        """
+        done()

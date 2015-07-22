@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
@@ -9,8 +9,8 @@
     "integration-tests": "npm run compile && ./test/modules/bin/bats test/bats",
     "coverage": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require blanket --reporter html-cov > coverage.html && open coverage.html",
     "coveralls": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --compilers coffee:coffee-script/register --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js",
-    "compile": "coffee --output lib -c src/*",
-    "watch": "coffee --output lib -cw src/*",
+    "compile": "coffee --output lib -c src/*.coffee && ./node_modules/pegjs/bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
+    "watch": "coffee --output lib -cw src/*.coffee",
     "install-bats": "./scripts/install-bats"
   },
   "config": {
@@ -46,7 +46,6 @@
     "async": "^1.3.0",
     "dashdash": "^1.7.0",
     "lodash": "^3.0.0",
-    "pegjs": "^0.8.0",
     "request": "^2.58.0"
   },
   "devDependencies": {
@@ -56,6 +55,7 @@
     "coveralls": "^2.11.2",
     "mocha": "^2.2.5",
     "mocha-lcov-reporter": "^0.0.2",
-    "nock": "^2.7.0"
+    "nock": "^2.7.0",
+    "pegjs": "^0.8.0"
   }
 }
