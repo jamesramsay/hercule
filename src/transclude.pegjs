@@ -44,7 +44,7 @@ stringLink = s:string {
   };
 }
 
-reset = {
+reset = "" {
   return {
     "hrefType": "string",
     "href": ""
