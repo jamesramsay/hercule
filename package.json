@@ -55,7 +55,7 @@
     "coveralls": "2.11.4",
     "mocha": "2.3.3",
     "mocha-lcov-reporter": "1.0.0",
-    "nock": "2.13.0",
+    "nock": "2.15.0",
     "pegjs": "0.9.0"
   }
 }
