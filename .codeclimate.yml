@@ -1,0 +1,11 @@
+engine:
+  coffeelint:
+    enabled: true
+ratings:
+   paths:
+   - src/**
+exclude_paths:
+- bin/**/*
+- example/**/*
+- scripts/**/*
+- test/**/*
