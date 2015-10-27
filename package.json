@@ -52,6 +52,7 @@
     "assert-diff": "1.0.1",
     "blanket": "1.1.7",
     "coffee-script": "1.10.0",
+    "coffeelint": "^1.13.0",
     "coveralls": "2.11.4",
     "mocha": "2.3.3",
     "mocha-lcov-reporter": "1.0.0",
