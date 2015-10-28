@@ -3,7 +3,7 @@ engine:
     enabled: true
 ratings:
    paths:
-   - src/**
+   - src/**.coffee
 exclude_paths:
 - bin/**/*
 - example/**/*
