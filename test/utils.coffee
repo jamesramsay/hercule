@@ -269,9 +269,9 @@ describe 'utils', ->
     it 'should return contents of local files', (done) ->
       file = __dirname + "/fixtures/test-base/fox.md"
       utils.inflate file, 'file', (output) ->
-         assert.equal output, 'The quick brown fox jumps over the lazy dog.\n'
+        assert.equal output, 'The quick brown fox jumps over the lazy dog.\n'
 
-         done()
+        done()
 
     it 'should return contents of http files', (done) ->
       url  = "http://github.com"
