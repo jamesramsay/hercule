@@ -28,7 +28,7 @@ parser = dashdash.createParser options: [
 
 
 try
-  opts = parser.parse process.argv;
+  opts = parser.parse process.argv
 catch e
   console.error "hercule: error: #{e.message}"
   process.exit 1
