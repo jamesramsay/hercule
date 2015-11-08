@@ -1,6 +1,7 @@
 node_modules
 lib
 .coveralls.yml
-coverage.html
+coverage
+.nyc_output
 *.log
 test/modules*
