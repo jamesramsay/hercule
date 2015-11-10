@@ -87,6 +87,15 @@ describe 'hercule', ->
         assert.equal output, 'Jackdaws love my imagined sphinx of quartz.\n'
         done()
 
+    it 'should transclude strings with invalid links without hanging', (done) ->
+      file = __dirname + "/fixtures/test-default/missing-link.md"
+      input = (fs.readFileSync file).toString()
+      dir = path.dirname file
+
+      hercule.transcludeString input, null, {relativePath: dir}, (output) ->
+        assert.equal output, 'Jackdaws love my :[test link](non-existend-file.md) sphinx of quartz.\n'
+        done()
+
 
   describe 'transcludeFile', ->
 
