@@ -53,7 +53,8 @@
     "async": "^1.5.0",
     "dashdash": "^1.10.1",
     "lodash": "^3.10.1",
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+    "through2": "^2.0.0"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
