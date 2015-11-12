@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/jamesramsay/hercule](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jamesramsay/hercule?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build Status](https://travis-ci.org/jamesramsay/hercule.svg)](https://travis-ci.org/jamesramsay/hercule)
+[![Build Status](https://travis-ci.org/jamesramsay/hercule.svg?branch=master)](https://travis-ci.org/jamesramsay/hercule)
 [![Coverage Status](https://coveralls.io/repos/jamesramsay/hercule/badge.svg)](https://coveralls.io/r/jamesramsay/hercule)
 [![Dependency Status](https://david-dm.org/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
