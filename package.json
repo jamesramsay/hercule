@@ -62,7 +62,7 @@
     "coffee-script": "^1.10.0",
     "coffeelint": "^1.13.0",
     "coveralls": "^2.11.4",
-    "nock": "^2.15.0",
+    "nock": "^3.0.0",
     "nyc": "^3.2.2",
     "pegjs": "^0.9.0"
   }
