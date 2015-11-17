@@ -1,11 +1,11 @@
 import test  from 'ava';
-import RegExStream from '../src/RegExStream';
+import RegexStream from '../src/regex-stream';
 
 
 test('should find handle empty buffer', (t) => {
   let input = '';
 
-  let testStream = new RegExStream(/\w+/i);
+  let testStream = new RegexStream(/\w+/i);
 
   testStream.on('readable', function() {
     var content = null;
@@ -28,10 +28,27 @@ test('should return objects (transform)', (t) => {
   t.plan(18);
   let input = 'The quick brown fox jumps over the lazy dog.';
   let expected = [
-    'The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumps', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog', '.'
+    {content: 'The',   tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'quick', tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'brown', tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'fox',   tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'jumps', tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'over',  tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'the',   tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'lazy',  tokenType: 'match'},
+    {content: ' ',     tokenType: 'miss'},
+    {content: 'dog',   tokenType: 'match'},
+    {content: '.',     tokenType: 'miss'}
   ];
 
-  let testStream = new RegExStream(/\w+/i);
+  let testStream = new RegexStream(/\w+/i);
 
   testStream.on('readable', function() {
     var content = null;
@@ -57,10 +74,11 @@ test('should return objects (flush)', (t) => {
   t.plan(2);
   let input = 'a(test)';
   let expected = [
-    'a', '(test)'
+    {content: 'a', tokenType: 'miss'},
+    {content: '(test)', tokenType: 'match'}
   ];
 
-  let testStream = new RegExStream(/\(\w+\)/i);
+  let testStream = new RegexStream(/\(\w+\)/g);
 
   testStream.on('readable', function() {
     var content = null;

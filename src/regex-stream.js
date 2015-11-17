@@ -1,16 +1,12 @@
-var through2 = require( "through2" );
+var through2 = require('through2');
 
-// TODO: Add flags to enable handling of:
-//  - regular expressions which can mach one character width ( /\w+/) (FALSE)
-//  - regular expressions which have a defined end (/\(w+\)/) (FALSE)
-//  - return un-transformed text (TRUE)
+// TODO: Add flags to enable handle regular expressions which can mach one character width ( /\w+/)
+// TODO: Add flags to enable handle regular expressions which have a defined end (/\(w+\)/)
+// TODO: Add flags to enable handle return un-transformed text
 
-function RegExStream(patternIn) {
+function RegexStream(patternIn) {
 
-  // Each instance of the stream requires a unique instance of the regular expression
-  // if (!(patternIn instanceof RegExp)) {
-  //   patternIn = new RegExp(patternIn, "g");
-  // }
+  // TODO: Validate that the RegExp is a unique instance (clone)
   var pattern = clonePattern(patternIn);
   var inputBuffer = "";
 
@@ -34,46 +30,43 @@ function RegExStream(patternIn) {
 
 
   function transform(chunk, encoding, cb) {
-    inputBuffer += chunk.toString( "utf8" );
+    inputBuffer += chunk.toString('utf8');
 
-    // Prevent the buffer from growing unnecessarily large by tracking the last relevant index.
-    // Content before this index can be discarded.
     var nextOffset = null;
     var match = null;
 
     while ((match = pattern.exec(inputBuffer)) !== null) {
 
       // Content prior to match can be returned without transform
-      this.push(inputBuffer.slice(0, match.index));
+      if (match.index !== 0) {
+        this.push({
+          tokenType: 'miss',
+          content: inputBuffer.slice(0, match.index)
+        });
+      }
 
       // Match within bounds (exclusive): [     xxxxxx   ]
       if (pattern.lastIndex < inputBuffer.length) {
 
-        // TRANSFORM HERE!
-        this.push(match[0])
+        this.push({
+          tokenType: 'match',
+          content: match[0]
+        })
 
         // Next match must be after this match
         nextOffset = pattern.lastIndex;
 
+      } else {
       // Match within bounds (inclusive): [        xxxxxx]
       // Cannot be processed without inspecting next chunk or reaching end of stream
-      // NOTE: This will vary based on the specifics of the regular expression
-      } else {
+
+        // Next match will be the start of this match
         nextOffset = match.index;
       }
 
-      // All content prior to the match can be disposed of
       inputBuffer = inputBuffer.slice(nextOffset);
     }
 
-    // If no match was found at all, then we can reset the internal buffer entirely.
-    // TODO: THIS ASSUMPTION MAY NOT HOLD FOR ALL REGEXP!
-    // if ( nextOffset == null ) {
-    //   inputBuffer = "";
-    // }
-
-    // Reset the regular expression so that it can pick up at the start of the
-    // internal buffer when the next chunk is ready to be processed.
     pattern.lastIndex = 0;
 
     cb();
@@ -83,14 +76,20 @@ function RegExStream(patternIn) {
   function flush(cb) {
     var match = null;
 
-    // Loop over any remaining matches in the internal buffer.
     while ((match = pattern.exec(inputBuffer)) !== null) {
 
       // Content prior to match can be returned without modification
-      this.push(inputBuffer.slice(0, match.index));
+      if (match.index !== 0) {
+        this.push({
+          tokenType: 'miss',
+          content: inputBuffer.slice(0, match.index)
+        });
+      }
 
-      // TRANSFORM
-      this.push(match[0]);
+      this.push({
+        tokenType: 'match',
+        content: match[0]
+      });
 
       // Next match must be after this match
       nextOffset = pattern.lastIndex;
@@ -99,15 +98,17 @@ function RegExStream(patternIn) {
       inputBuffer = inputBuffer.slice(nextOffset);
     }
 
-    // Empty internal buffer
-    this.push(inputBuffer);
-
-    // Signal the end of the output stream.
+    // Empty internal buffer and signal the end of the output stream.
+    if (inputBuffer !== '') {
+      this.push({
+        tokenType: 'miss',
+        content: inputBuffer
+      });
+    }
     this.push(null);
 
-    // Signal that the input has been fully processed.
     cb();
   }
 }
 
-module.exports = RegExStream;
+module.exports = RegexStream;
