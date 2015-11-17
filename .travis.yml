@@ -1,20 +1,20 @@
 language: node_js
 node_js:
-  - '0.12'
+- '0.12'
 sudo: false
 cache:
   directories:
-    - node_modules
-    - test/modules
+  - node_modules
+  - test/modules
 before_install:
-  - npm run install-bats
+- npm run install-bats
 after_success:
-  - npm run coveralls
+- npm run coveralls
 deploy:
   provider: npm
   email: git@jwr.vc
   api_key:
-    secure: Hbd6eYtt4GiBLwru4GetULUTn49pudkDzo3Eof0/FkR7id8eONuPxbl4Wsf/ZB6C0VWBqbY2od/tCCeiUEa5sbEaZT79NQQCnygtZVjC1N/Aynt0Tzq3jjaBP7wOiq5rDzQPVESCloYD6cc0+O+siVz88EzwLzicl0W1tPAwM6o=
+    secure: K/+dVjtCqesr5E5EMZo/qBdKlWwPpZ60yp1GtKoAhSZUtL4VY4A8LOJmcSeIeYvsPkK8PRSCyb2FTDfSTYEO4dWVfNPoLxWp7U48iIiHSfLdNixfTiBHyjdKdP/6oCz3TNfb9upPUb1lcb5h+rM2KJgCLT6s30Vbajka6STeDCs=
   on:
     tags: true
     repo: jamesramsay/hercule
