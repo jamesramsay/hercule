@@ -43,6 +43,7 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
           output = output
             .replace /\n/g, "\n#{whitespace}"
             .replace /\n$/, ""
+            .replace /\$/, "$$$$"
 
           input = input.replace "#{placeholder}", () -> output
         return done()

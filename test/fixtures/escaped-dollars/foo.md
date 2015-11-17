@@ -1,0 +1,1 @@
+A regex: `^pattern$`
