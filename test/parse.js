@@ -19,6 +19,7 @@ test('should parse simple local links', (t) => {
     placeholder: link.placeholder,
     references: [],
     default: null,
+    defaultType: null,
     relativePath: "",
   });
 });
@@ -41,6 +42,7 @@ test('should parse remote http links', (t) => {
     placeholder: link.placeholder,
     references: [],
     default: null,
+    defaultType: null,
     relativePath: ""
   });
 });
@@ -83,6 +85,7 @@ test('should parse complex links', (t) => {
       }
     ],
     default: null,
+    defaultType: null,
     relativePath: "customer/farmers-market"
   });
 });
@@ -104,10 +107,8 @@ test('should parse links with default', (t) => {
     hrefType: "file",
     placeholder: link.placeholder,
     references: [],
-    default: {
-      hrefType: "string",
-      href: "default value"
-    },
+    default: "default value",
+    defaultType: "string",
     relativePath: ""
   });
 });
@@ -150,10 +151,8 @@ test('should parse complex links with default', (t) => {
         href:"Copyright 2014 (c)"
       }
     ],
-    default: {
-      hrefType: "string",
-      href: "Nope"
-    },
+    default: "Nope",
+    defaultType: "string",
     relativePath: "customer/farmers-market"
   });
 });
@@ -175,10 +174,8 @@ test('should parse links with an empty default', (t) => {
     hrefType: "file",
     placeholder: link.placeholder,
     references: [],
-    default: {
-      hrefType: "string",
-      href: ""
-    },
+    default: "",
+    defaultType: "string",
     relativePath: ""
   });
 });

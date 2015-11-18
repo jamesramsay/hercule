@@ -3,7 +3,8 @@ start = l:link? " || "? d:default? " "? o:reference* {
     "href": l.href,
     "hrefType": l.hrefType,
     "references": o,
-    "default": d
+    "default": d ? d.href : null,
+    "defaultType": d ? d.hrefType : null
   };
 }
 
