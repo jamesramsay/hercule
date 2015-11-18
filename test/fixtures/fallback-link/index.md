@@ -1,0 +1,1 @@
+:[example](story || fox.md)

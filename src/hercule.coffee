@@ -18,13 +18,19 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
     {href, hrefType, references, parents, whitespace, placeholder} = link
 
     matchingReferences = parentRefs.filter (ref) -> "#{ref.placeholder}" is "#{href}"
-    overridingReference = matchingReferences[0] || link.default
-    href = overridingReference.href if overridingReference?
-    hrefType = overridingReference.hrefType if overridingReference?
+    defaultReference = {href: link.default, hrefType: link.defaultType} if link.default
+    overridingReference = matchingReferences[0]
 
     if overridingReference?
       logger "Overriding reference: #{JSON.stringify overridingReference}"
-    else if hrefType is "file"
+      href = overridingReference.href
+      hrefType = overridingReference.hrefType
+    else if defaultReference?
+      logger "Fallback reference: #{JSON.stringify defaultReference}"
+      href = defaultReference.href
+      hrefType = defaultReference.hrefType
+
+    if not overridingReference? and hrefType is "file"
       href = path.join relativePath, href
 
     if _.contains parents, href
