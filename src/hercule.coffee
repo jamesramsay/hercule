@@ -39,7 +39,7 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
 
     parents.push href
     dir = path.dirname href
-    references = _.merge parentRefs, references
+    references = _.merge [], parentRefs, references
 
     utils.inflate href, hrefType, (content) ->
       logger "Transcluding: #{href} (#{hrefType}) into #{parents[-1..][0]}"
