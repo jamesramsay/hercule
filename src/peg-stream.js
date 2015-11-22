@@ -15,10 +15,10 @@ Input and output properties can be altered by providing options
 
 var defaultOptions = {
   expression: 'expression',
-  parsed: 'parsed'
-}
+  parsed: 'parsed',
+};
 
-module.exports = function(grammar, options) {
+module.exports = function pegStream(grammar, options) {
   var opt = _.merge({}, defaultOptions, options);
 
   function transform(chunk, encoding, cb) {
@@ -36,4 +36,4 @@ module.exports = function(grammar, options) {
   }
 
   return through2.obj(transform);
-}
+};

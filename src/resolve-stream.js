@@ -30,13 +30,16 @@ Input and output properties can be altered by providing options
 var defaultOptions = {
   input: 'link',
   output: 'link',
-  relativePath: 'relativePath'
-}
+  relativePath: 'relativePath',
+};
 
-module.exports = function(options) {
+module.exports = function resolveStream(options) {
   var opt = _.merge({}, defaultOptions, options);
 
   function transform(chunk, encoding, cb) {
+    var outputLink;
+    var overridingReference;
+    var fallbackReference;
     var link = chunk[opt.input];
     var relativePath = chunk[opt.relativePath];
 
@@ -46,11 +49,11 @@ module.exports = function(options) {
     }
 
     // Default to primary link
-    var outputLink = link.primary;
+    outputLink = link.primary;
 
     // Overriding and fallback references
-    var overridingReference = _.find(link.references, {'placeholder': outputLink.href});
-    var fallbackReference = link.fallback;
+    overridingReference = _.find(link.references, {'placeholder': outputLink.href});
+    fallbackReference = link.fallback;
 
     if (overridingReference || fallbackReference) {
       outputLink = _.pick(overridingReference || fallbackReference, ['href', 'hrefType']);
@@ -67,4 +70,4 @@ module.exports = function(options) {
   }
 
   return through2.obj(transform);
-}
+};

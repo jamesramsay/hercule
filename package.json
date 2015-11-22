@@ -5,12 +5,14 @@
   "main": "./lib/hercule",
   "scripts": {
     "test": "npm run compile && npm run unit-test",
+    "posttest": "npm run lint",
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
     "coverage": "./node_modules/.bin/nyc report --reporter=html && open coverage/index.html",
     "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
     "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
-    "install-bats": "./scripts/install-bats"
+    "install-bats": "./scripts/install-bats",
+    "lint": "./node_modules/.bin/eslint ./src"
   },
   "config": {
     "blanket": {
@@ -61,6 +63,8 @@
     "babel-preset-es2015": "^6.1.18",
     "blanket": "^1.1.9",
     "coveralls": "^2.11.4",
+    "eslint": "^1.10.1",
+    "eslint-config-airbnb": "^1.0.0",
     "nock": "^3.0.0",
     "nyc": "^3.2.2",
     "pegjs": "^0.9.0"

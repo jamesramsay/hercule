@@ -18,7 +18,7 @@ Input and output properties can be altered by providing options
 
 var defaultOptions = {
   input: 'link',
-  output: 'chunk'
+  output: 'chunk',
 };
 
 module.exports = function inflateStream(options) {
@@ -33,15 +33,15 @@ module.exports = function inflateStream(options) {
       return cb();
     }
 
-    switch(link.hrefType) {
-      case 'file':
-        content = fs.readFileSync(link.href, 'utf8').replace(/\n$/, '');
-        break;
-      case 'string':
-        content = link.href;
-        break;
-      default:
-        content = '';
+    switch (link.hrefType) {
+    case 'file':
+      content = fs.readFileSync(link.href, 'utf8').replace(/\n$/, '');
+      break;
+    case 'string':
+      content = link.href;
+      break;
+    default:
+      content = '';
     }
 
     chunk[opt.output] = content;

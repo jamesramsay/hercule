@@ -13,32 +13,32 @@ Output: (object)
 
 var defaultOptions = {
   match: 'match',
-  chunk: 'chunk'
-}
+  chunk: 'chunk',
+};
 
-module.exports = function(patternIn, options) {
+module.exports = function regexStream(patternIn, options) {
   var opt = _.merge({}, defaultOptions, options);
-  var pattern = clonePattern(patternIn);
-  var inputBuffer = "";
+  var pattern = null;
+  var inputBuffer = '';
 
-  function clonePattern(pattern) {
-    // Split the pattern into the pattern and the flags.
-    var parts = pattern.toString().slice(1).split("/");
+  function clonePattern(inputPattern) {
+    var clonedPattern = null;
+    var parts = inputPattern.toString().slice(1).split('/');
     var regex = parts[0];
-    var flags = (parts[1] || "g");
+    var flags = (parts[1] || 'g');
 
     // Make sure the pattern uses the global flag so our exec() will run as expected.
-    if (flags.indexOf("g") === -1) {
-      flags += "g";
+    if (flags.indexOf('g') === -1) {
+      flags += 'g';
     }
 
-    clonedPattern = new RegExp(regex, flags)
-    return(clonedPattern);
+    clonedPattern = new RegExp(regex, flags);
+    return clonedPattern;
   }
 
 
   function pushChunk(chunk, match) {
-    output = {};
+    var output = {};
     output[opt.chunk] = chunk;
 
     if (match) {
@@ -48,13 +48,12 @@ module.exports = function(patternIn, options) {
     this.push(output);
   }
 
-
   function transform(chunk, encoding, cb) {
-    var nextOffset = outputChunk = match = null;
+    var nextOffset = null;
+    var match = null;
     inputBuffer += chunk.toString('utf8');
 
     while ((match = pattern.exec(inputBuffer)) !== null) {
-
       // Content prior to match can be returned without transform
       if (match.index !== 0) {
         pushChunk.call(this, inputBuffer.slice(0, match.index));
@@ -67,10 +66,9 @@ module.exports = function(patternIn, options) {
         // Next match must be after this match
         nextOffset = pattern.lastIndex;
 
-      } else {
       // Match within bounds (inclusive): [        xxxxxx]
       // Cannot be processed without inspecting next chunk or reaching end of stream
-
+      } else {
         // Next match will be the start of this match
         nextOffset = match.index;
       }
@@ -85,10 +83,9 @@ module.exports = function(patternIn, options) {
 
   function flush(cb) {
     var match = null;
-    var outputChunk = null;
+    var nextOffset = null;
 
     while ((match = pattern.exec(inputBuffer)) !== null) {
-
       // Content prior to match can be returned without modification
       if (match.index !== 0) {
         pushChunk.call(this, inputBuffer.slice(0, match.index));
@@ -111,5 +108,6 @@ module.exports = function(patternIn, options) {
     cb();
   }
 
+  pattern = clonePattern(patternIn);
   return through2.obj(transform, flush);
-}
+};
