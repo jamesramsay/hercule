@@ -4,12 +4,12 @@
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
-    "test": "npm run compile",
+    "test": "npm run compile && npm run unit-test",
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
-    "coverage": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/nyc ./node_modules/.bin/ava && open coverage/lcov-report/index.html",
+    "coverage": "./node_modules/.bin/nyc report --reporter=html && open coverage/index.html",
     "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "compile": "./node_modules/.bin/babel src --out-dir lib && ./node_modules/pegjs/bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
+    "compile": "mkdir lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats"
   },
   "config": {
@@ -57,7 +57,6 @@
   "devDependencies": {
     "assert-diff": "^1.0.1",
     "ava": "^0.5.0",
-    "babel-cli": "^6.2.0",
     "blanket": "^1.1.9",
     "coveralls": "^2.11.4",
     "nock": "^3.0.0",
