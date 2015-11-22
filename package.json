@@ -4,20 +4,18 @@
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
-    "test": "npm run compile && npm run unit-test && npm run integration-test",
+    "test": "npm run compile",
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
     "coverage": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/nyc ./node_modules/.bin/ava && open coverage/lcov-report/index.html",
     "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "compile": "coffee --output lib -c src/*.coffee && ./node_modules/pegjs/bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
-    "watch": "coffee --output lib -cw src/*.coffee",
+    "compile": "./node_modules/.bin/babel src --out-dir lib && ./node_modules/pegjs/bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats"
   },
   "config": {
     "blanket": {
       "pattern": "src",
-      "data-cover-never": "node_modules",
-      "loader": "./node-loaders/coffee-script"
+      "data-cover-never": "node_modules"
     },
     "nyc": {
       "exclude": [
@@ -53,14 +51,14 @@
     "async": "^1.5.0",
     "dashdash": "^1.10.1",
     "lodash": "^3.10.1",
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+    "through2": "^2.0.0"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
     "ava": "^0.5.0",
+    "babel-cli": "^6.2.0",
     "blanket": "^1.1.9",
-    "coffee-script": "^1.10.0",
-    "coffeelint": "^1.13.0",
     "coveralls": "^2.11.4",
     "nock": "^3.0.0",
     "nyc": "^3.2.2",
