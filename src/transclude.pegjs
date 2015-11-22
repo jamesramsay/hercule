@@ -1,14 +1,12 @@
-start = l:link? " || "? d:default? " "? o:reference* {
+start = p:primary? " || "? f:fallback? " "? r:reference* {
   return {
-    "href": l.href,
-    "hrefType": l.hrefType,
-    "references": o,
-    "default": d ? d.href : null,
-    "defaultType": d ? d.hrefType : null
+    "primary": p,
+    "fallback": f,
+    "references": r
   };
 }
 
-reference = p:placeholder ":" l:link " "? {
+reference = p:placeholder ":" l:primary " "? {
   return {
     "placeholder": p,
     "href": l.href,
@@ -20,9 +18,9 @@ placeholder = p:[a-zA-Z0-9]+ {
   return p.join("");
 }
 
-default = httpLink / fileLink / stringLink
+primary = httpLink / fileLink / stringLink / reset
 
-link = httpLink / fileLink / stringLink / reset
+fallback = httpLink / fileLink / stringLink
 
 fileLink = f:[^ ()\"]+ {
   return {
