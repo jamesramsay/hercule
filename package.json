@@ -9,7 +9,7 @@
     "integration-test": "./test/modules/bin/bats test/bats",
     "coverage": "./node_modules/.bin/nyc report --reporter=html && open coverage/index.html",
     "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "compile": "mkdir lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
+    "compile": "mkdir -p lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats"
   },
   "config": {
