@@ -1,31 +1,29 @@
-var through2 = require('through2');
-var _ = require('lodash');
+import through2 from 'through2';
+import _ from 'lodash';
 
-/*
-
-Input: (string)
-
-Output: (object)
-- chunk (string, required) - Chunk that is either a match or miss.
-- match (RegExp Match, optional) - Only returned if a match is present.
-
+/**
+* Input stream: (string)
+*
+* Output stream: (object)
+* - chunk (string, required) - Chunk that is either a match or miss.
+* - match (RegExp Match, optional) - Only returned if a match is present.
 */
 
-var defaultOptions = {
+const defaultOptions = {
   match: 'match',
   chunk: 'chunk',
 };
 
 module.exports = function regexStream(patternIn, options) {
-  var opt = _.merge({}, defaultOptions, options);
-  var pattern = null;
-  var inputBuffer = '';
+  const opt = _.merge({}, defaultOptions, options);
+  let pattern = null;
+  let inputBuffer = '';
 
   function clonePattern(inputPattern) {
-    var clonedPattern = null;
-    var parts = inputPattern.toString().slice(1).split('/');
-    var regex = parts[0];
-    var flags = (parts[1] || 'g');
+    const parts = inputPattern.toString().slice(1).split('/');
+    let clonedPattern = null;
+    const regex = parts[0];
+    let flags = (parts[1] || 'g');
 
     // Make sure the pattern uses the global flag so our exec() will run as expected.
     if (flags.indexOf('g') === -1) {
@@ -38,20 +36,20 @@ module.exports = function regexStream(patternIn, options) {
 
 
   function pushChunk(chunk, match) {
-    var output = {};
-    output[opt.chunk] = chunk;
-
-    if (match) {
-      output[opt.match] = match;
-    }
-
+    const output = {
+      [opt.chunk]: chunk,
+      [opt.match]: match,
+    };
     this.push(output);
   }
 
-  function transform(chunk, encoding, cb) {
-    var nextOffset = null;
-    var match = null;
-    inputBuffer += chunk.toString('utf8');
+
+  function tokenize(chunk) {
+    const lastChunk = chunk ? false : true;
+    let nextOffset = null;
+    let match = null;
+
+    if (chunk) inputBuffer += chunk.toString('utf8');
 
     while ((match = pattern.exec(inputBuffer)) !== null) {
       // Content prior to match can be returned without transform
@@ -59,15 +57,14 @@ module.exports = function regexStream(patternIn, options) {
         pushChunk.call(this, inputBuffer.slice(0, match.index));
       }
 
-      // Match within bounds (exclusive): [     xxxxxx   ]
-      if (pattern.lastIndex < inputBuffer.length) {
+      // Match within bounds: [  xxxx  ]
+      if (lastChunk || pattern.lastIndex < inputBuffer.length) {
         pushChunk.call(this, match[0], match);
 
         // Next match must be after this match
         nextOffset = pattern.lastIndex;
 
-      // Match within bounds (inclusive): [        xxxxxx]
-      // Cannot be processed without inspecting next chunk or reaching end of stream
+      // Match against bounds: [     xxx]
       } else {
         // Next match will be the start of this match
         nextOffset = match.index;
@@ -77,34 +74,24 @@ module.exports = function regexStream(patternIn, options) {
     }
 
     pattern.lastIndex = 0;
+  }
+
+
+  function transform(chunk, encoding, cb) {
+    tokenize.call(this, chunk);
     cb();
   }
 
 
   function flush(cb) {
-    var match = null;
-    var nextOffset = null;
-
-    while ((match = pattern.exec(inputBuffer)) !== null) {
-      // Content prior to match can be returned without modification
-      if (match.index !== 0) {
-        pushChunk.call(this, inputBuffer.slice(0, match.index));
-      }
-
-      pushChunk.call(this, match[0], match);
-
-      // Next match must be after this match
-      // All content prior to the match can be disposed of
-      nextOffset = pattern.lastIndex;
-      inputBuffer = inputBuffer.slice(nextOffset);
-    }
+    tokenize.call(this);
 
     // Empty internal buffer and signal the end of the output stream.
     if (inputBuffer !== '') {
       pushChunk.call(this, inputBuffer);
     }
-    this.push(null);
 
+    this.push(null);
     cb();
   }
 

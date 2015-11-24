@@ -1,5 +1,5 @@
-var through2 = require('through2');
-var _ = require('lodash');
+import through2 from 'through2';
+import _ from 'lodash';
 
 /*
 
@@ -13,16 +13,16 @@ Input and output properties can be altered by providing options
 
 */
 
-var defaultOptions = {
+const defaultOptions = {
   expression: 'expression',
   parsed: 'parsed',
 };
 
 module.exports = function pegStream(grammar, options) {
-  var opt = _.merge({}, defaultOptions, options);
+  const opt = _.merge({}, defaultOptions, options);
 
   function transform(chunk, encoding, cb) {
-    var expression = chunk[opt.expression];
+    const expression = chunk[opt.expression];
 
     // No expression to parse
     if (!expression) {

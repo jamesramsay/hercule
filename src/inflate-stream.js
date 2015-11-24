@@ -1,6 +1,6 @@
-var through2 = require('through2');
-var fs = require('fs');
-var _ = require('lodash');
+import through2 from 'through2';
+import fs from 'fs';
+import _ from 'lodash';
 
 /*
 
@@ -16,17 +16,17 @@ Input and output properties can be altered by providing options
 
 */
 
-var defaultOptions = {
+const defaultOptions = {
   input: 'link',
   output: 'chunk',
 };
 
 module.exports = function inflateStream(options) {
-  var opt = _.merge({}, defaultOptions, options);
+  const opt = _.merge({}, defaultOptions, options);
 
   function transform(chunk, encoding, cb) {
-    var content;
-    var link = chunk[opt.input];
+    const link = chunk[opt.input];
+    let content;
 
     if (!link) {
       this.push(chunk);

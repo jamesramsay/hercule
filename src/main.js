@@ -1,19 +1,19 @@
-#!/usr/bin/env node
-
-// Hercule
-// A simple markdown transclusion tool
-// Author: james ramsay
+/**
+* Hercule
+* A simple markdown transclusion tool
+* Author: james ramsay
+*/
 
 // fs = require 'fs'
 // path = require 'path'
 // async = require 'async'
-var dashdash = require('dashdash');
-var opts;
+import dashdash from 'dashdash';
+let opts;
 
 // _VERBOSE = false
 // _DEBUG = false
 
-var parser = dashdash.createParser({
+const parser = dashdash.createParser({
   options: [
     {
       names: ['help', 'h'],

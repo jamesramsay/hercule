@@ -1,11 +1,11 @@
 import test from 'ava';
-import RegexStream from '../src/regex-stream';
+import RegexStream from '../lib/regex-stream';
 
 
 test('should find handle empty buffer', (t) => {
   let input = '';
 
-  let testStream = new RegexStream(/\w+/i);
+  let testStream = new RegexStream(/\w+/);
 
   testStream.on('readable', function() {
     var content = null;
@@ -47,7 +47,7 @@ test('should return objects (transform)', (t) => {
     {chunk: '.'}
   ];
 
-  let testStream = new RegexStream(/\w+/i);
+  let testStream = new RegexStream(/\w+/);
 
   testStream.on('readable', function() {
     var content = null;
@@ -66,7 +66,7 @@ test('should return objects (transform)', (t) => {
     t.end();
   });
 
-  input.match(/.{1,3}/gi)
+  input.match(/.{1,3}/g)
     .forEach(function(chunk) {
         testStream.write(chunk, 'utf8');
     });
@@ -85,7 +85,7 @@ test('should return objects (flush)', (t) => {
     {chunk: '(cat)', match: true}
   ];
 
-  let testStream = new RegexStream(/\(\w+\)/g);
+  let testStream = new RegexStream(/\(\w+\)/i);
 
   testStream.on('readable', function() {
     var content = null;
@@ -104,7 +104,7 @@ test('should return objects (flush)', (t) => {
     t.end();
   });
 
-  input.match(/.{1,14}/gi)
+  input.match(/.{1,14}/g)
     .forEach(function(chunk) {
         testStream.write(chunk, 'utf8');
     });
