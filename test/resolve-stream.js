@@ -1,5 +1,5 @@
 import test  from 'ava';
-import ResolveStream from '../src/resolve-stream';
+import ResolveStream from '../lib/resolve-stream';
 
 
 test('should handle no input', (t) => {

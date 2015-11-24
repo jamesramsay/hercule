@@ -1,5 +1,5 @@
 import test  from 'ava';
-import InflateStream from '../src/inflate-stream';
+import InflateStream from '../lib/inflate-stream';
 
 
 test('should handle no input', (t) => {

@@ -1,5 +1,5 @@
 import test  from 'ava';
-import PegStream from '../src/peg-stream';
+import PegStream from '../lib/peg-stream';
 import grammar from '../lib/transclude-parser';
 
 
