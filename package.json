@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
-    "ava": "^0.5.0",
+    "ava": "^0.6.0",
     "blanket": "^1.1.9",
     "coffee-script": "^1.10.0",
     "coffeelint": "^1.13.0",
