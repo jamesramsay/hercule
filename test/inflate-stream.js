@@ -110,7 +110,7 @@ test('should return empty string when hrefType is not recognised', (t) => {
     chunk: ':[Example](size.md)',
     link: {
       href: 'http://example.com',
-      hrefType: 'http'
+      hrefType: 'null'
     }
   }
   let expected = ''
