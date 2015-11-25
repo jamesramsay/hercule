@@ -1,4 +1,5 @@
 import test  from 'ava';
+import nock from 'nock';
 import InflateStream from '../lib/inflate-stream';
 
 
@@ -76,6 +77,35 @@ test('should inflate input with file link', (t) => {
 });
 
 
+test('should skip input with invalid file link', (t) => {
+  let input = {
+    chunk: ':[Example](size.md)',
+    link: {
+      href: __dirname + '/i-dont-exist.md',
+      hrefType: 'file'
+    }
+  }
+  let expected = ':[Example](size.md)'
+
+  let testStream = new InflateStream();
+
+  testStream.on('readable', function() {
+    var chunk = null;
+    while (chunk = this.read()) {
+      t.same(chunk.chunk, expected);
+    }
+  });
+
+  testStream.on('end', function() {
+    t.end();
+  });
+
+  testStream.write(input)
+  testStream.end();
+
+});
+
+
 test('should inflate input with string link', (t) => {
   let input = {
     chunk: ':[Example](size.md)',
@@ -105,7 +135,65 @@ test('should inflate input with string link', (t) => {
 });
 
 
-test('should return empty string when hrefType is not recognised', (t) => {
+test('should inflate input with http link', (t) => {
+  let input = {
+    chunk: ':[Example](size.md)',
+    link: {
+      href: 'http://github.com/size.md',
+      hrefType: 'http'
+    }
+  }
+  let expected = 'big'
+
+  let testStream = new InflateStream();
+
+  testStream.on('readable', function() {
+    var chunk = null;
+    while (chunk = this.read()) {
+      t.same(chunk.chunk, expected);
+    }
+  });
+
+  testStream.on('end', function() {
+    t.end();
+  });
+
+  testStream.write(input)
+  testStream.end();
+
+});
+
+
+test('should skip input with invalid http link', (t) => {
+  let input = {
+    chunk: ':[Example](size.md)',
+    link: {
+      href: 'http://github.com/i-dont-exist.md',
+      hrefType: 'http'
+    }
+  }
+  let expected = ':[Example](size.md)'
+  let testStream = new InflateStream();
+  let mock = nock("http://github.com").get("/size.md").reply(200, "big\n");
+
+  testStream.on('readable', function() {
+    var chunk = null;
+    while (chunk = this.read()) {
+      t.same(chunk.chunk, expected);
+    }
+  });
+
+  testStream.on('end', function() {
+    t.end();
+  });
+
+  testStream.write(input)
+  testStream.end();
+
+});
+
+
+test('should not make modifications if hrefType is unrecognised', (t) => {
   let input = {
     chunk: ':[Example](size.md)',
     link: {
@@ -113,9 +201,9 @@ test('should return empty string when hrefType is not recognised', (t) => {
       hrefType: 'null'
     }
   }
-  let expected = ''
-
+  let expected = ':[Example](size.md)';
   let testStream = new InflateStream();
+  let mock = nock("http://github.com").get("/i-dont-exist.md").reply(404);
 
   testStream.on('readable', function() {
     var chunk = null;
