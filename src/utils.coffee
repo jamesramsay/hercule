@@ -45,7 +45,7 @@ readFile = (filename) ->
     content = (fs.readFileSync filename).toString()
     return content
   catch err
-    if err.code = 'ENOENT'
+    if err.code is 'ENOENT'
       console.error "Error: File (#{filename}) not found."
   return null
 
