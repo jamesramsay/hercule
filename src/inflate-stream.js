@@ -1,7 +1,7 @@
 import through2 from 'through2';
 import fs from 'fs';
 import _ from 'lodash';
-// import request from 'request';
+import request from 'request';
 
 /**
 * Input stream: object
@@ -23,9 +23,42 @@ const defaultOptions = {
 module.exports = function inflateStream(options) {
   const opt = _.merge({}, defaultOptions, options);
 
+  function inflateString(chunk, link, cb) {
+    chunk[opt.output] = link.href;
+    this.push(chunk);
+    return cb();
+  }
+
+  function inflateLocalFile(chunk, link, cb) {
+    let content;
+
+    try {
+      content = fs.readFileSync(link.href, 'utf8').replace(/\n$/, '');
+      chunk[opt.output] = content;
+    } catch (err) {
+      console.log(`Warning: Local file (${link.href}) not found.`);
+    }
+
+    this.push(chunk);
+    return cb();
+  }
+
+  function inflateRemoteFile(chunk, link, cb) {
+    request(link.href, (err, res, content) => {
+      if (err || res.statusCode !== 200) {
+        console.log(`Warning: Remote file (${link.href}) could not be retrieved.`);
+        this.push(chunk);
+        return cb();
+      }
+
+      chunk[opt.output] = content.replace(/\n$/, '');
+      this.push(chunk);
+      return cb();
+    });
+  }
+
   function transform(chunk, encoding, cb) {
     const link = chunk[opt.input];
-    let content;
 
     if (!link) {
       this.push(chunk);
@@ -34,26 +67,18 @@ module.exports = function inflateStream(options) {
 
     switch (link.hrefType) {
     case 'file':
-      try {
-        content = fs.readFileSync(link.href, 'utf8').replace(/\n$/, '');
-      } catch (err) {
-        console.error(`Error: File (${link.href}) not found.`);
-        content = null;
-      }
+      inflateLocalFile.call(this, chunk, link, cb);
+      break;
+    case 'http':
+      inflateRemoteFile.call(this, chunk, link, cb);
       break;
     case 'string':
-      content = link.href;
+      inflateString.call(this, chunk, link, cb);
       break;
     default:
-      content = '';
+      this.push(chunk);
+      return cb();
     }
-
-    if (content !== null) {
-      chunk[opt.output] = content;
-    }
-
-    this.push(chunk);
-    return cb();
   }
 
   return through2.obj(transform);
