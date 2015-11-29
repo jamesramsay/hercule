@@ -1,4 +1,5 @@
 import test from 'ava';
+import {linkRegExp} from '../lib/config';
 import RegexStream from '../lib/regex-stream';
 
 
@@ -75,8 +76,8 @@ test('should return objects (transform)', (t) => {
 });
 
 test('should return objects (flush)', (t) => {
-  let input = 'a (fox) a (dog) a (cat)';
-  let expected = [
+  const input = 'a (fox) a (dog) a (cat)';
+  const expected = [
     {chunk: 'a '},
     {chunk: '(fox)', match: true},
     {chunk: ' a '},
@@ -84,23 +85,24 @@ test('should return objects (flush)', (t) => {
     {chunk: ' a '},
     {chunk: '(cat)', match: true}
   ];
-
+  let index = 0;
   let testStream = new RegexStream(/\(\w+\)/i);
 
   testStream.on('readable', function() {
     var content = null;
     while (content = this.read()) {
-      t.same(content.chunk, expected[0].chunk);
-      if (expected[0].match) {
+      t.same(content.chunk, expected[index].chunk);
+      if (expected[index].match) {
         t.ok(content.match);
       } else {
         t.notOk(content.match);
       }
-      expected = expected.slice(1);
+      index += 1;
     }
   });
 
   testStream.on('end', function() {
+    t.same(expected.length, index);
     t.end();
   });
 
@@ -111,3 +113,47 @@ test('should return objects (flush)', (t) => {
 
   testStream.end();
 });
+
+
+test('should return tokenised input', (t) => {
+  const input = ':[](a.md) :[](b.md) :[](c.md) :[](d.md) :[](e.md) :[](f.md) :[](g.md)\n';
+  const expected = [
+    {chunk: ':[](a.md)', match: true},
+    {chunk: ' '},
+    {chunk: ':[](b.md)', match: true},
+    {chunk: ' '},
+    {chunk: ':[](c.md)', match: true},
+    {chunk: ' '},
+    {chunk: ':[](d.md)', match: true},
+    {chunk: ' '},
+    {chunk: ':[](e.md)', match: true},
+    {chunk: ' '},
+    {chunk: ':[](f.md)', match: true},
+    {chunk: ' '},
+    {chunk: ':[](g.md)', match: true},
+    {chunk: '\n'},
+  ];
+  let index = 0;
+  let testStream = new RegexStream(linkRegExp);
+
+  testStream.on('readable', function() {
+    var content = null;
+    while (content = this.read()) {
+      t.same(content.chunk, expected[index].chunk);
+      if (expected[index].match) {
+        t.ok(content.match);
+      } else {
+        t.notOk(content.match);
+      }
+      index += 1;
+    }
+  });
+
+  testStream.on('end', function() {
+    t.same(expected.length, index);
+    t.end();
+  });
+
+  testStream.write(input, 'utf8');
+  testStream.end();
+})
