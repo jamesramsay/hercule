@@ -18,11 +18,12 @@ const defaultOptions = {
   parsed: 'parsed',
 };
 
-module.exports = function pegStream(grammar, options) {
+module.exports = function PegStream(grammar, options) {
   const opt = _.merge({}, defaultOptions, options);
 
   function transform(chunk, encoding, cb) {
-    const expression = chunk[opt.expression];
+    const expression = _.get(chunk, opt.expression);
+    let parsed;
 
     // No expression to parse
     if (!expression) {
@@ -30,8 +31,9 @@ module.exports = function pegStream(grammar, options) {
       return cb();
     }
 
-    chunk[opt.parsed] = grammar.parse(expression);
-    this.push(chunk);
+    parsed = grammar.parse(expression);
+
+    this.push(_.assign({}, chunk, {[opt.parsed]: parsed}));
     return cb();
   }
 

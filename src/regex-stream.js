@@ -12,9 +12,10 @@ import _ from 'lodash';
 const defaultOptions = {
   match: 'match',
   chunk: 'chunk',
+  extend: null,
 };
 
-module.exports = function regexStream(patternIn, options) {
+module.exports = function RegexStream(patternIn, options) {
   const opt = _.merge({}, defaultOptions, options);
   let pattern = null;
   let inputBuffer = '';
@@ -40,7 +41,8 @@ module.exports = function regexStream(patternIn, options) {
       [opt.chunk]: chunk,
       [opt.match]: match,
     };
-    this.push(output);
+
+    this.push(_.assign({}, output, opt.extend));
   }
 
 
@@ -63,7 +65,6 @@ module.exports = function regexStream(patternIn, options) {
 
         // Next match must be after this match
         nextOffset = pattern.lastIndex;
-
       // Match against bounds: [     xxx]
       } else {
         // Next match will be the start of this match
