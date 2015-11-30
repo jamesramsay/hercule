@@ -46,15 +46,15 @@ module.exports = function regexStream(patternIn, options) {
 
   function tokenize(chunk) {
     const lastChunk = chunk ? false : true;
-    let nextOffset = null;
+    let nextOffset = 0;
     let match = null;
 
     if (chunk) inputBuffer += chunk.toString('utf8');
 
     while ((match = pattern.exec(inputBuffer)) !== null) {
       // Content prior to match can be returned without transform
-      if (match.index !== 0) {
-        pushChunk.call(this, inputBuffer.slice(0, match.index));
+      if (match.index !== nextOffset) {
+        pushChunk.call(this, inputBuffer.slice(nextOffset, match.index));
       }
 
       // Match within bounds: [  xxxx  ]
@@ -69,10 +69,8 @@ module.exports = function regexStream(patternIn, options) {
         // Next match will be the start of this match
         nextOffset = match.index;
       }
-
-      inputBuffer = inputBuffer.slice(nextOffset);
     }
-
+    inputBuffer = inputBuffer.slice(nextOffset);
     pattern.lastIndex = 0;
   }
 
