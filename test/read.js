@@ -21,7 +21,7 @@ test('readFile should read files which exist', (t) => {
 });
 
 
-test('readUri should return null for files not found (404)', (t) => {
+test.cb('readUri should return null for files not found (404)', (t) => {
   t.plan(1);
   let url  = "http://github.com";
   let file = "/dog.md";
@@ -30,11 +30,12 @@ test('readUri should return null for files not found (404)', (t) => {
 
   utils.readUri(`${url}${file}`, function(content) {
     t.same(content, null);
+    t.end();
   });
 });
 
 
-test('readUri should read http files which exist', (t) => {
+test.cb('readUri should read http files which exist', (t) => {
   t.plan(1);
   let url  = "http://github.com";
   let file = "/fox.md";
@@ -44,5 +45,6 @@ test('readUri should read http files which exist', (t) => {
 
   utils.readUri(`${url}${file}`, function(content) {
     t.same(content, 'The quick brown fox jumps over the lazy dog.\n');
+    t.end();
   });
 });
