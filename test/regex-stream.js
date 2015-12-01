@@ -3,9 +3,8 @@ import {linkRegExp} from '../lib/config';
 import RegexStream from '../lib/regex-stream';
 
 
-test('should find handle empty buffer', (t) => {
-  let input = '';
-
+test.cb('should find handle empty buffer', (t) => {
+  const input = '';
   let testStream = new RegexStream(/\w+/);
 
   testStream.on('readable', function() {
@@ -22,12 +21,11 @@ test('should find handle empty buffer', (t) => {
 
   testStream.write(input, 'utf8');
   testStream.end();
-
 });
 
-test('should return objects (transform)', (t) => {
-  let input = 'The quick brown fox jumps over the lazy dog.';
-  let expected = [
+test.cb('should return objects (transform)', (t) => {
+  const input = 'The quick brown fox jumps over the lazy dog.';
+  const expected = [
     {chunk: 'The',   match: true},
     {chunk: ' '},
     {chunk: 'quick', match: true},
@@ -45,21 +43,21 @@ test('should return objects (transform)', (t) => {
     {chunk: 'lazy',  match: true},
     {chunk: ' '},
     {chunk: 'dog',   match: true},
-    {chunk: '.'}
+    {chunk: '.'},
   ];
-
+  let index = 0;
   let testStream = new RegexStream(/\w+/);
 
   testStream.on('readable', function() {
     var content = null;
     while (content = this.read()) {
-      t.same(content.chunk, expected[0].chunk);
-      if (expected[0].match) {
+      t.same(content.chunk, expected[index].chunk);
+      if (expected[index].match) {
         t.ok(content.match);
       } else {
         t.notOk(content.match);
       }
-      expected = expected.slice(1);
+      index += 1;
     }
   });
 
@@ -67,15 +65,13 @@ test('should return objects (transform)', (t) => {
     t.end();
   });
 
-  input.match(/.{1,3}/g)
-    .forEach(function(chunk) {
-        testStream.write(chunk, 'utf8');
-    });
-
+  input.match(/.{1,3}/g).forEach(function(chunk) {
+    testStream.write(chunk, 'utf8');
+  });
   testStream.end();
 });
 
-test('should return objects (flush)', (t) => {
+test.cb('should return objects (flush)', (t) => {
   const input = 'a (fox) a (dog) a (cat)';
   const expected = [
     {chunk: 'a '},
@@ -83,7 +79,7 @@ test('should return objects (flush)', (t) => {
     {chunk: ' a '},
     {chunk: '(dog)', match: true},
     {chunk: ' a '},
-    {chunk: '(cat)', match: true}
+    {chunk: '(cat)', match: true},
   ];
   let index = 0;
   let testStream = new RegexStream(/\(\w+\)/i);
@@ -106,16 +102,14 @@ test('should return objects (flush)', (t) => {
     t.end();
   });
 
-  input.match(/.{1,14}/g)
-    .forEach(function(chunk) {
-        testStream.write(chunk, 'utf8');
-    });
-
+  input.match(/.{1,14}/g).forEach(function(chunk) {
+    testStream.write(chunk, 'utf8');
+  });
   testStream.end();
 });
 
 
-test('should return tokenised input', (t) => {
+test.cb('should return tokenised input', (t) => {
   const input = ':[](a.md) :[](b.md) :[](c.md) :[](d.md) :[](e.md) :[](f.md) :[](g.md)\n';
   const expected = [
     {chunk: ':[](a.md)', match: true},

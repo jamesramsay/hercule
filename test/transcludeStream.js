@@ -13,7 +13,7 @@ let mock = nock("http://github.com").get("/size.md").reply(200, "big\n");
 
 _.forEach((fixtures.fixtures), function(fixture) {
 
-  test('should transclude ' + fixture.name, (t) => {
+  test.cb('should transclude ' + fixture.name, (t) => {
     let outputString = '';
     let input = fs.createReadStream(fixture.inputFile, {encoding: 'utf8'});
     let output = through2.obj(function (chunk, enc, cb) {

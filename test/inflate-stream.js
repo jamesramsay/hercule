@@ -3,8 +3,7 @@ import nock from 'nock';
 import InflateStream from '../lib/inflate-stream';
 
 
-test('should handle no input', (t) => {
-
+test.cb('should handle no input', (t) => {
   let testStream = new InflateStream();
 
   testStream.on('readable', function() {
@@ -20,15 +19,13 @@ test('should handle no input', (t) => {
   });
 
   testStream.end();
-
 });
 
 
-test('should skip input without link', (t) => {
-  let input = {
+test.cb('should skip input without link', (t) => {
+  const input = {
     chunk: 'The quick brown fox jumps over the lazy dog./n'
   }
-
   let testStream = new InflateStream();
 
   testStream.on('readable', function() {
@@ -39,25 +36,24 @@ test('should skip input without link', (t) => {
   });
 
   testStream.on('end', function() {
+    t.pass();
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should inflate input with file link', (t) => {
-  let input = {
+test.cb('should inflate input with file link', (t) => {
+  const input = {
     chunk: ':[Example](size.md)',
     link: {
       href: __dirname + '/fixtures/basic/size.md',
-      hrefType: 'file'
-    }
-  }
-  let expected = 'big'
-
+      hrefType: 'file',
+    },
+  };
+  const expected = 'big'
   let testStream = new InflateStream();
 
   testStream.on('readable', function() {
@@ -71,22 +67,20 @@ test('should inflate input with file link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should skip input with invalid file link', (t) => {
-  let input = {
+test.cb('should skip input with invalid file link', (t) => {
+  const input = {
     chunk: ':[Example](size.md)',
     link: {
       href: __dirname + '/i-dont-exist.md',
-      hrefType: 'file'
-    }
-  }
-  let expected = ':[Example](size.md)'
-
+      hrefType: 'file',
+    },
+  };
+  const expected = ':[Example](size.md)';
   let testStream = new InflateStream();
 
   testStream.on('readable', function() {
@@ -100,22 +94,20 @@ test('should skip input with invalid file link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should inflate input with string link', (t) => {
-  let input = {
+test.cb('should inflate input with string link', (t) => {
+  const input = {
     chunk: ':[Example](size.md)',
     link: {
       href: 'tiny',
-      hrefType: 'string'
-    }
-  }
-  let expected = 'tiny'
-
+      hrefType: 'string',
+    },
+  };
+  const expected = 'tiny';
   let testStream = new InflateStream();
 
   testStream.on('readable', function() {
@@ -129,22 +121,20 @@ test('should inflate input with string link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should inflate input with http link', (t) => {
-  let input = {
+test.cb('should inflate input with http link', (t) => {
+  const input = {
     chunk: ':[Example](size.md)',
     link: {
       href: 'http://github.com/size.md',
-      hrefType: 'http'
+      hrefType: 'http',
     }
-  }
-  let expected = 'big'
-
+  };
+  const expected = 'big';
   let testStream = new InflateStream();
 
   testStream.on('readable', function() {
@@ -158,23 +148,22 @@ test('should inflate input with http link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should skip input with invalid http link', (t) => {
-  let input = {
+test.cb('should skip input with invalid http link', (t) => {
+  const input = {
     chunk: ':[Example](size.md)',
     link: {
       href: 'http://github.com/i-dont-exist.md',
-      hrefType: 'http'
-    }
-  }
-  let expected = ':[Example](size.md)'
+      hrefType: 'http',
+    },
+  };
+  const expected = ':[Example](size.md)';
+  const mock = nock("http://github.com").get("/size.md").reply(200, "big\n");
   let testStream = new InflateStream();
-  let mock = nock("http://github.com").get("/size.md").reply(200, "big\n");
 
   testStream.on('readable', function() {
     var chunk = null;
@@ -187,23 +176,22 @@ test('should skip input with invalid http link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should not make modifications if hrefType is unrecognised', (t) => {
-  let input = {
+test.cb('should not make modifications if hrefType is unrecognised', (t) => {
+  const input = {
     chunk: ':[Example](size.md)',
     link: {
       href: 'http://example.com',
-      hrefType: 'null'
-    }
-  }
-  let expected = ':[Example](size.md)';
+      hrefType: 'null',
+    },
+  };
+  const expected = ':[Example](size.md)';
+  const mock = nock("http://github.com").get("/i-dont-exist.md").reply(404);
   let testStream = new InflateStream();
-  let mock = nock("http://github.com").get("/i-dont-exist.md").reply(404);
 
   testStream.on('readable', function() {
     var chunk = null;
@@ -216,7 +204,6 @@ test('should not make modifications if hrefType is unrecognised', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
