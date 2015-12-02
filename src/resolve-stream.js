@@ -31,10 +31,10 @@ const defaultOptions = {
   relativePath: 'relativePath',
 };
 
-module.exports = function resolveStream(options) {
+module.exports = function ResolveStream(options) {
   const opt = _.merge({}, defaultOptions, options);
 
-  function resolve(unresolvedLink, relativePath = '') {
+  function resolve(unresolvedLink, parentRefs = [], relativePath = '') {
     let link;
     let fallback;
     let override;
@@ -44,7 +44,7 @@ module.exports = function resolveStream(options) {
     fallback = unresolvedLink.fallback;
 
     // Overriding reference
-    override = _.find(unresolvedLink.references, {'placeholder': link.href}) || fallback;
+    override = _.find(parentRefs, {'placeholder': link.href}) || fallback;
 
     if (override) {
       link = _.pick(override, ['href', 'hrefType']);
@@ -58,15 +58,17 @@ module.exports = function resolveStream(options) {
   }
 
   function transform(chunk, encoding, cb) {
-    const link = chunk[opt.input];
-    const relativePath = chunk[opt.relativePath];
+    const link = _.get(chunk, opt.input);
+    const relativePath = _.get(chunk, opt.relativePath);
+    const parentRefs = _.get(chunk, `${opt.input}.references`);
 
     if (!link) {
       this.push(chunk);
       return cb();
     }
 
-    chunk[opt.output] = resolve(link, relativePath);
+    chunk[opt.output] = resolve(link, chunk.parentRefs, relativePath);
+    chunk.parentRefs = _.merge([], chunk.parentRefs, parentRefs);
     this.push(chunk);
     return cb();
   }
