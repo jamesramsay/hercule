@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import through2 from 'through2'
 
-import hercule  from '../lib/hercule';
+import Transcluder from '../lib/transclude-stream';
 import fixtures from './fixtures';
 
 
@@ -14,8 +14,14 @@ let mock = nock("http://github.com").get("/size.md").reply(200, "big\n");
 _.forEach((fixtures.fixtures), function(fixture) {
 
   test.cb('should transclude ' + fixture.name, (t) => {
+    const options = {
+      relativePath: path.dirname(fixture.inputFile),
+      parents: [],
+      parentRefs: []
+    };
     let outputString = '';
     let input = fs.createReadStream(fixture.inputFile, {encoding: 'utf8'});
+    let transclude = new Transcluder(options);
     let output = through2.obj(function (chunk, enc, cb) {
       this.push(chunk);
       cb();
@@ -34,14 +40,8 @@ _.forEach((fixtures.fixtures), function(fixture) {
       t.same(outputString, fixture.expectedOutput);
       t.end();
     })
+    input.pipe(transclude).pipe(output);
 
-    let options = {
-      relativePath: path.dirname(fixture.inputFile),
-      parents: [],
-      parentRefs: []
-    }
-
-    hercule.transcludeStream(input, null, options, output);
 
   });
 

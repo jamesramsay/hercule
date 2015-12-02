@@ -61,15 +61,17 @@ module.exports = function ResolveStream(options) {
     const link = _.get(chunk, opt.input);
     const relativePath = _.get(chunk, opt.relativePath);
     const parentRefs = _.get(chunk, `${opt.input}.references`);
+    let output;
 
     if (!link) {
       this.push(chunk);
       return cb();
     }
 
-    chunk[opt.output] = resolve(link, chunk.parentRefs, relativePath);
-    chunk.parentRefs = _.merge([], chunk.parentRefs, parentRefs);
-    this.push(chunk);
+    output = resolve(link, chunk.parentRefs, relativePath);
+
+    chunk.parentRefs = _.assign([], chunk.parentRefs, parentRefs);
+    this.push(_.assign({}, chunk, {[opt.output]: output}));
     return cb();
   }
 

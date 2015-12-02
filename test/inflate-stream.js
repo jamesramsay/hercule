@@ -49,7 +49,7 @@ test.cb('should inflate input with file link', (t) => {
   const input = {
     chunk: ':[Example](size.md)',
     link: {
-      href: __dirname + '/fixtures/basic/size.md',
+      href: __dirname + '/fixtures/local-link/size.md',
       hrefType: 'file',
     },
   };
