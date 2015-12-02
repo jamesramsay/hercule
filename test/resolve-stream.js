@@ -89,8 +89,8 @@ test.cb('should parse input with overriding link', (t) => {
       references: [
         {
           placeholder: 'animal',
-          href: 'fox.md',
-          hrefType: 'file'
+          href: 'wolf.md',
+          hrefType: 'file',
         },
         {
           placeholder: 'food',
@@ -99,6 +99,18 @@ test.cb('should parse input with overriding link', (t) => {
         },
       ],
     },
+    parentRefs: [
+      {
+        placeholder: 'animal',
+        href: 'fox.md',
+        hrefType: 'file',
+      },
+      {
+        placeholder: 'food',
+        href: 'cheese.md',
+        hrefType: 'file',
+      },
+    ],
   };
   const expected = {
     href: 'fox.md',
