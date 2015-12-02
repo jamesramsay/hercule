@@ -3,8 +3,7 @@ import PegStream from '../lib/peg-stream';
 import grammar from '../lib/transclude-parser';
 
 
-test('should handle no input', (t) => {
-
+test.cb('should handle no input', (t) => {
   let testStream = new PegStream(grammar);
 
   testStream.on('readable', function() {
@@ -20,15 +19,13 @@ test('should handle no input', (t) => {
   });
 
   testStream.end();
-
 });
 
 
-test('should skip input without expression', (t) => {
-  let input = {
+test.cb('should skip input without expression', (t) => {
+  const input = {
     chunk: 'The quick brown fox jumps over the lazy dog./n'
-  }
-
+  };
   let testStream = new PegStream(grammar);
 
   testStream.on('readable', function() {
@@ -42,23 +39,20 @@ test('should skip input without expression', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should parse input with expression', (t) => {
-  let input = {
+test.cb('should parse input with expression', (t) => {
+  const input = {
     chunk: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
     expression: 'animal.md'
   }
-
-  let options = {
+  const options = {
     expression: 'expression',
     parsed: 'parsed'
   }
-
   let testStream = new PegStream(grammar, options);
 
   testStream.on('readable', function() {
@@ -72,7 +66,6 @@ test('should parse input with expression', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });

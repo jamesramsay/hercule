@@ -2,8 +2,7 @@ import test  from 'ava';
 import ResolveStream from '../lib/resolve-stream';
 
 
-test('should handle no input', (t) => {
-
+test.cb('should handle no input', (t) => {
   let testStream = new ResolveStream();
 
   testStream.on('readable', function() {
@@ -19,15 +18,13 @@ test('should handle no input', (t) => {
   });
 
   testStream.end();
-
 });
 
 
-test('should skip input without link', (t) => {
+test.cb('should skip input without link', (t) => {
   let input = {
     chunk: 'The quick brown fox jumps over the lazy dog./n'
-  }
-
+  };
   let testStream = new ResolveStream();
 
   testStream.on('readable', function() {
@@ -38,32 +35,30 @@ test('should skip input without link', (t) => {
   });
 
   testStream.on('end', function() {
+    t.pass();
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should parse input simple link', (t) => {
-  let input = {
+test.cb('should parse input simple link', (t) => {
+  const input = {
     chunk: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
     relativePath: 'test',
     link: {
       primary: {
         href: 'animal.md',
-        hrefType: 'file'
-      }
-    }
+        hrefType: 'file',
+      },
+    },
   };
-
-  let expected = {
+  const expected = {
     href: 'test/animal.md',
-    hrefType: 'file'
+    hrefType: 'file',
   };
-
   let testStream = new ResolveStream();
 
   testStream.on('readable', function() {
@@ -74,22 +69,22 @@ test('should parse input simple link', (t) => {
   });
 
   testStream.on('end', function() {
+    t.pass();
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should parse input with overriding link', (t) => {
-  let input = {
+test.cb('should parse input with overriding link', (t) => {
+  const input = {
     chunk: 'The quick brown :[](animal) jumps over the lazy dog./n',
     link: {
       primary: {
         href: 'animal',
-        hrefType: 'file'
+        hrefType: 'file',
       },
       references: [
         {
@@ -100,17 +95,15 @@ test('should parse input with overriding link', (t) => {
         {
           placeholder: 'food',
           href: 'cheese.md',
-          hrefType: 'file'
-        }
-      ]
-    }
+          hrefType: 'file',
+        },
+      ],
+    },
   };
-
-  let expected = {
+  const expected = {
     href: 'fox.md',
-    hrefType: 'file'
+    hrefType: 'file',
   };
-
   let testStream = new ResolveStream();
 
   testStream.on('readable', function() {
@@ -124,44 +117,41 @@ test('should parse input with overriding link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });
 
 
-test('should parse input with fallback link', (t) => {
-  let input = {
+test.cb('should parse input with fallback link', (t) => {
+  const input = {
     chunk: 'The quick brown :[](animal) jumps over the lazy dog./n',
     link: {
       primary: {
         href: 'animal',
-        hrefType: 'file'
+        hrefType: 'file',
       },
       references: [
         {
           placeholder: 'feline',
           href: 'cat.md',
-          hrefType: 'file'
+          hrefType: 'file',
         },
         {
           placeholder: 'food',
           href: 'cheese.md',
-          hrefType: 'file'
-        }
+          hrefType: 'file',
+        },
       ],
       fallback: {
         href: 'fox',
-        hrefType: 'string'
-      }
-    }
+        hrefType: 'string',
+      },
+    },
   };
-
-  let expected = {
+  const expected = {
     href: 'fox',
-    hrefType: 'string'
+    hrefType: 'string',
   };
-
   let testStream = new ResolveStream();
 
   testStream.on('readable', function() {
@@ -175,7 +165,6 @@ test('should parse input with fallback link', (t) => {
     t.end();
   });
 
-  testStream.write(input)
+  testStream.write(input);
   testStream.end();
-
 });

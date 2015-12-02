@@ -2,7 +2,7 @@ import test from 'ava';
 import TrimStream from '../lib/trim-stream';
 
 
-test('should handle no input', (t) => {
+test.cb('should handle no input', (t) => {
   const testStream = new TrimStream();
 
   testStream.on('readable', function read() {
@@ -18,7 +18,7 @@ test('should handle no input', (t) => {
 });
 
 
-test('should not modify input without trailing new line', (t) => {
+test.cb('should not modify input without trailing new line', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const testStream = new TrimStream();
   let output = '';
@@ -40,7 +40,7 @@ test('should not modify input without trailing new line', (t) => {
 });
 
 
-test('should not modify input with internal new lines', (t) => {
+test.cb('should not modify input with internal new lines', (t) => {
   const input = 'The quick brown\nfox jumps\nover the lazy dog.';
   const testStream = new TrimStream();
   let output = '';
@@ -62,7 +62,7 @@ test('should not modify input with internal new lines', (t) => {
 });
 
 
-test('should only trim trailing new line', (t) => {
+test.cb('should only trim trailing new line', (t) => {
   const input = 'The quick brown\nfox jumps\nover the lazy dog.\n\n';
   const expect = 'The quick brown\nfox jumps\nover the lazy dog.\n';
   const testStream = new TrimStream();
