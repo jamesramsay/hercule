@@ -1,18 +1,15 @@
-import test  from 'ava';
+import test from 'ava';
 import ResolveStream from '../lib/resolve-stream';
 
 
 test.cb('should handle no input', (t) => {
-  let testStream = new ResolveStream();
+  const testStream = new ResolveStream();
 
-  testStream.on('readable', function() {
-    var chunk = null;
-    while (chunk = this.read()) {
-      t.fail();
-    }
+  testStream.on('readable', function read() {
+    if (this.read() !== null) t.fail();
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.pass();
     t.end();
   });
@@ -22,19 +19,19 @@ test.cb('should handle no input', (t) => {
 
 
 test.cb('should skip input without link', (t) => {
-  let input = {
-    chunk: 'The quick brown fox jumps over the lazy dog./n'
+  const input = {
+    chunk: 'The quick brown fox jumps over the lazy dog./n',
   };
-  let testStream = new ResolveStream();
+  const testStream = new ResolveStream();
 
-  testStream.on('readable', function() {
-    var chunk = null;
-    while (chunk = this.read()) {
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
       t.notOk(chunk.link);
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.pass();
     t.end();
   });
@@ -59,16 +56,16 @@ test.cb('should parse input simple link', (t) => {
     href: 'test/animal.md',
     hrefType: 'file',
   };
-  let testStream = new ResolveStream();
+  const testStream = new ResolveStream();
 
-  testStream.on('readable', function() {
-    var chunk = null;
-    while (chunk = this.read()) {
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
       t.same(chunk.link, expected);
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.pass();
     t.end();
   });
@@ -116,16 +113,16 @@ test.cb('should parse input with overriding link', (t) => {
     href: 'fox.md',
     hrefType: 'file',
   };
-  let testStream = new ResolveStream();
+  const testStream = new ResolveStream();
 
-  testStream.on('readable', function() {
-    var chunk = null;
-    while (chunk = this.read()) {
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
       t.same(chunk.link, expected);
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.end();
   });
 
@@ -164,16 +161,16 @@ test.cb('should parse input with fallback link', (t) => {
     href: 'fox',
     hrefType: 'string',
   };
-  let testStream = new ResolveStream();
+  const testStream = new ResolveStream();
 
-  testStream.on('readable', function() {
-    var chunk = null;
-    while (chunk = this.read()) {
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
       t.same(chunk.link, expected);
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.end();
   });
 

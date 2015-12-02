@@ -12,7 +12,7 @@
     "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
     "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats",
-    "lint": "./node_modules/.bin/eslint ./src"
+    "lint": "./node_modules/.bin/eslint ./src ./test"
   },
   "config": {
     "blanket": {

@@ -5,16 +5,13 @@ import RegexStream from '../lib/regex-stream';
 
 test.cb('should find handle empty buffer', (t) => {
   const input = '';
-  let testStream = new RegexStream(/\w+/);
+  const testStream = new RegexStream(/\w+/);
 
-  testStream.on('readable', function() {
-    var content = null;
-    while (content = this.read()) {
-      t.fail();
-    }
+  testStream.on('readable', function read() {
+    if (this.read() !== null) t.fail();
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.pass();
     t.end();
   });
@@ -26,31 +23,31 @@ test.cb('should find handle empty buffer', (t) => {
 test.cb('should return objects (transform)', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const expected = [
-    {chunk: 'The',   match: true},
+    {chunk: 'The', match: true},
     {chunk: ' '},
     {chunk: 'quick', match: true},
     {chunk: ' '},
     {chunk: 'brown', match: true},
     {chunk: ' '},
-    {chunk: 'fox',   match: true},
+    {chunk: 'fox', match: true},
     {chunk: ' '},
     {chunk: 'jumps', match: true},
     {chunk: ' '},
-    {chunk: 'over',  match: true},
+    {chunk: 'over', match: true},
     {chunk: ' '},
-    {chunk: 'the',   match: true},
+    {chunk: 'the', match: true},
     {chunk: ' '},
-    {chunk: 'lazy',  match: true},
+    {chunk: 'lazy', match: true},
     {chunk: ' '},
-    {chunk: 'dog',   match: true},
+    {chunk: 'dog', match: true},
     {chunk: '.'},
   ];
+  const testStream = new RegexStream(/\w+/);
   let index = 0;
-  let testStream = new RegexStream(/\w+/);
 
-  testStream.on('readable', function() {
-    var content = null;
-    while (content = this.read()) {
+  testStream.on('readable', function read() {
+    let content = null;
+    while ((content = this.read()) !== null) {
       t.same(content.chunk, expected[index].chunk);
       if (expected[index].match) {
         t.ok(content.match);
@@ -61,11 +58,11 @@ test.cb('should return objects (transform)', (t) => {
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.end();
   });
 
-  input.match(/.{1,3}/g).forEach(function(chunk) {
+  input.match(/.{1,3}/g).forEach((chunk) => {
     testStream.write(chunk, 'utf8');
   });
   testStream.end();
@@ -81,12 +78,12 @@ test.cb('should return objects (flush)', (t) => {
     {chunk: ' a '},
     {chunk: '(cat)', match: true},
   ];
+  const testStream = new RegexStream(/\(\w+\)/i);
   let index = 0;
-  let testStream = new RegexStream(/\(\w+\)/i);
 
-  testStream.on('readable', function() {
-    var content = null;
-    while (content = this.read()) {
+  testStream.on('readable', function read() {
+    let content = null;
+    while ((content = this.read()) !== null) {
       t.same(content.chunk, expected[index].chunk);
       if (expected[index].match) {
         t.ok(content.match);
@@ -97,12 +94,12 @@ test.cb('should return objects (flush)', (t) => {
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.same(expected.length, index);
     t.end();
   });
 
-  input.match(/.{1,14}/g).forEach(function(chunk) {
+  input.match(/.{1,14}/g).forEach(function split(chunk) {
     testStream.write(chunk, 'utf8');
   });
   testStream.end();
@@ -127,12 +124,12 @@ test.cb('should return tokenised input', (t) => {
     {chunk: ':[](g.md)', match: true},
     {chunk: '\n'},
   ];
+  const testStream = new RegexStream(linkRegExp);
   let index = 0;
-  let testStream = new RegexStream(linkRegExp);
 
-  testStream.on('readable', function() {
-    var content = null;
-    while (content = this.read()) {
+  testStream.on('readable', function read() {
+    let content = null;
+    while ((content = this.read()) !== null) {
       t.same(content.chunk, expected[index].chunk);
       if (expected[index].match) {
         t.ok(content.match);
@@ -143,11 +140,11 @@ test.cb('should return tokenised input', (t) => {
     }
   });
 
-  testStream.on('end', function() {
+  testStream.on('end', function end() {
     t.same(expected.length, index);
     t.end();
   });
 
   testStream.write(input, 'utf8');
   testStream.end();
-})
+});
