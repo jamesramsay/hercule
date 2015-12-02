@@ -1,4 +1,7 @@
 import _ from 'lodash';
+import duplexer from 'duplexer2';
+
+// TODO: remove this dependency!
 import es from 'event-stream';
 
 import RegexStream from './regex-stream';
@@ -45,5 +48,5 @@ module.exports = function Transcluder(options) {
   .pipe(inflater)
   .pipe(stringify);
 
-  return es.duplex(tokenizer, stringify);
+  return duplexer(tokenizer, stringify);
 };
