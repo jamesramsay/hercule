@@ -2,8 +2,10 @@ blanket = require 'blanket' if process.env.COVERAGE
 
 path = require 'path'
 _ = require 'lodash'
-utils = require './utils'
 async = require 'async'
+child_process = require 'child_process'
+
+utils = require './utils'
 
 
 transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
@@ -119,5 +121,21 @@ transcludeFile = (args...) ->
   transclude content, fullRelativePath, parents, parentRefs, logger, (output) ->
     return cb output
 
+# transcludeFileSync(input)
+#
+# Arguments:
+#  1. filepath (string): The location of the local file which will be processed for transclusion links
+#
+# Returns: (string): Transcluded string
+transcludeFileSync = (filepath) ->
+  return child_process
+    .execFileSync '../bin/hercule', [filepath], {cwd: __dirname}
+    .toString()
+    .replace /\n$/, ""
 
-module.exports = {transcludeString, transcludeFile}
+
+module.exports = {
+  transcludeString,
+  transcludeFile,
+  transcludeFileSync
+}
