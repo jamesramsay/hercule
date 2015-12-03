@@ -18,15 +18,15 @@ const parser = dashdash.createParser({
       help: 'Print this help and exit.',
     },
     {
-      names: ['verbose', 'v'],
-      type: 'arrayOfBool',
-      help: 'Verbose output. Use multiple times for more verbose.',
-    },
-    {
       names: ['output', 'o'],
       type: 'string',
-      help: 'File to output',
+      help: 'File to output.',
       helpArg: 'FILE',
+    },
+    {
+      names: ['relative', 'r'],
+      type: 'string',
+      help: 'Relative path. stdin will be parsed relative to this path.',
     },
   ],
 });
@@ -58,6 +58,7 @@ function main() {
   if (opts._args.length === 0) {
     // Reading input from stdin
     inputStream = process.stdin;
+    options.relativePath = opts.relative;
   } else {
     // Reading input from file
     inputStream = fs.createReadStream(opts._args[0], {encoding: 'utf8'});

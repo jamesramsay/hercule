@@ -1,5 +1,8 @@
 import fs from 'fs';
+import childProcess from 'child_process';
+
 import Transcluder from './transclude-stream';
+
 
 function transcludeString(input, options, callback) {
   const transclude = new Transcluder(options);
@@ -40,7 +43,31 @@ function transcludeFile(input, options, callback) {
   inputStream.pipe(transclude);
 }
 
+
+function transcludeFileSync(input) {
+  const options = {
+    cwd: __dirname,
+  };
+  return childProcess.execFileSync('../bin/hercule', [input], options).toString();
+}
+
+
+function transcludeStringSync(input, {relativePath}) {
+  const options = {
+    cwd: __dirname,
+    input: input,
+  };
+  const args = [
+    '--relative',
+    relativePath,
+  ];
+  return childProcess.execFileSync('../bin/hercule', args, options).toString();
+}
+
+
 module.exports = {
   transcludeString,
   transcludeFile,
+  transcludeFileSync,
+  transcludeStringSync,
 };
