@@ -56,18 +56,19 @@ function main() {
   };
 
   if (opts._args.length === 0) {
-    console.log('hercule: streaming input from stdin');
+    // Reading input from stdin
     inputStream = process.stdin;
   } else {
+    // Reading input from file
     inputStream = fs.createReadStream(opts._args[0], {encoding: 'utf8'});
     options.relativePath = path.dirname(opts._args[0]);
-    console.log(`hercule: reading input from file ${opts._args[0]}`);
   }
 
   if (opts.output) {
+    // Writing output to file
     outputStream = fs.createWriteStream(opts.output, {encoding: 'utf8'});
-    console.log(`hercule: writing output to file ${opts.output}`);
   } else {
+    // Writing output to stdout
     outputStream = process.stdout;
   }
 

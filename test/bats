@@ -1,14 +1,7 @@
 #!/usr/bin/env bats
 
-@test "transcluding remote http files" {
-  result="$(./bin/hercule ./test/fixtures/http-link/index.md)"
-  expected="Jackdaws love my big sphinx of quartz."
-  [ "$result" == "$expected" ]
-}
-
-
 @test "transcluding local files" {
-  result="$(./bin/hercule ./test/fixtures/basic/index.md)"
+  result="$(./bin/hercule ./test/fixtures/local-link/index.md)"
   expected="Jackdaws love my big sphinx of quartz."
   [ "$result" == "$expected" ]
 }

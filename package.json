@@ -4,7 +4,7 @@
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
-    "test": "npm run compile && npm run unit-test",
+    "test": "npm run compile && npm run unit-test && npm run integration-test",
     "posttest": "npm run lint",
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
