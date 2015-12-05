@@ -4,14 +4,11 @@
 * Author: james ramsay
 */
 
-// fs = require 'fs'
-// path = require 'path'
-// async = require 'async'
+import fs from 'fs';
+import path from 'path';
 import dashdash from 'dashdash';
+import Transcluder from './transclude-stream';
 let opts;
-
-// _VERBOSE = false
-// _DEBUG = false
 
 const parser = dashdash.createParser({
   options: [
@@ -47,29 +44,37 @@ if (opts.help) {
   process.exit();
 }
 
-// logger = (message) ->
-//   if _VERBOSE then console.error "#{message}"
 
 function main() {
-  // var inputStream;
-  // var outputStream = process.stdout;
-  // var options = {
-  //   relativePath: '',
-  //   parents: [],
-  //   parentRefs: [],
-  // };
+  let transclude;
+  let inputStream;
+  let outputStream;
+  const options = {
+    relativePath: '',
+    parents: [],
+    parentRefs: [],
+  };
 
   if (opts._args.length === 0) {
-    // Assume stdio stream
-    console.log('hercule: streaming input from stdin');
-    // inputStream = process.stdin;
+    // Reading input from stdin
+    inputStream = process.stdin;
   } else {
-    // Read file as stream
-    // TODO: implement opening stream from file
-    console.log('hercule: reading input from file ' + opts._args[0]);
+    // Reading input from file
+    inputStream = fs.createReadStream(opts._args[0], {encoding: 'utf8'});
+    options.relativePath = path.dirname(opts._args[0]);
   }
 
-  console.log('Not yet implemented!');
+  if (opts.output) {
+    // Writing output to file
+    outputStream = fs.createWriteStream(opts.output, {encoding: 'utf8'});
+  } else {
+    // Writing output to stdout
+    outputStream = process.stdout;
+  }
+
+  transclude = new Transcluder(options);
+
+  inputStream.pipe(transclude).pipe(outputStream);
 }
 
 main();

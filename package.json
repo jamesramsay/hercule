@@ -1,10 +1,10 @@
 {
   "name": "hercule",
-  "version": "1.2.5",
+  "version": "2.0.0-alpha.1",
   "description": "Markdown transcluder",
   "main": "./lib/hercule",
   "scripts": {
-    "test": "npm run compile && npm run unit-test",
+    "test": "npm run compile && npm run unit-test && npm run integration-test",
     "posttest": "npm run lint",
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
@@ -52,6 +52,7 @@
   "dependencies": {
     "async": "^1.5.0",
     "dashdash": "^1.10.1",
+    "duplexer2": "^0.1.4",
     "lodash": "^3.10.1",
     "request": "^2.65.0",
     "through2": "^2.0.0"
