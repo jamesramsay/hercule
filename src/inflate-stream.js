@@ -57,10 +57,10 @@ module.exports = function InflateStream(options) {
 
     input.on('error', function inputError(err) {
       if (err.code === 'ENOENT') {
-        console.log(`Error: Local file (${link.href}) not found.`);
+        // console.log(`Error: Local file (${link.href}) not found.`);
         self.push(chunk);
       } else {
-        console.log(`Error: Local file (${link.href}) could not be transcluded.`);
+        // console.log(`Error: Local file (${link.href}) could not be transcluded.`);
       }
       return cb();
     });
@@ -87,7 +87,7 @@ module.exports = function InflateStream(options) {
     request(link.href, (err, res, content) => {
       let output;
       if (err || res.statusCode !== 200) {
-        console.log(`Warning: Remote file (${link.href}) could not be retrieved.`);
+        // console.log(`Warning: Remote file (${link.href}) could not be retrieved.`);
         this.push(chunk);
         return cb();
       }
