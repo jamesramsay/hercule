@@ -9,16 +9,12 @@
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
     "coverage": "./node_modules/.bin/nyc report --reporter=html && open coverage/index.html",
-    "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
+    "codecov": "./node_modules/.bin/nyc report --reporter=json && cat coverage/coverage-final.json | ./node_modules/.bin/codecov",
     "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats",
     "lint": "./node_modules/.bin/eslint ./src ./test"
   },
   "config": {
-    "blanket": {
-      "pattern": "src",
-      "data-cover-never": "node_modules"
-    },
     "nyc": {
       "exclude": [
         "lib/transclude-parser.js",
@@ -61,8 +57,7 @@
     "ava": "^0.7.0",
     "babel-cli": "^6.2.0",
     "babel-preset-es2015": "^6.1.18",
-    "blanket": "^1.1.9",
-    "coveralls": "^2.11.4",
+    "codecov.io": "^0.1.6",
     "eslint": "^1.10.1",
     "eslint-config-airbnb": "^1.0.0",
     "event-stream": "^3.3.2",
