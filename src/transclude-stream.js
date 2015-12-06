@@ -8,8 +8,9 @@ import RegexStream from './regex-stream';
 import PegStream from './peg-stream';
 import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
+import IndentStream from './indent-stream';
 
-import {grammar, linkRegExp, LINK_GROUP} from './config';
+import {grammar, linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: string
@@ -37,6 +38,9 @@ module.exports = function Transcluder(options) {
   });
   const resolver = new ResolveStream();
   const inflater = new InflateStream();
+  const indenter = new IndentStream({
+    indent: `link[${WHITESPACE_GROUP}]`,
+  });
   const stringify = es.map(function chunkToString(chunk, cb) {
     // TODO: chunk.chunk is stupid variable naming
     return cb(null, chunk.chunk);
@@ -46,6 +50,7 @@ module.exports = function Transcluder(options) {
   .pipe(parser)
   .pipe(resolver)
   .pipe(inflater)
+  .pipe(indenter)
   .pipe(stringify);
 
   return duplexer(tokenizer, stringify);
