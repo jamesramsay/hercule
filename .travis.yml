@@ -9,7 +9,7 @@ cache:
 before_install:
 - npm run install-bats
 after_success:
-- npm run coveralls
+- npm run codecov
 deploy:
   provider: npm
   email: git@jwr.vc
