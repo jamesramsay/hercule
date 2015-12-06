@@ -67,18 +67,18 @@ test.cb('should not modify input without new lines', (t) => {
 test.cb('should only indent text after each new line', (t) => {
   const input = {
     chunk: 'The quick brown\nfox jumps\nover the lazy dog.\n',
-    whitespace: '  ',
+    indent: '  ',
   };
   const expect = {
     chunk: 'The quick brown\n  fox jumps\n  over the lazy dog.\n  ',
-    whitespace: '  ',
+    indent: '  ',
   };
   const testStream = new IndentStream();
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk, input);
+      t.same(chunk, expect);
     }
   });
 

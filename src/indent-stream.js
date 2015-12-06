@@ -12,7 +12,7 @@ import _ from 'lodash';
 const defaultOptions = {
   input: 'chunk',
   output: 'chunk',
-  indent: 'indent'
+  indent: 'indent',
 };
 
 module.exports = function IndentStream(options) {

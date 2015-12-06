@@ -27,20 +27,19 @@ module.exports = function Transcluder(options) {
   const opt = _.merge({}, defaultOptions, options);
 
   const tokenizer = new RegexStream(linkRegExp, {
-    match: 'link',
+    match: {
+      link: `${LINK_GROUP}`,
+      indent: `${WHITESPACE_GROUP}`,
+    },
     extend: {
       relativePath: opt.relativePath,
     },
+    leaveBehind: `${WHITESPACE_GROUP}`,
   });
-  const parser = new PegStream(grammar, {
-    expression: `link[${LINK_GROUP}]`,
-    parsed: 'link',
-  });
+  const parser = new PegStream(grammar);
   const resolver = new ResolveStream();
   const inflater = new InflateStream();
-  const indenter = new IndentStream({
-    indent: `link[${WHITESPACE_GROUP}]`,
-  });
+  const indenter = new IndentStream();
   const stringify = es.map(function chunkToString(chunk, cb) {
     // TODO: chunk.chunk is stupid variable naming
     return cb(null, chunk.chunk);
