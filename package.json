@@ -8,9 +8,9 @@
     "posttest": "npm run lint",
     "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
-    "coverage": "./node_modules/.bin/nyc report --reporter=html && open coverage/index.html",
-    "codecov": "./node_modules/.bin/nyc report --reporter=json && cat coverage/coverage-final.json | ./node_modules/.bin/codecov",
-    "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
+    "coverage": "./scripts/coverage && ./node_modules/.bin/istanbul report --reporter=html && open coverage/index.html",
+    "codecov": "./scripts/coverage && cat coverage/coverage.json | ./node_modules/.bin/codecov",
+    "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib --source-maps && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats",
     "lint": "./node_modules/.bin/eslint ./src ./test"
   },
@@ -61,8 +61,10 @@
     "eslint": "^1.10.1",
     "eslint-config-airbnb": "^1.0.0",
     "event-stream": "^3.3.2",
+    "istanbul": "^0.4.1",
     "nock": "^3.0.0",
     "nyc": "^4.0.1",
-    "pegjs": "^0.9.0"
+    "pegjs": "^0.9.0",
+    "remap-istanbul": "^0.4.0"
   }
 }
