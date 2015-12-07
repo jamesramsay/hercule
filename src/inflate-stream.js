@@ -58,13 +58,10 @@ module.exports = function InflateStream(options) {
 
     let content;
 
-    input.on('error', function inputError(err) {
-      if (err.code === 'ENOENT') {
-        // console.log(`Error: Local file (${link.href}) not found.`);
-        self.push(chunk);
-      } else {
-        // console.log(`Error: Local file (${link.href}) could not be transcluded.`);
-      }
+    input.on('error', function inputError() {
+      // TODO: better error handling: inputError(err)
+      // console.log(`Error: ${link.href} could not be be read. (${err.code})`);
+      self.push(chunk);
       return cb();
     });
 

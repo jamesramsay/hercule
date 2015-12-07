@@ -12,7 +12,7 @@ module.exports = function TrimStream() {
   let inputBuffer = '';
 
   function transform(chunk, encoding, cb) {
-    if (chunk) inputBuffer += chunk.toString('utf8');
+    inputBuffer += chunk.toString('utf8');
 
     this.push(inputBuffer.slice(0, -1));
     inputBuffer = inputBuffer.slice(-1);
