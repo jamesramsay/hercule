@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run compile && npm run unit-test && npm run integration-test",
     "posttest": "npm run lint",
-    "unit-test": "./node_modules/.bin/nyc ./node_modules/.bin/ava",
+    "unit-test": "./node_modules/.bin/nyc --reporter=json ./node_modules/.bin/ava",
     "integration-test": "./test/modules/bin/bats test/bats",
     "coverage": "./scripts/coverage && ./node_modules/.bin/istanbul report --reporter=html && open coverage/index.html",
     "codecov": "./scripts/coverage && cat coverage/coverage.json | ./node_modules/.bin/codecov",

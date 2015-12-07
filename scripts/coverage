@@ -5,10 +5,10 @@ set -e
 # been applied.
 
 # Clear previous coverage.
-rm -rf coverage
+#rm -rf coverage
 
 # Generate test coverage based on however `npm test` performs the tests.
-./node_modules/.bin/nyc --reporter=json ./node_modules/.bin/ava
+#./node_modules/.bin/nyc --reporter=json ./node_modules/.bin/ava
 
 # Move generated JSON file so it can be remapped and won't confuse Istanbul
 # later.
