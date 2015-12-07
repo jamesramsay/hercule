@@ -35,12 +35,12 @@ const parser = dashdash.createParser({
 try {
   opts = parser.parse(process.argv);
 } catch (err) {
-  console.log('hercule: error: ' + err.message);
+  console.log(`hercule: error: ${err.message}`); // eslint-disable-line
   process.exit(1);
 }
 
 if (opts.help) {
-  console.log('usage: hercule [OPTIONS]\noptions:\n' + parser.help({includeEnv: true}).trimRight());
+  console.log(`usage: hercule [OPTIONS]\noptions:\n${parser.help({includeEnv: true}).trimRight()}`); // eslint-disable-line
   process.exit();
 }
 
