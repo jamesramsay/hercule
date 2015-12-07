@@ -1,5 +1,6 @@
 import test from 'ava';
-import {linkRegExp} from '../lib/config';
+import _ from 'lodash';
+import {linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from '../lib/config';
 import RegexStream from '../lib/regex-stream';
 
 
@@ -142,6 +143,79 @@ test.cb('should return tokenised input', (t) => {
 
   testStream.on('end', function end() {
     t.same(expected.length, index);
+    t.end();
+  });
+
+  testStream.write(input, 'utf8');
+  testStream.end();
+});
+
+
+test.cb('should return restructed match', (t) => {
+  const input = '  :[foo](bar.md)';
+  const expected = {
+    chunk: '  :[foo](bar.md)',
+    link: 'bar.md',
+    indent: '__  ',
+  };
+  const options = {
+    match: {
+      link: `${LINK_GROUP}`,
+      indent: (match) => {
+        return ['__', _.get(match, `${WHITESPACE_GROUP}`)].join('');
+      },
+      number: 2,
+    },
+  };
+  const testStream = new RegexStream(linkRegExp, options);
+
+  testStream.on('readable', function read() {
+    let output = null;
+    while ((output = this.read()) !== null) {
+      t.same(output, expected);
+    }
+  });
+
+  testStream.on('end', function end() {
+    t.end();
+  });
+
+  testStream.write(input, 'utf8');
+  testStream.end();
+});
+
+
+test.cb('should leave behind leading whitespace', (t) => {
+  const input = '  :[foo](bar.md)';
+  const expected = [
+    {
+      chunk: '  ',
+    },
+    {
+      chunk: '  :[foo](bar.md)',
+      link: 'bar.md',
+      indent: '  ',
+    },
+  ];
+  const options = {
+    match: {
+      link: `${LINK_GROUP}`,
+      indent: `${WHITESPACE_GROUP}`,
+    },
+    leaveBehind: `${WHITESPACE_GROUP}`,
+  };
+  const testStream = new RegexStream(linkRegExp, options);
+  let index = 0;
+
+  testStream.on('readable', function read() {
+    let output = null;
+    while ((output = this.read()) !== null) {
+      t.same(output, expected[index]);
+      index += 1;
+    }
+  });
+
+  testStream.on('end', function end() {
     t.end();
   });
 

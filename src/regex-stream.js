@@ -37,12 +37,29 @@ module.exports = function RegexStream(patternIn, options) {
 
 
   function pushChunk(chunk, match) {
-    const output = {
-      [opt.chunk]: chunk,
-      [opt.match]: match,
-    };
+    const leaveBehind = _.get(match, opt.leaveBehind);
+    let output = {[opt.chunk]: chunk};
 
-    this.push(_.assign({}, output, opt.extend));
+    if (leaveBehind) {
+      this.push({[opt.chunk]: leaveBehind});
+    }
+
+    if (typeof opt.match === 'string') {
+      output = _(output).assign({[opt.match]: match});
+    }
+
+    if (typeof opt.match === 'object') {
+      output = _(opt.match).mapValues((value) => {
+        if (typeof value === 'string') return _.get(match, value);
+        if (typeof value === 'function') return value(match, chunk);
+        return null;
+      }).assign(output);
+    }
+
+    // remove any null attributes
+    output = _(output).assign(opt.extend).omit(_.isNull);
+
+    this.push(output.value());
   }
 
 

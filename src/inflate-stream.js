@@ -7,7 +7,7 @@ import RegexStream from '../lib/regex-stream';
 import PegStream from './peg-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
-import {grammar, linkRegExp, LINK_GROUP} from './config';
+import {grammar, linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: object
@@ -38,17 +38,20 @@ module.exports = function InflateStream(options) {
     const input = fs.createReadStream(link.href, {encoding: 'utf8'});
     const self = this;
     const tokenizer = new RegexStream(linkRegExp, {
-      match: 'link',
+      match: {
+        link: `${LINK_GROUP}`,
+        indent: (match) => {
+          return [chunk.indent, _.get(match, `${WHITESPACE_GROUP}`)].join('');
+        },
+      },
       extend: {
         relativePath: chunk.relativePath,
         parents: _.merge([], chunk.parents),
         parentRefs: _.merge([], chunk.parentRefs),
+        indent: chunk.indent,
       },
     });
-    const parser = new PegStream(grammar, {
-      expression: `link[${LINK_GROUP}]`,
-      parsed: 'link',
-    });
+    const parser = new PegStream(grammar);
     const resolver = new ResolveStream();
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
