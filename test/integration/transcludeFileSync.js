@@ -1,18 +1,16 @@
 import test from 'ava';
+import path from 'path';
 import _ from 'lodash';
 
-import {transcludeStringSync} from '../lib/hercule';
-import fixtures from './fixtures';
+import {transcludeFileSync} from '../../lib/hercule';
+import fixtures from '../fixtures';
 
 
 _.forEach((fixtures.fixtures), (fixture) => {
   // Exclude http test because mocking won't cover sync sub-process
   if (fixture.name !== 'http-link') {
     test(`should transclude ${fixture.name}`, (t) => {
-      const options = {
-        relativePath: `${__dirname}/fixtures/${fixture.name}`,
-      };
-      const output = transcludeStringSync(fixture.input, options);
+      const output = transcludeFileSync(fixture.inputFile);
       t.same(output, fixture.expectedOutput);
     });
   }
