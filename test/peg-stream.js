@@ -66,3 +66,26 @@ test.cb('should parse input with expression', (t) => {
   testStream.write(input);
   testStream.end();
 });
+
+
+test.cb('should handle parse error', (t) => {
+  const input = {
+    chunk: 'The quick brown :[](animal.md foo:bar:"exception!") jumps over the lazy dog./n',
+    link: 'animal.md foo:bar:"exception!"',
+  };
+  const testStream = new PegStream(grammar);
+
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
+      t.ok(chunk.link);
+    }
+  });
+
+  testStream.on('end', function end() {
+    t.end();
+  });
+
+  testStream.write(input);
+  testStream.end();
+});

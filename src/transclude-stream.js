@@ -33,7 +33,7 @@ module.exports = function Transcluder(options) {
 
   const tokenizer = new RegexStream(linkRegExp, {
     match: {
-      link: `${LINK_GROUP}`,
+      match: `${LINK_GROUP}`,
       indent: `${WHITESPACE_GROUP}`,
     },
     leaveBehind: `${WHITESPACE_GROUP}`,
