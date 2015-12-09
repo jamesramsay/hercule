@@ -14,7 +14,7 @@ Input and output properties can be altered by providing options
 */
 
 const defaultOptions = {
-  expression: 'link',
+  expression: 'match',
   parsed: 'link',
 };
 
@@ -31,9 +31,17 @@ module.exports = function PegStream(grammar, options) {
       return cb();
     }
 
-    parsed = grammar.parse(expression);
+    try {
+      parsed = {
+        [opt.parsed]: grammar.parse(expression),
+      };
+    } catch (err) {
+      // TODO: store the error to chunk
+      // console.log(JSON.stringify({err}));
+      parsed = null;
+    }
 
-    this.push(_.assign({}, chunk, {[opt.parsed]: parsed}));
+    this.push(_.assign({}, chunk, parsed));
     return cb();
   }
 

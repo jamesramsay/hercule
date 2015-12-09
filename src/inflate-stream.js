@@ -39,7 +39,7 @@ module.exports = function InflateStream(options) {
     const self = this;
     const tokenizer = new RegexStream(linkRegExp, {
       match: {
-        link: `${LINK_GROUP}`,
+        match: `${LINK_GROUP}`,
         indent: (match) => {
           return [chunk.indent, _.get(match, `${WHITESPACE_GROUP}`)].join('');
         },
