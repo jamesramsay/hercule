@@ -25,17 +25,21 @@ const defaultOptions = {
 
 module.exports = function Transcluder(options) {
   const opt = _.merge({}, defaultOptions, options);
+  const extendTokens = {
+    relativePath: opt.relativePath,
+    references: opt.references,
+    parents: opt.parents,
+  };
 
   const tokenizer = new RegexStream(linkRegExp, {
     match: {
       link: `${LINK_GROUP}`,
       indent: `${WHITESPACE_GROUP}`,
     },
-    extend: {
-      relativePath: opt.relativePath,
-    },
     leaveBehind: `${WHITESPACE_GROUP}`,
+    extend: extendTokens,
   });
+
   const parser = new PegStream(grammar);
   const resolver = new ResolveStream();
   const inflater = new InflateStream();
