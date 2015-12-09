@@ -46,7 +46,7 @@ module.exports = function InflateStream(options) {
       },
       extend: {
         relativePath: chunk.relativePath,
-        parents: _.merge([], chunk.parents),
+        parents: _.merge([link.href], chunk.parents),
         parentRefs: _.merge([], chunk.parentRefs),
         indent: chunk.indent,
       },
@@ -61,6 +61,7 @@ module.exports = function InflateStream(options) {
     input.on('error', function inputError() {
       // TODO: better error handling: inputError(err)
       // console.log(`Error: ${link.href} could not be be read. (${err.code})`);
+      // TODO: append error notice to chunk
       self.push(chunk);
       return cb();
     });
@@ -88,6 +89,7 @@ module.exports = function InflateStream(options) {
       let output;
       if (err || res.statusCode !== 200) {
         // console.log(`Warning: Remote file (${link.href}) could not be retrieved.`);
+        // TODO: append error notice to chunk
         this.push(chunk);
         return cb();
       }
@@ -103,6 +105,13 @@ module.exports = function InflateStream(options) {
     const link = chunk[opt.input];
 
     if (!link) {
+      this.push(chunk);
+      return cb();
+    }
+
+    if (_(chunk.parents).contains(link.href)) {
+      // Circular dependency. Skipping inflate.
+      // TODO: append error notice to chunk
       this.push(chunk);
       return cb();
     }

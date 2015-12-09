@@ -49,6 +49,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
     const options = {
       relativePath: path.resolve(__dirname, '../fixtures', fixture.name),
     };
+
     transcludeString(fixture.input, options, (output) => {
       t.same(output, fixture.expectedOutput);
       t.end();

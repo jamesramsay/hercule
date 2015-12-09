@@ -10,7 +10,11 @@ nock('http://github.com').get('/size.md').reply(200, 'big\n');
 
 _.forEach((fixtures.fixtures), (fixture) => {
   test.cb(`should transclude ${fixture.name}`, (t) => {
-    transcludeFile(fixture.inputFile, {relativePath: path.resolve(__dirname, '../fixtures', fixture.name)}, (output) => {
+    const options = {
+      relativePath: path.resolve(__dirname, '../fixtures', fixture.name),
+    };
+
+    transcludeFile(fixture.inputFile, options, (output) => {
       t.same(output, fixture.expectedOutput);
       t.end();
     });

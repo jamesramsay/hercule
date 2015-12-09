@@ -1,5 +1,4 @@
 import test from 'ava';
-import path from 'path';
 import _ from 'lodash';
 
 import {transcludeFileSync} from '../../lib/hercule';
