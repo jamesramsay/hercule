@@ -14,8 +14,6 @@ _.forEach((fixtures.fixtures), function testFixture(fixture) {
   test.cb(`should transclude ${fixture.name}`, (t) => {
     const options = {
       relativePath: path.dirname(fixture.inputFile),
-      parents: [],
-      parentRefs: [],
     };
     const input = fs.createReadStream(fixture.inputFile, {encoding: 'utf8'});
     const transclude = new Transcluder(options);

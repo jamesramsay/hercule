@@ -4,7 +4,6 @@ import _ from 'lodash';
 import request from 'request';
 
 import RegexStream from '../lib/regex-stream';
-import PegStream from './peg-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
 import {grammar, linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from './config';
@@ -14,6 +13,8 @@ import {grammar, linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from './config';
 * - link (object, required)
 *   - href (string, required)
 *   - hrefType (enum, required)
+* - parents (array, required)
+* - references (array, required)
 *
 * Output stream: object
 * - chunk (string, required)
@@ -37,22 +38,28 @@ module.exports = function InflateStream(options) {
   function inflateLocalFile(chunk, link, cb) {
     const input = fs.createReadStream(link.href, {encoding: 'utf8'});
     const self = this;
+    const extend = {
+      relativePath: chunk.relativePath,
+      parents: [link.href, ...chunk.parents],
+      references: [...chunk.references],
+      indent: chunk.indent,
+    };
+
     const tokenizer = new RegexStream(linkRegExp, {
       match: {
-        match: `${LINK_GROUP}`,
+        link: (match) => {
+          return {
+            href: _.get(match, `[${LINK_GROUP}]`),
+          };
+        },
         indent: (match) => {
           return [chunk.indent, _.get(match, `${WHITESPACE_GROUP}`)].join('');
         },
       },
-      extend: {
-        relativePath: chunk.relativePath,
-        parents: _.merge([link.href], chunk.parents),
-        parentRefs: _.merge([], chunk.parentRefs),
-        indent: chunk.indent,
-      },
+      leaveBehind: `${WHITESPACE_GROUP}`, // TODO: add failing test for this missing
+      extend,
     });
-    const parser = new PegStream(grammar);
-    const resolver = new ResolveStream();
+    const resolver = new ResolveStream(grammar);
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
 
@@ -79,7 +86,6 @@ module.exports = function InflateStream(options) {
     input
     .pipe(trimmer)
     .pipe(tokenizer)
-    .pipe(parser)
     .pipe(resolver)
     .pipe(inflater);
   }
@@ -103,13 +109,14 @@ module.exports = function InflateStream(options) {
 
   function transform(chunk, encoding, cb) {
     const link = chunk[opt.input];
+    const parents = chunk.parents;
 
     if (!link) {
       this.push(chunk);
       return cb();
     }
 
-    if (_(chunk.parents).contains(link.href)) {
+    if (_(parents).contains(link.href)) {
       // Circular dependency. Skipping inflate.
       // TODO: append error notice to chunk
       this.push(chunk);

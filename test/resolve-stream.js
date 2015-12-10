@@ -1,9 +1,10 @@
 import test from 'ava';
+import grammar from '../lib/transclude-parser';
 import ResolveStream from '../lib/resolve-stream';
 
 
 test.cb('should handle no input', (t) => {
-  const testStream = new ResolveStream();
+  const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     if (this.read() !== null) t.fail();
@@ -22,7 +23,7 @@ test.cb('should skip input without link', (t) => {
   const input = {
     chunk: 'The quick brown fox jumps over the lazy dog./n',
   };
-  const testStream = new ResolveStream();
+  const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     let chunk = null;
@@ -46,17 +47,14 @@ test.cb('should parse input simple link', (t) => {
     chunk: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
     relativePath: 'test',
     link: {
-      primary: {
-        href: 'animal.md',
-        hrefType: 'file',
-      },
+      href: 'animal.md',
     },
   };
   const expected = {
     href: 'test/animal.md',
     hrefType: 'file',
   };
-  const testStream = new ResolveStream();
+  const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     let chunk = null;
@@ -79,24 +77,9 @@ test.cb('should parse input with overriding link', (t) => {
   const input = {
     chunk: 'The quick brown :[](animal) jumps over the lazy dog./n',
     link: {
-      primary: {
-        href: 'animal',
-        hrefType: 'file',
-      },
-      references: [
-        {
-          placeholder: 'animal',
-          href: 'wolf.md',
-          hrefType: 'file',
-        },
-        {
-          placeholder: 'food',
-          href: 'cheese.md',
-          hrefType: 'file',
-        },
-      ],
+      href: 'animal animal:wolf.md food:cheese.md',
     },
-    parentRefs: [
+    references: [
       {
         placeholder: 'animal',
         href: 'fox.md',
@@ -113,7 +96,7 @@ test.cb('should parse input with overriding link', (t) => {
     href: 'fox.md',
     hrefType: 'file',
   };
-  const testStream = new ResolveStream();
+  const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     let chunk = null;
@@ -135,38 +118,44 @@ test.cb('should parse input with fallback link', (t) => {
   const input = {
     chunk: 'The quick brown :[](animal) jumps over the lazy dog./n',
     link: {
-      primary: {
-        href: 'animal',
-        hrefType: 'file',
-      },
-      references: [
-        {
-          placeholder: 'feline',
-          href: 'cat.md',
-          hrefType: 'file',
-        },
-        {
-          placeholder: 'food',
-          href: 'cheese.md',
-          hrefType: 'file',
-        },
-      ],
-      fallback: {
-        href: 'fox',
-        hrefType: 'string',
-      },
+      href: 'animal || "fox" feline:cat.md food:cheese.md',
     },
   };
   const expected = {
     href: 'fox',
     hrefType: 'string',
   };
-  const testStream = new ResolveStream();
+  const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
       t.same(chunk.link, expected);
+    }
+  });
+
+  testStream.on('end', function end() {
+    t.end();
+  });
+
+  testStream.write(input);
+  testStream.end();
+});
+
+
+test.cb('should handle parse error', (t) => {
+  const input = {
+    chunk: ':[](animal.md foo:bar:"exception!")',
+    link: {
+      href: 'animal.md foo:bar:"exception!"',
+    },
+  };
+  const testStream = new ResolveStream(grammar);
+
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
+      t.same(chunk.link, null);
     }
   });
 
