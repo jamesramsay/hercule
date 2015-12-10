@@ -49,6 +49,8 @@ test.cb('should inflate input with file link', (t) => {
       href: __dirname + '/fixtures/local-link/size.md',
       hrefType: 'file',
     },
+    parents: [],
+    references: [],
   };
   const expected = 'big';
   const testStream = new InflateStream();
@@ -76,6 +78,8 @@ test.cb('should skip input with invalid file link', (t) => {
       href: __dirname + '/i-dont-exist.md',
       hrefType: 'file',
     },
+    parents: [],
+    references: [],
   };
   const expected = ':[Example](size.md)';
   const testStream = new InflateStream();

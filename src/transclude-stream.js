@@ -5,7 +5,6 @@ import duplexer from 'duplexer2';
 import es from 'event-stream';
 
 import RegexStream from './regex-stream';
-import PegStream from './peg-stream';
 import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
@@ -25,23 +24,28 @@ const defaultOptions = {
 
 module.exports = function Transcluder(options) {
   const opt = _.merge({}, defaultOptions, options);
-  const extendTokens = {
+  const extend = {
     relativePath: opt.relativePath,
-    references: opt.references,
-    parents: opt.parents,
+    references: opt.references || [],
+    parents: opt.parents || [],
+    indent: opt.indent,
   };
 
   const tokenizer = new RegexStream(linkRegExp, {
     match: {
-      match: `${LINK_GROUP}`,
+      link: (match) => {
+        return {
+          href: _.get(match, `[${LINK_GROUP}]`),
+        };
+      },
       indent: `${WHITESPACE_GROUP}`,
     },
     leaveBehind: `${WHITESPACE_GROUP}`,
-    extend: extendTokens,
+    extend,
   });
 
-  const parser = new PegStream(grammar);
-  const resolver = new ResolveStream();
+  // const parser = new PegStream(grammar);
+  const resolver = new ResolveStream(grammar);
   const inflater = new InflateStream();
   const indenter = new IndentStream();
   const stringify = es.map(function chunkToString(chunk, cb) {
@@ -50,7 +54,7 @@ module.exports = function Transcluder(options) {
   });
 
   tokenizer
-  .pipe(parser)
+  // .pipe(parser)
   .pipe(resolver)
   .pipe(inflater)
   .pipe(indenter)

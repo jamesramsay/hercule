@@ -5,22 +5,14 @@ import _ from 'lodash';
 /**
 * Input stream: (object)
 * - link (object, required)
-*   - primary (object, required)
-*     - href (string, required)
-*     - hrefType (enum, required)
-*   - fallback (object)
-*     - href (string, required)
-*     - hrefType (enum, required)
-*   - references (array[object])
-*     - placeholder (string, required)
-*     - href (string, required)
-*     - hrefType (enum, required)
+*   - href (string, required)
 * - relativePath (string, optional)
 *
 * Output stream: (object)
 * - link (object, required)
 *   - href (string)
 *   - hrefType (enum)
+* - relativePath (string, optional)
 *
 * Input and output properties can be altered by providing options
 */
@@ -31,7 +23,7 @@ const defaultOptions = {
   relativePath: 'relativePath',
 };
 
-module.exports = function ResolveStream(options) {
+module.exports = function ResolveStream(grammar, options) {
   const opt = _.merge({}, defaultOptions, options);
 
   function resolve(unresolvedLink, parentRefs = [], relativePath = '') {
@@ -58,20 +50,32 @@ module.exports = function ResolveStream(options) {
   }
 
   function transform(chunk, encoding, cb) {
-    const link = _.get(chunk, opt.input);
-    const relativePath = _.get(chunk, opt.relativePath);
-    const parentRefs = _.get(chunk, `${opt.input}.references`);
-    let output;
+    const rawLink = _.get(chunk, opt.input);
+    const relativePath = _.get(chunk, `relativePath`);
+    const parentRefs = _.get(chunk, `references`);
+    let link;
+    let references;
 
-    if (!link) {
+    // No link to parse
+    if (!rawLink) {
       this.push(chunk);
       return cb();
     }
 
-    output = resolve(link, chunk.parentRefs, relativePath);
+    try {
+      link = grammar.parse(rawLink.href);
+    } catch (err) {
+      // TODO: store the error to chunk
+      // console.log(JSON.stringify({err}));
+      link = null;
+    }
 
-    chunk.parentRefs = _.assign([], chunk.parentRefs, parentRefs);
-    this.push(_.assign({}, chunk, {[opt.output]: output}));
+    if (link) {
+      references = _.assign([], parentRefs, link.references);
+      link = resolve(link, parentRefs, relativePath);
+    }
+
+    this.push(_.assign({}, chunk, {link}, {references}));
     return cb();
   }
 
