@@ -22,6 +22,7 @@ test.cb('should handle no input', (t) => {
 test.cb('should skip input without link', (t) => {
   const input = {
     content: 'The quick brown fox jumps over the lazy dog./n',
+    references: [],
   };
   const testStream = new ResolveStream(grammar);
 
@@ -46,6 +47,7 @@ test.cb('should parse input simple link', (t) => {
   const input = {
     content: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
     relativePath: 'test',
+    references: [],
     link: {
       href: 'animal.md',
     },
@@ -117,6 +119,7 @@ test.cb('should parse input with overriding link', (t) => {
 test.cb('should parse input with fallback link', (t) => {
   const input = {
     content: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    references: [],
     link: {
       href: 'animal || "fox" feline:cat.md food:cheese.md',
     },

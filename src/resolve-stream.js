@@ -7,6 +7,7 @@ import _ from 'lodash';
 * - link (object, required)
 *   - href (string, required)
 * - relativePath (string, optional)
+* - references (array, required) - Empty array permitted
 *
 * Output stream: (object)
 * - link (object, required)
@@ -72,7 +73,7 @@ module.exports = function ResolveStream(grammar, options) {
     }
 
     if (link) {
-      references = _.assign([], parentRefs, link.references);
+      references = _.unique([...link.references, ...parentRefs], true);
       link = resolve(link, parentRefs, relativePath);
     }
 
