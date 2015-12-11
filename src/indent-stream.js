@@ -10,8 +10,8 @@ import _ from 'lodash';
 */
 
 const defaultOptions = {
-  input: 'chunk',
-  output: 'chunk',
+  input: 'content',
+  output: 'content',
   indent: 'indent',
 };
 

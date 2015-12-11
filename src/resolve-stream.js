@@ -20,13 +20,13 @@ import _ from 'lodash';
 const defaultOptions = {
   input: 'link',
   output: 'link',
-  relativePath: 'relativePath',
 };
 
 module.exports = function ResolveStream(grammar, options) {
   const opt = _.merge({}, defaultOptions, options);
 
-  function resolve(unresolvedLink, parentRefs = [], relativePath = '') {
+
+  function resolve(unresolvedLink, references = [], relativePath = '') {
     let link;
     let fallback;
     let override;
@@ -36,7 +36,7 @@ module.exports = function ResolveStream(grammar, options) {
     fallback = unresolvedLink.fallback;
 
     // Overriding reference
-    override = _.find(parentRefs, {'placeholder': link.href}) || fallback;
+    override = _.find(references, {'placeholder': link.href}) || fallback;
 
     if (override) {
       link = _.pick(override, ['href', 'hrefType']);
@@ -48,6 +48,7 @@ module.exports = function ResolveStream(grammar, options) {
 
     return link;
   }
+
 
   function transform(chunk, encoding, cb) {
     const rawLink = _.get(chunk, opt.input);

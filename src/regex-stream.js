@@ -11,7 +11,7 @@ import _ from 'lodash';
 
 const defaultOptions = {
   match: 'match',
-  chunk: 'chunk',
+  chunk: 'content',
   extend: null,
 };
 

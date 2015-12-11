@@ -20,7 +20,7 @@ test.cb('should handle no input', (t) => {
 
 test.cb('should not modify input without whitespace', (t) => {
   const input = {
-    chunk: 'The quick brown fox jumps over the lazy dog.',
+    content: 'The quick brown fox jumps over the lazy dog.',
     whitespace: null,
   };
   const testStream = new IndentStream();
@@ -43,7 +43,7 @@ test.cb('should not modify input without whitespace', (t) => {
 
 test.cb('should not modify input without new lines', (t) => {
   const input = {
-    chunk: 'The quick brown fox jumps over the lazy dog.',
+    content: 'The quick brown fox jumps over the lazy dog.',
     whitespace: '  ',
   };
   const testStream = new IndentStream();
@@ -66,11 +66,11 @@ test.cb('should not modify input without new lines', (t) => {
 
 test.cb('should only indent text after each new line', (t) => {
   const input = {
-    chunk: 'The quick brown\nfox jumps\nover the lazy dog.\n',
+    content: 'The quick brown\nfox jumps\nover the lazy dog.\n',
     indent: '  ',
   };
   const expect = {
-    chunk: 'The quick brown\n  fox jumps\n  over the lazy dog.\n  ',
+    content: 'The quick brown\n  fox jumps\n  over the lazy dog.\n  ',
     indent: '  ',
   };
   const testStream = new IndentStream();

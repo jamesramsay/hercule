@@ -24,24 +24,24 @@ test.cb('should find handle empty buffer', (t) => {
 test.cb('should return objects (transform)', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const expected = [
-    {chunk: 'The', match: true},
-    {chunk: ' '},
-    {chunk: 'quick', match: true},
-    {chunk: ' '},
-    {chunk: 'brown', match: true},
-    {chunk: ' '},
-    {chunk: 'fox', match: true},
-    {chunk: ' '},
-    {chunk: 'jumps', match: true},
-    {chunk: ' '},
-    {chunk: 'over', match: true},
-    {chunk: ' '},
-    {chunk: 'the', match: true},
-    {chunk: ' '},
-    {chunk: 'lazy', match: true},
-    {chunk: ' '},
-    {chunk: 'dog', match: true},
-    {chunk: '.'},
+    {content: 'The', match: true},
+    {content: ' '},
+    {content: 'quick', match: true},
+    {content: ' '},
+    {content: 'brown', match: true},
+    {content: ' '},
+    {content: 'fox', match: true},
+    {content: ' '},
+    {content: 'jumps', match: true},
+    {content: ' '},
+    {content: 'over', match: true},
+    {content: ' '},
+    {content: 'the', match: true},
+    {content: ' '},
+    {content: 'lazy', match: true},
+    {content: ' '},
+    {content: 'dog', match: true},
+    {content: '.'},
   ];
   const testStream = new RegexStream(/\w+/);
   let index = 0;
@@ -72,12 +72,12 @@ test.cb('should return objects (transform)', (t) => {
 test.cb('should return objects (flush)', (t) => {
   const input = 'a (fox) a (dog) a (cat)';
   const expected = [
-    {chunk: 'a '},
-    {chunk: '(fox)', match: true},
-    {chunk: ' a '},
-    {chunk: '(dog)', match: true},
-    {chunk: ' a '},
-    {chunk: '(cat)', match: true},
+    {content: 'a '},
+    {content: '(fox)', match: true},
+    {content: ' a '},
+    {content: '(dog)', match: true},
+    {content: ' a '},
+    {content: '(cat)', match: true},
   ];
   const testStream = new RegexStream(/\(\w+\)/i);
   let index = 0;
@@ -110,20 +110,20 @@ test.cb('should return objects (flush)', (t) => {
 test.cb('should return tokenised input', (t) => {
   const input = ':[](a.md) :[](b.md) :[](c.md) :[](d.md) :[](e.md) :[](f.md) :[](g.md)\n';
   const expected = [
-    {chunk: ':[](a.md)', match: true},
-    {chunk: ' '},
-    {chunk: ':[](b.md)', match: true},
-    {chunk: ' '},
-    {chunk: ':[](c.md)', match: true},
-    {chunk: ' '},
-    {chunk: ':[](d.md)', match: true},
-    {chunk: ' '},
-    {chunk: ':[](e.md)', match: true},
-    {chunk: ' '},
-    {chunk: ':[](f.md)', match: true},
-    {chunk: ' '},
-    {chunk: ':[](g.md)', match: true},
-    {chunk: '\n'},
+    {content: ':[](a.md)', match: true},
+    {content: ' '},
+    {content: ':[](b.md)', match: true},
+    {content: ' '},
+    {content: ':[](c.md)', match: true},
+    {content: ' '},
+    {content: ':[](d.md)', match: true},
+    {content: ' '},
+    {content: ':[](e.md)', match: true},
+    {content: ' '},
+    {content: ':[](f.md)', match: true},
+    {content: ' '},
+    {content: ':[](g.md)', match: true},
+    {content: '\n'},
   ];
   const testStream = new RegexStream(linkRegExp);
   let index = 0;
@@ -154,7 +154,7 @@ test.cb('should return tokenised input', (t) => {
 test.cb('should return restructed match', (t) => {
   const input = '  :[foo](bar.md)';
   const expected = {
-    chunk: '  :[foo](bar.md)',
+    content: '  :[foo](bar.md)',
     link: 'bar.md',
     indent: '__  ',
   };
@@ -189,10 +189,10 @@ test.cb('should leave behind leading whitespace', (t) => {
   const input = '  :[foo](bar.md)';
   const expected = [
     {
-      chunk: '  ',
+      content: '  ',
     },
     {
-      chunk: '  :[foo](bar.md)',
+      content: '  :[foo](bar.md)',
       link: 'bar.md',
       indent: '  ',
     },
