@@ -21,21 +21,21 @@ const defaultOptions = {
 module.exports = function IndentStream(options) {
   const opt = _.merge({}, defaultOptions, options);
 
-  function transform(chunk, encoding, callback) {
+  function transform(chunk, encoding, cb) {
     const indent = _.get(chunk, opt.indent);
     let content = _.get(chunk, opt.input);
     let output;
 
     if (!indent) {
       this.push(chunk);
-      return callback();
+      return cb();
     }
 
     content = content.replace(/\n/g, `\n${indent}`);
     output = _.assign(chunk, {[opt.output]: content});
 
     this.push(output);
-    return callback();
+    return cb();
   }
 
   return through2.obj(transform);

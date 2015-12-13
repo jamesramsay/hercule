@@ -4,7 +4,7 @@ import childProcess from 'child_process';
 import Transcluder from './transclude-stream';
 
 
-function transcludeString(input, options, callback) {
+function transcludeString(input, options, cb) {
   const transclude = new Transcluder(options);
   let outputString = '';
 
@@ -16,7 +16,7 @@ function transcludeString(input, options, callback) {
   });
 
   transclude.on('end', function end() {
-    callback(outputString);
+    return cb(outputString);
   });
 
   transclude.write(input, 'utf8');
@@ -24,7 +24,7 @@ function transcludeString(input, options, callback) {
 }
 
 
-function transcludeFile(input, options, callback) {
+function transcludeFile(input, options, cb) {
   const transclude = new Transcluder(options);
   const inputStream = fs.createReadStream(input, {encoding: 'utf8'});
   let outputString = '';
@@ -37,7 +37,7 @@ function transcludeFile(input, options, callback) {
   });
 
   transclude.on('end', function end() {
-    return callback(outputString);
+    return cb(outputString);
   });
 
   inputStream.pipe(transclude);

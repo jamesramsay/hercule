@@ -24,8 +24,8 @@ module.exports = function TrimStream() {
     output = inputBuffer.slice(0, -1);
     inputBuffer = inputBuffer.slice(-1);
 
-    cb();
     this.push(output);
+    return cb();
   }
 
 
@@ -37,7 +37,7 @@ module.exports = function TrimStream() {
     }
 
     this.push(null);
-    cb();
+    return cb();
   }
 
   return through2.obj(transform, flush);
