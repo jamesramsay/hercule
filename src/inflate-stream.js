@@ -49,7 +49,7 @@ module.exports = function InflateStream(options) {
         link: getLink,
         indent: (match) => {return '' + indent + match[WHITESPACE_GROUP];},
       },
-      leaveBehind: `${WHITESPACE_GROUP}`, // TODO: add failing test for this missing
+      leaveBehind: `${WHITESPACE_GROUP}`,
       extend: {
         relativePath: chunk.relativePath,
         parents: [link.href, ...chunk.parents],
