@@ -67,17 +67,18 @@ module.exports = function ResolveStream(grammar, options) {
     try {
       link = grammar.parse(rawLink.href);
     } catch (err) {
-      // TODO: store the error to chunk
-      // console.log(JSON.stringify({err}));
-      link = null;
+      const error = {
+        message: `${link} could not be be parsed.`,
+        code: err,
+      };
+      this.push(_.assign(chunk, error));
+      return cb();
     }
 
-    if (link) {
-      references = _.unique([...link.references, ...parentRefs], true);
-      link = resolve(link, parentRefs, relativePath);
-    }
+    references = _.unique([...link.references, ...parentRefs], true);
+    link = resolve(link, parentRefs, relativePath);
 
-    this.push(_.assign({}, chunk, {link}, {references}));
+    this.push(_.assign(chunk, {link}, {references}));
     return cb();
   }
 

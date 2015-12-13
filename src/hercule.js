@@ -57,10 +57,7 @@ function transcludeStringSync(input, {relativePath}) {
     cwd: __dirname,
     input: input,
   };
-  const args = [
-    '--relative',
-    relativePath,
-  ];
+  const args = ['--relative', relativePath];
   return childProcess.execFileSync('../bin/hercule', args, options).toString();
 }
 

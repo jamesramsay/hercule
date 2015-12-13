@@ -21,7 +21,7 @@ module.exports = function TrimStream() {
     inputBuffer = inputBuffer.concat(input);
 
     // Return everything but the last character
-    output = inputBuffer.slice(0, -1)
+    output = inputBuffer.slice(0, -1);
     inputBuffer = inputBuffer.slice(-1);
 
     cb();
