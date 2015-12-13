@@ -21,7 +21,8 @@ test.cb('should handle no input', (t) => {
 
 test.cb('should skip input without link', (t) => {
   const input = {
-    chunk: 'The quick brown fox jumps over the lazy dog./n',
+    content: 'The quick brown fox jumps over the lazy dog./n',
+    references: [],
   };
   const testStream = new ResolveStream(grammar);
 
@@ -44,8 +45,9 @@ test.cb('should skip input without link', (t) => {
 
 test.cb('should parse input simple link', (t) => {
   const input = {
-    chunk: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
+    content: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
     relativePath: 'test',
+    references: [],
     link: {
       href: 'animal.md',
     },
@@ -75,7 +77,7 @@ test.cb('should parse input simple link', (t) => {
 
 test.cb('should parse input with overriding link', (t) => {
   const input = {
-    chunk: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    content: 'The quick brown :[](animal) jumps over the lazy dog./n',
     link: {
       href: 'animal animal:wolf.md food:cheese.md',
     },
@@ -116,7 +118,8 @@ test.cb('should parse input with overriding link', (t) => {
 
 test.cb('should parse input with fallback link', (t) => {
   const input = {
-    chunk: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    content: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    references: [],
     link: {
       href: 'animal || "fox" feline:cat.md food:cheese.md',
     },
@@ -145,7 +148,7 @@ test.cb('should parse input with fallback link', (t) => {
 
 test.cb('should handle parse error', (t) => {
   const input = {
-    chunk: ':[](animal.md foo:bar:"exception!")',
+    content: ':[](animal.md foo:bar:"exception!")',
     link: {
       href: 'animal.md foo:bar:"exception!"',
     },
@@ -155,7 +158,8 @@ test.cb('should handle parse error', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.link, null);
+      // TODO: check error
+      t.same(chunk.link, input.link);
     }
   });
 

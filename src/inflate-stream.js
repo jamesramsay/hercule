@@ -6,7 +6,7 @@ import request from 'request';
 import RegexStream from '../lib/regex-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
-import {grammar, linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from './config';
+import {grammar, linkRegExp, getLink, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: object
@@ -24,56 +24,44 @@ import {grammar, linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from './config';
 
 const defaultOptions = {
   input: 'link',
-  output: 'chunk',
+  output: 'content',
 };
 
 module.exports = function InflateStream(options) {
   const opt = _.merge({}, defaultOptions, options);
 
+
   function inflateString(chunk, link, cb) {
-    this.push(_.assign({}, chunk, {[opt.output]: link.href}));
+    const output = _.assign({}, chunk, {[opt.output]: link.href});
+    this.push(output);
     return cb();
   }
 
+
   function inflateLocalFile(chunk, link, cb) {
     const input = fs.createReadStream(link.href, {encoding: 'utf8'});
-    const self = this;
-    const extend = {
-      relativePath: chunk.relativePath,
-      parents: [link.href, ...chunk.parents],
-      references: [...chunk.references],
-      indent: chunk.indent,
-    };
-
-    const tokenizer = new RegexStream(linkRegExp, {
-      match: {
-        link: (match) => {
-          return {
-            href: _.get(match, `[${LINK_GROUP}]`),
-          };
-        },
-        indent: (match) => {
-          return [chunk.indent, _.get(match, `${WHITESPACE_GROUP}`)].join('');
-        },
-      },
-      leaveBehind: `${WHITESPACE_GROUP}`, // TODO: add failing test for this missing
-      extend,
-    });
+    const indent = chunk.indent;
     const resolver = new ResolveStream(grammar);
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
-
-    let content;
-
-    input.on('error', function inputError() {
-      // TODO: better error handling: inputError(err)
-      // console.log(`Error: ${link.href} could not be be read. (${err.code})`);
-      // TODO: append error notice to chunk
-      self.push(chunk);
-      return cb();
+    const tokenizer = new RegexStream(linkRegExp, {
+      match: {
+        link: getLink,
+        indent: (match) => {return '' + indent + match[WHITESPACE_GROUP];},
+      },
+      leaveBehind: `${WHITESPACE_GROUP}`,
+      extend: {
+        relativePath: chunk.relativePath,
+        parents: [link.href, ...chunk.parents],
+        references: [...chunk.references],
+        indent,
+      },
     });
 
+    const self = this;
+
     inflater.on('readable', function inputReadable() {
+      let content;
       while ((content = this.read()) !== null) {
         self.push(content);
       }
@@ -83,29 +71,41 @@ module.exports = function InflateStream(options) {
       return cb();
     });
 
-    input
-    .pipe(trimmer)
-    .pipe(tokenizer)
-    .pipe(resolver)
-    .pipe(inflater);
+    input.on('error', function inputError(err) {
+      const error = {
+        message: `${link.href} could not be be read.`,
+        code: err.code,
+      };
+      self.push(_.assign(chunk, error));
+      return cb();
+    });
+
+    input.pipe(trimmer).pipe(tokenizer).pipe(resolver).pipe(inflater);
   }
+
 
   function inflateRemoteFile(chunk, link, cb) {
     request(link.href, (err, res, content) => {
       let output;
+
       if (err || res.statusCode !== 200) {
-        // console.log(`Warning: Remote file (${link.href}) could not be retrieved.`);
-        // TODO: append error notice to chunk
-        this.push(chunk);
+        const error = {
+          message: `${link.href} could not be retrieved.`,
+          code: (err || res.statusCode),
+        };
+        this.push(_.assign(chunk, error));
         return cb();
       }
 
-      output = content.replace(/\n$/, '');
+      output = {
+        [opt.output]: content.replace(/\n$/, ''),
+      };
 
-      this.push(_.assign({}, chunk, {[opt.output]: output}));
+      this.push(_.assign({}, chunk, output));
       return cb();
     });
   }
+
 
   function transform(chunk, encoding, cb) {
     const link = chunk[opt.input];
@@ -117,9 +117,10 @@ module.exports = function InflateStream(options) {
     }
 
     if (_(parents).contains(link.href)) {
-      // Circular dependency. Skipping inflate.
-      // TODO: append error notice to chunk
-      this.push(chunk);
+      const error = {
+        message: `${link.href} skipped to prevent circular transclusion.`,
+      };
+      this.push(_.assign(chunk, error));
       return cb();
     }
 

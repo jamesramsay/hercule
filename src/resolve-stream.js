@@ -7,6 +7,7 @@ import _ from 'lodash';
 * - link (object, required)
 *   - href (string, required)
 * - relativePath (string, optional)
+* - references (array, required) - Empty array permitted
 *
 * Output stream: (object)
 * - link (object, required)
@@ -20,13 +21,13 @@ import _ from 'lodash';
 const defaultOptions = {
   input: 'link',
   output: 'link',
-  relativePath: 'relativePath',
 };
 
 module.exports = function ResolveStream(grammar, options) {
   const opt = _.merge({}, defaultOptions, options);
 
-  function resolve(unresolvedLink, parentRefs = [], relativePath = '') {
+
+  function resolve(unresolvedLink, references = [], relativePath = '') {
     let link;
     let fallback;
     let override;
@@ -36,7 +37,7 @@ module.exports = function ResolveStream(grammar, options) {
     fallback = unresolvedLink.fallback;
 
     // Overriding reference
-    override = _.find(parentRefs, {'placeholder': link.href}) || fallback;
+    override = _.find(references, {'placeholder': link.href}) || fallback;
 
     if (override) {
       link = _.pick(override, ['href', 'hrefType']);
@@ -48,6 +49,7 @@ module.exports = function ResolveStream(grammar, options) {
 
     return link;
   }
+
 
   function transform(chunk, encoding, cb) {
     const rawLink = _.get(chunk, opt.input);
@@ -65,17 +67,18 @@ module.exports = function ResolveStream(grammar, options) {
     try {
       link = grammar.parse(rawLink.href);
     } catch (err) {
-      // TODO: store the error to chunk
-      // console.log(JSON.stringify({err}));
-      link = null;
+      const error = {
+        message: `${link} could not be be parsed.`,
+        code: err,
+      };
+      this.push(_.assign(chunk, error));
+      return cb();
     }
 
-    if (link) {
-      references = _.assign([], parentRefs, link.references);
-      link = resolve(link, parentRefs, relativePath);
-    }
+    references = _.unique([...link.references, ...parentRefs], true);
+    link = resolve(link, parentRefs, relativePath);
 
-    this.push(_.assign({}, chunk, {link}, {references}));
+    this.push(_.assign(chunk, {link}, {references}));
     return cb();
   }
 

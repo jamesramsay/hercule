@@ -21,7 +21,7 @@ test.cb('should handle no input', (t) => {
 
 test.cb('should skip input without link', (t) => {
   const input = {
-    chunk: 'The quick brown fox jumps over the lazy dog./n',
+    content: 'The quick brown fox jumps over the lazy dog./n',
   };
   const testStream = new InflateStream();
 
@@ -44,7 +44,7 @@ test.cb('should skip input without link', (t) => {
 
 test.cb('should inflate input with file link', (t) => {
   const input = {
-    chunk: ':[Example](size.md)',
+    content: ':[Example](size.md)',
     link: {
       href: __dirname + '/fixtures/local-link/size.md',
       hrefType: 'file',
@@ -58,7 +58,7 @@ test.cb('should inflate input with file link', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.chunk, expected);
+      t.same(chunk.content, expected);
     }
   });
 
@@ -73,7 +73,7 @@ test.cb('should inflate input with file link', (t) => {
 
 test.cb('should skip input with invalid file link', (t) => {
   const input = {
-    chunk: ':[Example](size.md)',
+    content: ':[Example](size.md)',
     link: {
       href: __dirname + '/i-dont-exist.md',
       hrefType: 'file',
@@ -87,7 +87,7 @@ test.cb('should skip input with invalid file link', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.chunk, expected);
+      t.same(chunk.content, expected);
     }
   });
 
@@ -102,7 +102,7 @@ test.cb('should skip input with invalid file link', (t) => {
 
 test.cb('should inflate input with string link', (t) => {
   const input = {
-    chunk: ':[Example](size.md)',
+    content: ':[Example](size.md)',
     link: {
       href: 'tiny',
       hrefType: 'string',
@@ -114,7 +114,7 @@ test.cb('should inflate input with string link', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.chunk, expected);
+      t.same(chunk.content, expected);
     }
   });
 
@@ -129,7 +129,7 @@ test.cb('should inflate input with string link', (t) => {
 
 test.cb('should inflate input with http link', (t) => {
   const input = {
-    chunk: ':[Example](size.md)',
+    content: ':[Example](size.md)',
     link: {
       href: 'http://github.com/size.md',
       hrefType: 'http',
@@ -143,7 +143,7 @@ test.cb('should inflate input with http link', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.chunk, expected);
+      t.same(chunk.content, expected);
     }
   });
 
@@ -158,7 +158,7 @@ test.cb('should inflate input with http link', (t) => {
 
 test.cb('should skip input with invalid http link', (t) => {
   const input = {
-    chunk: ':[Example](size.md)',
+    content: ':[Example](size.md)',
     link: {
       href: 'http://github.com/i-dont-exist.md',
       hrefType: 'http',
@@ -172,7 +172,7 @@ test.cb('should skip input with invalid http link', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.chunk, expected);
+      t.same(chunk.content, expected);
     }
   });
 
@@ -187,7 +187,7 @@ test.cb('should skip input with invalid http link', (t) => {
 
 test.cb('should not make modifications if hrefType is unrecognised', (t) => {
   const input = {
-    chunk: ':[Example](size.md)',
+    content: ':[Example](size.md)',
     link: {
       href: 'http://example.com',
       hrefType: 'null',
@@ -199,7 +199,7 @@ test.cb('should not make modifications if hrefType is unrecognised', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.chunk, expected);
+      t.same(chunk.content, expected);
     }
   });
 

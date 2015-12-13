@@ -11,7 +11,7 @@ import _ from 'lodash';
 
 const defaultOptions = {
   match: 'match',
-  chunk: 'chunk',
+  chunk: 'content',
   extend: null,
 };
 
@@ -99,7 +99,7 @@ module.exports = function RegexStream(patternIn, options) {
 
   function transform(chunk, encoding, cb) {
     tokenize.call(this, chunk);
-    cb();
+    return cb();
   }
 
 
@@ -112,7 +112,7 @@ module.exports = function RegexStream(patternIn, options) {
     }
 
     this.push(null);
-    cb();
+    return cb();
   }
 
   pattern = clonePattern(patternIn);
