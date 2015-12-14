@@ -1,7 +1,7 @@
 {
   "name": "hercule",
-  "version": "2.0.0-alpha.1",
-  "description": "Markdown transcluder",
+  "version": "2.0.0-alpha.2",
+  "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
     "test": "npm run compile && npm run test-units && npm run test-integration && npm run test-cli",
@@ -35,13 +35,17 @@
     "markdown",
     "transclude",
     "transclusion",
-    "commonmark"
+    "api",
+    "blueprint",
+    "documentation",
+    "apiary",
+    "preprocessor"
   ],
   "author": {
     "name": "James Ramsay",
     "url": "http://jramsay.com.au"
   },
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jamesramsay/hercule/issues"
   },
@@ -63,8 +67,8 @@
     "eslint-config-airbnb": "^1.0.0",
     "istanbul": "^0.4.1",
     "nock": "^3.0.0",
-    "nyc": "^5.0.0",
+    "nyc": "^4.0.0",
     "pegjs": "^0.9.0",
-    "remap-istanbul": "^0.4.0"
+    "remap-istanbul": "^0.5.0"
   }
 }
