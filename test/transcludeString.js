@@ -27,13 +27,32 @@ test('should require a string', (t) => {
 });
 
 
-test.cb('should allow a custom logger to be provided', (t) => {
+test.cb('should allow a custom logger function to be provided', (t) => {
   t.plan(2);
   let input = 'Jackdaws love my big sphinx of quartz.\n'
   let logOutput = []
 
   let logger = function(message) {
     logOutput.push(message);
+  }
+
+  hercule.transcludeString(input, logger, function(output) {
+    t.same(output, 'Jackdaws love my big sphinx of quartz.\n');
+    t.same(logOutput.length, 2);
+    t.end();
+  });
+});
+
+
+test.cb('should allow a custom logger object to be provided', (t) => {
+  t.plan(2);
+  let input = 'Jackdaws love my big sphinx of quartz.\n'
+  let logOutput = []
+
+  let logger = {
+    debug: function(message) {
+      logOutput.push(message);
+    }
   }
 
   hercule.transcludeString(input, logger, function(output) {

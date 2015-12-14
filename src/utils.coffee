@@ -40,34 +40,34 @@ parse = (link) ->
 
 
 # Read file to string
-readFile = (filename) ->
+readFile = (filename, logger) ->
   try
     content = (fs.readFileSync filename).toString()
     return content
   catch err
     if err.code is 'ENOENT'
-      console.error "Error: File (#{filename}) not found."
+      logger.error "Error: File (#{filename}) not found."
   return null
 
 
 # Read URI contents to string
-readUri = (uri, cb) ->
+readUri = (uri, logger, cb) ->
   request uri, (err, res, body) ->
     if (err) or not (res.statusCode is 200)
-      console.error "Error: Remote file (#{uri}) could not be retrieved."
+      logger.error "Error: Remote file (#{uri}) could not be retrieved."
       return cb null
     return cb body
 
 
-inflate = (href, hrefType, cb) ->
+inflate = (href, hrefType, logger, cb) ->
   switch hrefType
     when "string"
       return cb href
     when "file"
-      content = readFile href
+      content = readFile href, logger
       return cb content
     when "http"
-      readUri href, (content) ->
+      readUri href, logger, (content) ->
         return cb content
     else
       return cb ""
