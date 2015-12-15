@@ -8,8 +8,8 @@ import RegexStream from './regex-stream';
 import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
-
-import {grammar, linkRegExp, getLink, WHITESPACE_GROUP} from './config';
+import grammar from './transclude-parser';
+import {getLink, LINK_REGEXP, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: string
@@ -22,7 +22,7 @@ const defaultOptions = {
   output: 'content',
 };
 
-module.exports = function Transcluder(options) {
+export default function Transcluder(options) {
   const opt = _.merge({}, defaultOptions, options);
   const extend = {
     relativePath: opt.relativePath,
@@ -30,7 +30,7 @@ module.exports = function Transcluder(options) {
     parents: opt.parents || [],
     indent: opt.indent,
   };
-  const tokenizer = new RegexStream(linkRegExp, {
+  const tokenizer = new RegexStream(LINK_REGEXP, {
     match: {
       link: getLink,
       indent: `${WHITESPACE_GROUP}`,
@@ -52,4 +52,4 @@ module.exports = function Transcluder(options) {
   .pipe(stringify);
 
   return duplexer(tokenizer, stringify);
-};
+}

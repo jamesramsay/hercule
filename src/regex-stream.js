@@ -15,7 +15,7 @@ const defaultOptions = {
   extend: null,
 };
 
-module.exports = function RegexStream(patternIn, options) {
+export default function RegexStream(patternIn, options) {
   const opt = _.merge({}, defaultOptions, options);
   let pattern = null;
   let inputBuffer = '';
@@ -117,4 +117,4 @@ module.exports = function RegexStream(patternIn, options) {
 
   pattern = clonePattern(patternIn);
   return through2.obj(transform, flush);
-};
+}

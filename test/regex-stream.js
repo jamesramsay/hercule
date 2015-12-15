@@ -1,6 +1,6 @@
 import test from 'ava';
 import _ from 'lodash';
-import {linkRegExp, LINK_GROUP, WHITESPACE_GROUP} from '../lib/config';
+import {LINK_REGEXP, LINK_GROUP, WHITESPACE_GROUP} from '../lib/config';
 import RegexStream from '../lib/regex-stream';
 
 
@@ -125,7 +125,7 @@ test.cb('should return tokenised input', (t) => {
     {content: ':[](g.md)', match: true},
     {content: '\n'},
   ];
-  const testStream = new RegexStream(linkRegExp);
+  const testStream = new RegexStream(LINK_REGEXP);
   let index = 0;
 
   testStream.on('readable', function read() {
@@ -167,7 +167,7 @@ test.cb('should return restructed match', (t) => {
       number: 2,
     },
   };
-  const testStream = new RegexStream(linkRegExp, options);
+  const testStream = new RegexStream(LINK_REGEXP, options);
 
   testStream.on('readable', function read() {
     let output = null;
@@ -204,7 +204,7 @@ test.cb('should leave behind leading whitespace', (t) => {
     },
     leaveBehind: `${WHITESPACE_GROUP}`,
   };
-  const testStream = new RegexStream(linkRegExp, options);
+  const testStream = new RegexStream(LINK_REGEXP, options);
   let index = 0;
 
   testStream.on('readable', function read() {
