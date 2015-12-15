@@ -9,8 +9,8 @@
     "test-integration": "./node_modules/.bin/ava --serial test/integration",
     "test-cli": "./test/modules/bin/bats test/bats",
     "posttest": "npm run lint",
-    "coverage": "./scripts/coverage && ./node_modules/.bin/istanbul report --reporter=html && open coverage/lcov-report/index.html",
-    "codecov": "./scripts/coverage && cat coverage/coverage.json | ./node_modules/.bin/codecov",
+    "coverage": "./node_modules/.bin/istanbul report --reporter=html && open coverage/lcov-report/index.html",
+    "codecov": "cat coverage/coverage-final.json | ./node_modules/.bin/codecov",
     "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib --source-maps && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats",
     "lint": "./node_modules/.bin/eslint ./src ./test"
@@ -59,7 +59,7 @@
     "through2": "^2.0.0"
   },
   "devDependencies": {
-    "ava": "^0.7.0",
+    "ava": "^0.8.0",
     "babel-cli": "^6.2.0",
     "babel-preset-es2015": "^6.1.18",
     "codecov.io": "^0.1.6",
@@ -67,8 +67,7 @@
     "eslint-config-airbnb": "^1.0.0",
     "istanbul": "^0.4.1",
     "nock": "^3.0.0",
-    "nyc": "^4.0.0",
-    "pegjs": "^0.9.0",
-    "remap-istanbul": "^0.5.0"
+    "nyc": "^5.0.0",
+    "pegjs": "^0.9.0"
   }
 }
