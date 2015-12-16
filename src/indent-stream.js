@@ -18,7 +18,7 @@ const defaultOptions = {
   indent: 'indent',
 };
 
-module.exports = function IndentStream(options) {
+export default function IndentStream(options) {
   const opt = _.merge({}, defaultOptions, options);
 
   function transform(chunk, encoding, cb) {
@@ -39,4 +39,4 @@ module.exports = function IndentStream(options) {
   }
 
   return through2.obj(transform);
-};
+}

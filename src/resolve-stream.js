@@ -23,7 +23,7 @@ const defaultOptions = {
   output: 'link',
 };
 
-module.exports = function ResolveStream(grammar, options) {
+export default function ResolveStream(grammar, options) {
   const opt = _.merge({}, defaultOptions, options);
 
 
@@ -83,4 +83,4 @@ module.exports = function ResolveStream(grammar, options) {
   }
 
   return through2.obj(transform);
-};
+}

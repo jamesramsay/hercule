@@ -6,7 +6,8 @@ import request from 'request';
 import RegexStream from '../lib/regex-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
-import {grammar, linkRegExp, getLink, WHITESPACE_GROUP} from './config';
+import grammar from './transclude-parser';
+import {getLink, LINK_REGEXP, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: object
@@ -27,7 +28,7 @@ const defaultOptions = {
   output: 'content',
 };
 
-module.exports = function InflateStream(options) {
+export default function InflateStream(options) {
   const opt = _.merge({}, defaultOptions, options);
 
 
@@ -44,7 +45,7 @@ module.exports = function InflateStream(options) {
     const resolver = new ResolveStream(grammar);
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
-    const tokenizer = new RegexStream(linkRegExp, {
+    const tokenizer = new RegexStream(LINK_REGEXP, {
       match: {
         link: getLink,
         indent: (match) => {return '' + indent + match[WHITESPACE_GROUP];},
@@ -141,4 +142,4 @@ module.exports = function InflateStream(options) {
   }
 
   return through2.obj(transform);
-};
+}

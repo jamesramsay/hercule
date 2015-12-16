@@ -10,7 +10,7 @@ import through2 from 'through2';
 * Output stream: (string)
 */
 
-module.exports = function TrimStream() {
+export default function TrimStream() {
   let inputBuffer = '';
 
   function transform(chunk, encoding, cb) {
@@ -41,4 +41,4 @@ module.exports = function TrimStream() {
   }
 
   return through2.obj(transform, flush);
-};
+}
