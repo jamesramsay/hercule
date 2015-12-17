@@ -13,7 +13,7 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
   links = _.forEach rawLinks, (rawLink) ->
     utils.parse rawLink
 
-  logger "Links found: #{links.length}"
+  logger.debug "Links found: #{links.length}"
   if links.length < 1 then return cb input
 
   async.eachSeries links, (link, done) ->
@@ -24,11 +24,11 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
     overridingReference = matchingReferences[0]
 
     if overridingReference?
-      logger "Overriding reference: #{JSON.stringify overridingReference}"
+      logger.debug "Overriding reference: #{JSON.stringify overridingReference}"
       href = overridingReference.href
       hrefType = overridingReference.hrefType
     else if defaultReference?
-      logger "Fallback reference: #{JSON.stringify defaultReference}"
+      logger.debug "Fallback reference: #{JSON.stringify defaultReference}"
       href = defaultReference.href
       hrefType = defaultReference.hrefType
 
@@ -36,15 +36,15 @@ transclude = (input, relativePath, parents, parentRefs, logger, cb) ->
       href = path.join relativePath, href
 
     if _.contains parents, href
-      logger "#{href} is in parents:\n#{JSON.stringify parents}"
+      logger.debug "#{href} is in parents:\n#{JSON.stringify parents}"
       throw new Error("Circular reference detected")
 
     parents.push href
     dir = path.dirname href
     references = _.unique [references..., parentRefs...], true
 
-    utils.inflate href, hrefType, (content) ->
-      logger "Transcluding: #{href} (#{hrefType}) into #{parents[-1..][0]}"
+    utils.inflate href, hrefType, logger, (content) ->
+      logger.debug "Transcluding: #{href} (#{hrefType}) into #{parents[-1..][0]}"
       transclude content, dir, parents, references, logger, (output) ->
         if output?
           # Preserve leading whitespace and trim excess new lines at EOF
@@ -66,7 +66,9 @@ validateOptionalArgs = ([input, optionalArgs..., cb]) ->
     relativePath: ""
     parents: []
     parentRefs: []
-  logger = (message) -> return true
+  logger =
+    debug: (message) -> return true,
+    error: (message) -> console.error(message)
 
   if not (typeof cb is 'function')
     throw new Error("Argument error: 'callback' should be a function")
@@ -75,6 +77,8 @@ validateOptionalArgs = ([input, optionalArgs..., cb]) ->
     throw new Error("Argument error: 'input' should be a string")
 
   if typeof optionalArgs[OPTION_LOGGER] is 'function'
+    logger.debug = optionalArgs[OPTION_LOGGER]
+  else if typeof optionalArgs[OPTION_LOGGER] is 'object'
     logger = optionalArgs[OPTION_LOGGER]
 
   {relativePath, parents, parentRefs} = _.merge defaultOptions, optionalArgs[OPTION_OPTIONS]
@@ -94,7 +98,7 @@ validateOptionalArgs = ([input, optionalArgs..., cb]) ->
 transcludeString = (args...) ->
   {input, relativePath, parents, parentRefs, logger, cb} = validateOptionalArgs args
 
-  logger "Transcluding string..."
+  logger.debug "Transcluding string..."
   transclude input, relativePath, parents, parentRefs, logger, (output) ->
     return cb output
 
@@ -111,7 +115,7 @@ transcludeString = (args...) ->
 transcludeFile = (args...) ->
   {input, relativePath, parents, parentRefs, logger, cb} = validateOptionalArgs args
 
-  logger "Transcluding file... #{input}"
+  logger.debug "Transcluding file... #{input}"
   fullFilePath = path.join relativePath, input
   fullRelativePath = path.dirname fullFilePath
 
