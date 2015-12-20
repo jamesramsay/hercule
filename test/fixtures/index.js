@@ -8,6 +8,7 @@ module.exports.fixtures = fs.readdirSync(__dirname).filter(function(file){
 		name: '' + file,
 		inputFile: __dirname + '/' + file + '/index.md',
 		input: fs.readFileSync(__dirname + '/' + file + '/index.md', {encoding: 'utf8'}),
-    expectedOutput: fs.readFileSync(__dirname + '/' + file + '/_expect.md', {encoding: 'utf8'})
+    expectedOutput: fs.readFileSync(__dirname + '/' + file + '/_expect.md', {encoding: 'utf8'}),
+		expectedLogOutput: JSON.parse(fs.readFileSync(__dirname + '/' + file + '/_log.json', {encoding: 'utf8'}))
 	};
 });

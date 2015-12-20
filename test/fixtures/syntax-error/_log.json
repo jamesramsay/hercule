@@ -1,0 +1,8 @@
+[
+  {
+    "name": "hercule",
+    "link": "animal.md foo:bar:\"exception!\"",
+    "msg": "Link could not be parsed",
+    "level": 40
+  }
+]

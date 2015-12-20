@@ -1,7 +1,23 @@
 import fs from 'fs';
 import childProcess from 'child_process';
+import _ from 'lodash';
 
 import Transcluder from './transclude-stream';
+
+const SYNC_TIMEOUT = 10000;
+const LOG_OMIT = ['name', 'hostname', 'pid', 'time', 'v', 'msg'];
+const LOG_LEVELS = {
+  10: 'trace',
+  20: 'debug',
+  30: 'info',
+  40: 'warn',
+  50: 'error',
+};
+
+
+function relog(log, level, body, message) {
+  log[LOG_LEVELS[level]](body, message);
+}
 
 
 export function transcludeString(input, options, cb) {
@@ -44,19 +60,44 @@ export function transcludeFile(input, options, cb) {
 }
 
 
-export function transcludeFileSync(input) {
+export function transcludeFileSync(input, opts, log) {
   const options = {
     cwd: __dirname,
+    timeout: SYNC_TIMEOUT,
   };
-  return childProcess.execFileSync('../bin/hercule', [input], options).toString();
+  const args = [input, '--reporter', 'json'];
+  const result = childProcess.spawnSync('../bin/hercule', args, options);
+  const outputContent = result.stdout.toString();
+  const outputLogs = result.stderr.toString().split('\n');
+
+  _.compact(outputLogs).map(JSON.parse).forEach((message) => {
+    const msg = message.msg;
+    const level = message.level;
+    const body = _.omit(message, LOG_OMIT);
+    relog(log, level, body, msg);
+  });
+
+  return outputContent;
 }
 
 
-export function transcludeStringSync(input, {relativePath}) {
+export function transcludeStringSync(input, {relativePath}, log) {
   const options = {
     cwd: __dirname,
     input: input,
+    timeout: SYNC_TIMEOUT,
   };
-  const args = ['--relative', relativePath];
-  return childProcess.execFileSync('../bin/hercule', args, options).toString();
+  const args = ['--relative', relativePath, '--reporter', 'json'];
+  const result = childProcess.spawnSync('../bin/hercule', args, options);
+  const outputContent = result.stdout.toString();
+  const outputLogs = result.stderr.toString().split('\n');
+
+  _.compact(outputLogs).map(JSON.parse).forEach((message) => {
+    const msg = message.msg;
+    const level = message.level;
+    const body = _.omit(message, LOG_OMIT);
+    relog(log, level, body, msg);
+  });
+
+  return outputContent;
 }

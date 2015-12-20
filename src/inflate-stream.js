@@ -7,7 +7,7 @@ import RegexStream from '../lib/regex-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
 import grammar from './transclude-parser';
-import {getLink, LINK_REGEXP, WHITESPACE_GROUP} from './config';
+import {DEFAULT_LOG, getLink, nestIndent, LINK_REGEXP, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: object
@@ -23,13 +23,13 @@ import {getLink, LINK_REGEXP, WHITESPACE_GROUP} from './config';
 * Input and output properties can be altered by providing options
 */
 
-const defaultOptions = {
+const DEFAULT_OPTIONS = {
   input: 'link',
   output: 'content',
 };
 
-export default function InflateStream(options) {
-  const opt = _.merge({}, defaultOptions, options);
+export default function InflateStream(options, log = DEFAULT_LOG) {
+  const opt = _.merge({}, DEFAULT_OPTIONS, options);
 
 
   function inflateString(chunk, link, cb) {
@@ -42,22 +42,22 @@ export default function InflateStream(options) {
   function inflateLocalFile(chunk, link, cb) {
     const input = fs.createReadStream(link.href, {encoding: 'utf8'});
     const indent = chunk.indent;
-    const resolver = new ResolveStream(grammar);
-    const inflater = new InflateStream();
+    const resolver = new ResolveStream(grammar, null, log);
+    const inflater = new InflateStream(null, log);
     const trimmer = new TrimStream();
     const tokenizer = new RegexStream(LINK_REGEXP, {
       match: {
         link: getLink,
-        indent: (match) => {return '' + indent + match[WHITESPACE_GROUP];},
+        indent: nestIndent,
       },
       leaveBehind: `${WHITESPACE_GROUP}`,
       extend: {
         relativePath: chunk.relativePath,
         parents: [link.href, ...chunk.parents],
         references: [...chunk.references],
-        indent,
+        indent: indent,
       },
-    });
+    }, log);
 
     const self = this;
 
@@ -73,11 +73,8 @@ export default function InflateStream(options) {
     });
 
     input.on('error', function inputError(err) {
-      const error = {
-        message: `${link.href} could not be be read.`,
-        code: err.code,
-      };
-      self.push(_.assign(chunk, error));
+      log.warn({err, link}, 'Could not read local file');
+      self.push(chunk);
       return cb();
     });
 
@@ -89,12 +86,9 @@ export default function InflateStream(options) {
     request(link.href, (err, res, content) => {
       let output;
 
-      if (err || res.statusCode !== 200) {
-        const error = {
-          message: `${link.href} could not be retrieved.`,
-          code: (err || res.statusCode),
-        };
-        this.push(_.assign(chunk, error));
+      if (err) {
+        log.warn({err, link}, 'Could not read remote file');
+        this.push(chunk);
         return cb();
       }
 
@@ -118,10 +112,8 @@ export default function InflateStream(options) {
     }
 
     if (_(parents).contains(link.href)) {
-      const error = {
-        message: `${link.href} skipped to prevent circular transclusion.`,
-      };
-      this.push(_.assign(chunk, error));
+      log.warn({link}, 'Circular dependency detected');
+      this.push(chunk);
       return cb();
     }
 
