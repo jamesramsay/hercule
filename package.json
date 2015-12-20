@@ -69,5 +69,8 @@
     "nock": "^3.0.0",
     "nyc": "^5.0.0",
     "pegjs": "^0.9.0"
+  },
+  "publishConfig": {
+    "tag": "next"
   }
 }
