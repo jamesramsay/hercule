@@ -9,14 +9,14 @@ import _ from 'lodash';
 * - match (RegExp Match, optional) - Only returned if a match is present.
 */
 
-const defaultOptions = {
+const DEFAULT_OPTIONS = {
   match: 'match',
   chunk: 'content',
   extend: null,
 };
 
 export default function RegexStream(patternIn, options) {
-  const opt = _.merge({}, defaultOptions, options);
+  const opt = _.merge({}, DEFAULT_OPTIONS, options);
   let pattern = null;
   let inputBuffer = '';
 

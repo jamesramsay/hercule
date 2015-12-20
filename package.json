@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.3",
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
@@ -51,6 +51,7 @@
   },
   "homepage": "https://github.com/jamesramsay/hercule",
   "dependencies": {
+    "bunyan": "^1.5.1",
     "dashdash": "^1.10.1",
     "duplexer2": "^0.1.4",
     "event-stream": "^3.3.2",

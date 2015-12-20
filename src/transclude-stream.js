@@ -17,13 +17,13 @@ import {getLink, LINK_REGEXP, WHITESPACE_GROUP} from './config';
 * Output stream: string
 */
 
-const defaultOptions = {
+const DEFAULT_OPTIONS = {
   input: 'link',
   output: 'content',
 };
 
-export default function Transcluder(options) {
-  const opt = _.merge({}, defaultOptions, options);
+export default function Transcluder(options, log) {
+  const opt = _.merge({}, DEFAULT_OPTIONS, options);
   const extend = {
     relativePath: opt.relativePath,
     references: opt.references || [],
@@ -37,10 +37,10 @@ export default function Transcluder(options) {
     },
     leaveBehind: `${WHITESPACE_GROUP}`,
     extend,
-  });
-  const resolver = new ResolveStream(grammar);
-  const inflater = new InflateStream();
-  const indenter = new IndentStream();
+  }, log);
+  const resolver = new ResolveStream(grammar, null, log);
+  const inflater = new InflateStream(null, log);
+  const indenter = new IndentStream(null, log);
   const stringify = es.map(function chunkToString(chunk, cb) {
     return cb(null, _.get(chunk, `${opt.output}`));
   });

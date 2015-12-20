@@ -7,8 +7,13 @@
 import fs from 'fs';
 import path from 'path';
 import dashdash from 'dashdash';
+import bunyan from 'bunyan';
 import Transcluder from './transclude-stream';
+
+import {BUNYAN_DEFAULTS} from './config';
+
 let opts;
+let log;
 
 const parser = dashdash.createParser({
   options: [
@@ -28,6 +33,11 @@ const parser = dashdash.createParser({
       type: 'string',
       help: 'Relative path. stdin will be parsed relative to this path.',
     },
+    {
+      name: 'reporter',
+      type: 'string',
+      help: 'Supported reporters include json, json-stderr, tree',
+    },
   ],
 });
 
@@ -39,6 +49,7 @@ try {
   process.exit(1);
 }
 
+
 if (opts.help) {
   console.log(`usage: hercule [OPTIONS]\noptions:\n${parser.help({includeEnv: true}).trimRight()}`); // eslint-disable-line
   process.exit();
@@ -49,11 +60,15 @@ function main() {
   let transclude;
   let inputStream;
   let outputStream;
+  let bunyanOptions;
   const options = {
     relativePath: '',
     parents: [],
     parentRefs: [],
   };
+
+  bunyanOptions = BUNYAN_DEFAULTS[opts.reporter] || BUNYAN_DEFAULTS.file;
+  log = bunyan.createLogger(bunyanOptions);
 
   if (opts._args.length === 0) {
     // Reading input from stdin
@@ -73,7 +88,7 @@ function main() {
     outputStream = process.stdout;
   }
 
-  transclude = new Transcluder(options);
+  transclude = new Transcluder(options, log);
 
   inputStream.pipe(transclude).pipe(outputStream);
 }

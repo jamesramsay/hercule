@@ -158,7 +158,6 @@ test.cb('should handle parse error', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      // TODO: check error
       t.same(chunk.link, input.link);
     }
   });

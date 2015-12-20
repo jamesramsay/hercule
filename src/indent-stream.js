@@ -12,14 +12,14 @@ import _ from 'lodash';
 * - content (string)
 */
 
-const defaultOptions = {
+const DEFAULT_OPTIONS = {
   input: 'content',
   output: 'content',
   indent: 'indent',
 };
 
 export default function IndentStream(options) {
-  const opt = _.merge({}, defaultOptions, options);
+  const opt = _.merge({}, DEFAULT_OPTIONS, options);
 
   function transform(chunk, encoding, cb) {
     const indent = _.get(chunk, opt.indent);

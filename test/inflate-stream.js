@@ -210,3 +210,31 @@ test.cb('should not make modifications if hrefType is unrecognised', (t) => {
   testStream.write(input);
   testStream.end();
 });
+
+
+test.cb('should skip circular references', (t) => {
+  const input = {
+    content: ':[Example](size.md)',
+    link: {
+      href: 'size.md',
+      hrefType: 'file',
+    },
+    parents: ['size.md'],
+  };
+  const expected = ':[Example](size.md)';
+  const testStream = new InflateStream();
+
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
+      t.same(chunk.content, expected);
+    }
+  });
+
+  testStream.on('end', function end() {
+    t.end();
+  });
+
+  testStream.write(input);
+  testStream.end();
+});

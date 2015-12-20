@@ -1,0 +1,12 @@
+[
+  {
+    "name": "hercule",
+    "msg": "Could not read local file",
+    "link":
+    {
+      "hrefType": "file",
+      "href": "../fixtures/invalid-link/i-dont-exist.md"
+    },
+    "level": 40
+  }
+]
