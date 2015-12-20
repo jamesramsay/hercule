@@ -7,7 +7,7 @@ import RegexStream from '../lib/regex-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
 import grammar from './transclude-parser';
-import {DEFAULT_LOG, getLink, nestIndent, LINK_REGEXP, WHITESPACE_GROUP} from './config';
+import {DEFAULT_LOG, LINK_REGEXP, LINK_MATCH, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: object
@@ -45,11 +45,8 @@ export default function InflateStream(options, log = DEFAULT_LOG) {
     const resolver = new ResolveStream(grammar, null, log);
     const inflater = new InflateStream(null, log);
     const trimmer = new TrimStream();
-    const tokenizer = new RegexStream(LINK_REGEXP, {
-      match: {
-        link: getLink,
-        indent: nestIndent,
-      },
+    const tokenizerOptions = {
+      match: LINK_MATCH,
       leaveBehind: `${WHITESPACE_GROUP}`,
       extend: {
         relativePath: chunk.relativePath,
@@ -57,7 +54,8 @@ export default function InflateStream(options, log = DEFAULT_LOG) {
         references: [...chunk.references],
         indent: indent,
       },
-    }, log);
+    };
+    const tokenizer = new RegexStream(LINK_REGEXP, tokenizerOptions, log);
 
     const self = this;
 
