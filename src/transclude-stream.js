@@ -9,7 +9,7 @@ import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
 import grammar from './transclude-parser';
-import {getLink, LINK_REGEXP, WHITESPACE_GROUP} from './config';
+import {LINK_REGEXP, LINK_MATCH, WHITESPACE_GROUP} from './config';
 
 /**
 * Input stream: string
@@ -24,20 +24,17 @@ const DEFAULT_OPTIONS = {
 
 export default function Transcluder(options, log) {
   const opt = _.merge({}, DEFAULT_OPTIONS, options);
-  const extend = {
-    relativePath: opt.relativePath,
-    references: opt.references || [],
-    parents: opt.parents || [],
-    indent: opt.indent,
-  };
-  const tokenizer = new RegexStream(LINK_REGEXP, {
-    match: {
-      link: getLink,
-      indent: `${WHITESPACE_GROUP}`,
-    },
+  const tokenizerOptions = {
+    match: LINK_MATCH,
     leaveBehind: `${WHITESPACE_GROUP}`,
-    extend,
-  }, log);
+    extend: {
+      relativePath: opt.relativePath,
+      references: opt.references || [],
+      parents: opt.parents || [],
+      indent: opt.indent,
+    },
+  };
+  const tokenizer = new RegexStream(LINK_REGEXP, tokenizerOptions, log);
   const resolver = new ResolveStream(grammar, null, log);
   const inflater = new InflateStream(null, log);
   const indenter = new IndentStream(null, log);

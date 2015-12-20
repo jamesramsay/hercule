@@ -38,30 +38,32 @@ export default function RegexStream(patternIn, options) {
 
   function pushChunk(chunk, match) {
     const leaveBehind = _.get(match, opt.leaveBehind);
-    let output = {
-      [opt.chunk]: chunk,
-    };
+    let output = _.assign({[opt.chunk]: chunk}, opt.extend);
 
     if (match) {
       if (leaveBehind) {
-        this.push({[opt.chunk]: leaveBehind});
+        this.push(_.assign({[opt.chunk]: leaveBehind}, opt.extend));
+
+        // Trim what was left behind
+        output[opt.chunk] = chunk.slice(chunk.indexOf(leaveBehind) + leaveBehind.length);
       }
 
       if (typeof opt.match === 'string') {
-        output = _(output).assign({[opt.match]: match});
+        output = _(output).assign({[opt.match]: match}).value();
       }
 
       if (typeof opt.match === 'object') {
-        output = _(opt.match).mapValues((value) => {
+        let processedMatch = _.mapValues(opt.match, (value) => {
           if (typeof value === 'string') return _.get(match, value);
-          if (typeof value === 'function') return value(match, chunk);
+          if (typeof value === 'function') return value(match, opt);
           return null;
-        }).assign(output);
+        });
+        output = _(output).assign(processedMatch).value();
       }
     }
 
     // remove any null attributes
-    output = _(output).assign(opt.extend).omit(_.isNull).value();
+    output = _(output).omit(_.isNull).value();
 
     this.push(output);
   }

@@ -1,6 +1,5 @@
 import test from 'ava';
-import _ from 'lodash';
-import {LINK_REGEXP, LINK_GROUP, WHITESPACE_GROUP} from '../lib/config';
+import {LINK_REGEXP, LINK_MATCH, LINK_GROUP, WHITESPACE_GROUP} from '../lib/config';
 import RegexStream from '../lib/regex-stream';
 
 
@@ -160,11 +159,12 @@ test.cb('should return restructed match', (t) => {
   };
   const options = {
     match: {
-      link: `${LINK_GROUP}`,
-      indent: (match) => {
-        return ['__', _.get(match, `${WHITESPACE_GROUP}`)].join('');
-      },
+      link: `[${LINK_GROUP}]`,
+      indent: LINK_MATCH.indent,
       number: 2,
+    },
+    extend: {
+      indent: '__',
     },
   };
   const testStream = new RegexStream(LINK_REGEXP, options);
@@ -192,16 +192,15 @@ test.cb('should leave behind leading whitespace', (t) => {
       content: '  ',
     },
     {
-      content: '  :[foo](bar.md)',
-      link: 'bar.md',
+      content: ':[foo](bar.md)',
+      link: {
+        href: 'bar.md',
+      },
       indent: '  ',
     },
   ];
   const options = {
-    match: {
-      link: `${LINK_GROUP}`,
-      indent: `${WHITESPACE_GROUP}`,
-    },
+    match: LINK_MATCH,
     leaveBehind: `${WHITESPACE_GROUP}`,
   };
   const testStream = new RegexStream(LINK_REGEXP, options);
