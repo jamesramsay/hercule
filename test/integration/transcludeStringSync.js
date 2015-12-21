@@ -36,8 +36,8 @@ test.beforeEach((t) => {
 
 
 _.forEach((fixtures.fixtures), (fixture) => {
-  // Exclude http test because mocking won't cover sub-process
-  if (fixture.name === 'http-link') return;
+  // Exclude http tests because mocking won't cover sub-process
+  if (_.contains(['http-link', 'http-deep-nesting'], fixture.name)) return;
 
   test(`should transclude ${fixture.name}`, (t) => {
     const options = {

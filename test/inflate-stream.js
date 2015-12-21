@@ -134,6 +134,8 @@ test.cb('should inflate input with http link', (t) => {
       href: 'http://github.com/size.md',
       hrefType: 'http',
     },
+    parents: [],
+    references: [],
   };
   const expected = 'big';
   const testStream = new InflateStream();
@@ -163,11 +165,13 @@ test.cb('should skip input with invalid http link', (t) => {
       href: 'http://github.com/i-dont-exist.md',
       hrefType: 'http',
     },
+    parents: [],
+    references: [],
   };
   const expected = ':[Example](size.md)';
   const testStream = new InflateStream();
 
-  nock('http://github.com').get('/size.md').reply(404);
+  nock('http://github.com').get('/i-dont-exist.md').reply(404);
 
   testStream.on('readable', function read() {
     let chunk = null;
