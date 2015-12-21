@@ -53,7 +53,7 @@ export default function RegexStream(patternIn, options) {
       }
 
       if (typeof opt.match === 'object') {
-        let processedMatch = _.mapValues(opt.match, (value) => {
+        const processedMatch = _.mapValues(opt.match, (value) => {
           if (typeof value === 'string') return _.get(match, value);
           if (typeof value === 'function') return value(match, opt);
           return null;
