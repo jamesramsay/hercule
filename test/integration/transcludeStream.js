@@ -1,5 +1,4 @@
 import test from 'ava';
-import nock from 'nock';
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
@@ -8,9 +7,7 @@ import bunyan from 'bunyan';
 
 import Transcluder from '../../lib/transclude-stream';
 import fixtures from '../fixtures';
-
-
-nock('http://github.com').get('/size.md').reply(200, 'big\n');
+import './_mock';
 
 
 test.beforeEach((t) => {

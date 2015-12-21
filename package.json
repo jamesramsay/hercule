@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run compile && npm run test-units && npm run test-integration && npm run test-cli",
     "test-units": "./node_modules/.bin/nyc --reporter=json ./node_modules/.bin/ava",
-    "test-integration": "./node_modules/.bin/ava --serial test/integration",
+    "test-integration": "./node_modules/.bin/ava test/integration",
     "test-cli": "./test/modules/bin/bats test/bats",
     "posttest": "npm run lint",
     "coverage": "./node_modules/.bin/istanbul report --reporter=html && open coverage/lcov-report/index.html",
