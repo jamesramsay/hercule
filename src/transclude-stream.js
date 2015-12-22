@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import duplexer from 'duplexer2';
-
-// TODO: remove this dependency!
-import es from 'event-stream';
+import through2 from 'through2';
 
 import RegexStream from './regex-stream';
 import ResolveStream from './resolve-stream';
@@ -38,9 +36,13 @@ export default function Transcluder(options, log) {
   const resolver = new ResolveStream(grammar, null, log);
   const inflater = new InflateStream(null, log);
   const indenter = new IndentStream(null, log);
-  const stringify = es.map(function chunkToString(chunk, cb) {
-    return cb(null, _.get(chunk, `${opt.output}`));
-  });
+  const stringify = through2.obj(function chunkToString(chunk, encoding, cb) {
+    const content = _.get(chunk, `${opt.output}`);
+    // Prevent signaling end of readable stream
+    // https://nodejs.org/api/stream.html#stream_stream_push
+    if (_.isString(content) && content !== '') this.push(content);
+    return cb();
+  })
 
   tokenizer
   .pipe(resolver)
