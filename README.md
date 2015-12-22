@@ -186,7 +186,7 @@ Async interfaces should work with node 0.10 and above.
 
 <a name="transclude" />
 
-### transcludeStream([options])
+### transcludeStream([options], [log])
 
 Returns a duplex stream.
 
@@ -200,6 +200,9 @@ __Arguments__
     - `href` - A link which will be trancluded according to its `hrefType`.
     - `hrefType` - `file`, `http`, or `string`
   - `parents` - A collection of fully qualified file paths of the input used to detect and prevent circular transclusion.
+- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
+  - `warn(object, message)` - A note on something that should be looked at eventually.
+  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
 
 __Examples__
 
@@ -216,7 +219,7 @@ input.pipe(transcluder).pipe(output);
 
 <a name="transcludeString" />
 
-### transcludeString(str, [options], callback)
+### transcludeString(str, [options], [log], callback)
 
 Transcludes the input `str`, and `callback` is called when finished.
 
@@ -225,6 +228,9 @@ __Arguments__
 - `str` - A string to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the transclusion links within input `str` are relative.
+- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
+  - `warn(object, message)` - A note on something that should be looked at eventually.
+  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
 - `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
   has been processed. `callback` will be passed an error and the processed output.
 
@@ -236,7 +242,9 @@ __Examples__
 // async
 import {trancludeString} from 'hercule';
 
-// TODO
+trancludeString(':[foo](bar.md)', (output) => {
+  console.log(output);
+});
 
 ```
 
@@ -244,7 +252,8 @@ import {trancludeString} from 'hercule';
 // sync
 import {trancludeStringSync} from 'hercule';
 
-// TODO
+var output = trancludeFileSync('bar.md');
+console.log(output);
 
 ```
 
@@ -252,7 +261,7 @@ import {trancludeStringSync} from 'hercule';
 
 <a name="transcludeFile" />
 
-### transcludeFile(filepath, [options], callback)
+### transcludeFile(filepath, [options], [log], callback)
 
 Transcludes the file at the provided `filepath`, and `callback` is called when finished.
 
@@ -261,6 +270,9 @@ __Arguments__
 - `filepath` - A path to a file to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the input `filepath` is relative.
+- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
+  - `warn(object, message)` - A note on something that should be looked at eventually.
+  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
 - `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
   has been processed. `callback` will be passed an error and the processed output.
 
@@ -272,7 +284,9 @@ __Examples__
 // async
 import {trancludeFile} from 'hercule';
 
-// TODO
+trancludeFileSync('foo.md', (output) => {
+  console.log(output);
+});
 
 ```
 
@@ -280,6 +294,6 @@ import {trancludeFile} from 'hercule';
 // sync
 import {trancludeFileSync} from 'hercule';
 
-// TODO
-
+var output = trancludeFileSync('foo.md');
+console.log(output);
 ```

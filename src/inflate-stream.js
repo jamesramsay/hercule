@@ -69,7 +69,7 @@ export default function InflateStream(options, log = DEFAULT_LOG) {
     }
 
     if (_(parents).contains(link.href)) {
-      log.warn({link}, 'Circular dependency detected');
+      log.error({link}, 'Circular dependency detected');
       this.push(chunk);
       return cb();
     }
@@ -103,7 +103,7 @@ export default function InflateStream(options, log = DEFAULT_LOG) {
     });
 
     input.on('error', function inputError(err) {
-      log.warn({err, link}, 'Could not read file');
+      log.error({err, link}, 'Could not read file');
       self.push(chunk);
       return cb();
     });
