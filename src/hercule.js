@@ -20,8 +20,12 @@ function relog(log, level, body, message) {
 }
 
 
-export function transcludeString(input, options, cb) {
-  const transclude = new Transcluder(options);
+export function transcludeString(...args) {
+  const input = args.shift();
+  const cb = args.pop();
+  const [options, log] = args;
+
+  const transclude = new Transcluder(options, log);
   let outputString = '';
 
   transclude.on('readable', function read() {
@@ -40,8 +44,12 @@ export function transcludeString(input, options, cb) {
 }
 
 
-export function transcludeFile(input, options, cb) {
-  const transclude = new Transcluder(options);
+export function transcludeFile(...args) {
+  const input = args.shift();
+  const cb = args.pop();
+  const [options, log] = args;
+
+  const transclude = new Transcluder(options, log);
   const inputStream = fs.createReadStream(input, {encoding: 'utf8'});
   let outputString = '';
 
@@ -60,7 +68,7 @@ export function transcludeFile(input, options, cb) {
 }
 
 
-export function transcludeFileSync(input, opts, log) {
+export function transcludeFileSync(input, {relativePath}, log) {
   const options = {
     cwd: __dirname,
     timeout: SYNC_TIMEOUT,

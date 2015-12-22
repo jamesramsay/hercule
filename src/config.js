@@ -3,6 +3,12 @@ import _ from 'lodash';
 
 const APP_NAME = 'hercule';
 
+export const SUPPORTED_LINK_TYPES = [
+  'string',
+  'file',
+  'http',
+];
+
 // Log into the void, so that providing a logger is optional
 export const DEFAULT_LOG = {
   debug: () => {},
