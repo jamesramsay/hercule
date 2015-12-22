@@ -4,7 +4,7 @@
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
-    "test": "npm run compile && npm run test-units && npm run test-integration && npm run test-cli",
+    "test": "npm run compile && npm run test-units && npm run test-integration && npm run test-cli && npm run check-commit",
     "test-units": "./node_modules/.bin/nyc --reporter=json ./node_modules/.bin/ava",
     "test-integration": "./node_modules/.bin/ava test/integration",
     "test-cli": "./test/modules/bin/bats test/bats",
@@ -13,7 +13,8 @@
     "codecov": "cat coverage/coverage-final.json | ./node_modules/.bin/codecov",
     "compile": "BABEL_ENV=compile ./node_modules/.bin/babel src --out-dir lib --source-maps && ./node_modules/.bin/pegjs src/transclude.pegjs lib/transclude-parser.js",
     "install-bats": "./scripts/install-bats",
-    "lint": "./node_modules/.bin/eslint ./src ./test"
+    "lint": "./node_modules/.bin/eslint ./src ./test",
+    "check-commit": "./scripts/commit-msg"
   },
   "config": {
     "nyc": {
@@ -69,7 +70,9 @@
     "istanbul": "^0.4.1",
     "nock": "^3.0.0",
     "nyc": "^5.0.0",
-    "pegjs": "^0.9.0"
+    "pegjs": "^0.9.0",
+    "semver": "^5.1.0",
+    "shelljs": "^0.5.3"
   },
   "publishConfig": {
     "tag": "next"
