@@ -1,6 +1,6 @@
 import test from 'ava';
-import grammar from '../lib/transclude-parser';
-import ResolveStream from '../lib/resolve-stream';
+import grammar from '../../lib/transclude-parser';
+import ResolveStream from '../../lib/resolve-stream';
 
 
 test.cb('should handle no input', (t) => {

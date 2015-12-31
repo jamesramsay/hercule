@@ -1,6 +1,7 @@
+import path from 'path';
 import test from 'ava';
 import nock from 'nock';
-import InflateStream from '../lib/inflate-stream';
+import InflateStream from '../../lib/inflate-stream';
 
 
 test.cb('should handle no input', (t) => {
@@ -46,7 +47,7 @@ test.cb('should inflate input with file link', (t) => {
   const input = {
     content: ':[Example](size.md)',
     link: {
-      href: __dirname + '/fixtures/local-link/size.md',
+      href: path.join(__dirname, '../fixtures/local-link/size.md'),
       hrefType: 'file',
     },
     parents: [],
@@ -75,7 +76,7 @@ test.cb('should skip input with invalid file link', (t) => {
   const input = {
     content: ':[Example](size.md)',
     link: {
-      href: __dirname + '/i-dont-exist.md',
+      href: path.join(__dirname, '/i-dont-exist.md'),
       hrefType: 'file',
     },
     parents: [],
