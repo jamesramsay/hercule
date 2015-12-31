@@ -8,7 +8,7 @@ import RegexStream from '../lib/regex-stream';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
 import grammar from './transclude-parser';
-import {DEFAULT_LOG, LINK_REGEXP, LINK_MATCH, WHITESPACE_GROUP} from './config';
+import {DEFAULT_LOG, LINK_REGEXP, LINK_MATCH, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES} from './config';
 
 /**
 * Input stream: object
@@ -68,29 +68,28 @@ export default function InflateStream(options, log = DEFAULT_LOG) {
       return cb();
     }
 
-    if (_(parents).contains(link.href)) {
+    // ES2016: Array.includes()
+    if (_(parents).includes(link.href)) {
       log.error({link}, 'Circular dependency detected');
       this.push(chunk);
       return cb();
     }
 
-    switch (link.hrefType) {
-    case 'string':
-      this.push(_.assign({}, chunk, {[opt.output]: link.href}));
-      return cb();
-    case 'file':
-      input = fs.createReadStream(link.href, {encoding: 'utf8'});
-      break;
-    case 'http':
-      input = request.get(link.href);
-      break;
-    default:
-      // Skip if unrecognised link type
+    if (_(SUPPORTED_LINK_TYPES).includes(link.hrefType) === false) {
       this.push(chunk);
       return cb();
     }
 
+    if (link.hrefType === 'string') {
+      this.push(_.assign(chunk, {[opt.output]: link.href}));
+      return cb();
+    }
+
+    // Inflate local or remote file streams
     inflater = inflateDuplex(chunk, link);
+    if (link.hrefType === 'file') input = fs.createReadStream(link.href, {encoding: 'utf8'});
+    if (link.hrefType === 'http') input = request.get(link.href);
+
     inflater.on('readable', function inputReadable() {
       let content;
       while ((content = this.read()) !== null) {

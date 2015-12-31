@@ -15,8 +15,8 @@ const DEFAULT_OPTIONS = {
   extend: null,
 };
 
-export default function RegexStream(patternIn, options) {
-  const opt = _.merge({}, DEFAULT_OPTIONS, options);
+export default function RegexStream(patternIn, opt) {
+  const options = _.merge({}, DEFAULT_OPTIONS, opt);
   let pattern = null;
   let inputBuffer = '';
 
@@ -37,23 +37,23 @@ export default function RegexStream(patternIn, options) {
 
 
   function pushChunk(chunk, match) {
-    const leaveBehind = _.get(match, opt.leaveBehind);
-    let output = _.assign({[opt.chunk]: chunk}, opt.extend);
+    const leaveBehind = _.get(match, options.leaveBehind);
+    let output = _.assign({[options.chunk]: chunk}, options.extend);
 
     if (match) {
       if (leaveBehind) {
-        this.push(_.assign({[opt.chunk]: leaveBehind}, opt.extend));
+        this.push(_.assign({[options.chunk]: leaveBehind}, options.extend));
 
         // Trim what was left behind
-        output[opt.chunk] = chunk.slice(chunk.indexOf(leaveBehind) + leaveBehind.length);
+        output[options.chunk] = chunk.slice(chunk.indexOf(leaveBehind) + leaveBehind.length);
       }
 
-      if (typeof opt.match === 'string') {
-        output = _(output).assign({[opt.match]: match}).value();
+      if (typeof options.match === 'string') {
+        output = _(output).assign({[options.match]: match}).value();
       }
 
-      if (typeof opt.match === 'object') {
-        const processedMatch = _.mapValues(opt.match, (value) => {
+      if (typeof options.match === 'object') {
+        const processedMatch = _.mapValues(options.match, (value) => {
           if (typeof value === 'string') return _.get(match, value);
           if (typeof value === 'function') return value(match, opt);
           return null;
