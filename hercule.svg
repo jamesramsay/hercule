@@ -1,29 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
   <defs>
-    <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="gradient-bg">
+    <linearGradient x1="0%" y1="0%" y2="100%" id="a">
       <stop stop-color="#1E1D73" offset="0%"/>
       <stop stop-color="#53A0FE" offset="50%"/>
       <stop stop-color="#00ABAD" offset="100%"/>
     </linearGradient>
   </defs>
-  <g id="canvas" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
-    <g id="icon" transform="translate(7.000000, 14.000000)">
-      <path d="M110.997 34.614L110.997 81.396 64.712 97.11 57.211 89.471 33.856 97.11 3 66.226 3 18.502 49.284 3 57.727 10.818 80.141 3 110.997 34.614Z" class="background" stroke="url(#gradient-bg)" stroke-width="20" stroke-linejoin="round" fill="url(#gradient-bg)"/>
-      <path d="M33.544 18.371L64.5 49.5" class="line" stroke="#FFFFFF"/>
-      <path d="M34.521 98.586L56.512 91.255" class="line" stroke="#FFFFFF"/>
-      <path d="M35.521 15.883L80.97 0.244" class="line" stroke="#FFFFFF"/>
-      <path d="M35.521 66.286L80.97 50.648" class="line" stroke="#FFFFFF"/>
-      <path d="M3.222 66.309L48.671 50.182" class="line" stroke="#FFFFFF"/>
-      <path d="M64.5 49.5L111.292 34.521" class="line" stroke="#FFFFFF"/>
-      <path d="M35.521 50.159L80.97 34.521" class="line" stroke="#FFFFFF"/>
-      <path d="M1.244 17.883L32.521 49.159" class="line" stroke="#FFFFFF"/>
-      <path d="M33.544 67.798L63.843 98.586" class="line" stroke="#FFFFFF"/>
-      <path d="M50.671 0.733L58.245 7.819" class="line" stroke="#FFFFFF"/>
-      <path d="M82.459 50.159L111.292 80.459" class="line" stroke="#FFFFFF"/>
-      <path d="M48.671 50.182L56.821 58.332" class="line" stroke="#FFFFFF"/>
-      <path d="M64.5 50.159L64.5 96.12" class="line" stroke="#FFFFFF"/>
-      <path d="M48.5 46.517L48.5 50.182" class="line" stroke="#FFFFFF"/>
-      <path d="M114 33.372L114 82.754 65.143 99.341 65.143 88.811 81.429 82.754 81.429 49.926 32.571 66.74 32.571 99.341 0 66.74 0 16.363 48.857 0 48.857 11.341 32.571 17.039 32.571 49.926 81.429 32.621 81.429 0 114 33.372Z" class="line-heavy" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round"/>
-    </g>
+  <g fill="none" fill-rule="evenodd" stroke-linecap="square">
+    <path d="M111 34.6v46.8L64.7 97.1l-7.5-7.63-23.34 7.64L3 66.27V18.5L49.28 3l8.45 7.82L80.13 3 111 34.6z" class="background" stroke="url(#a)" stroke-width="20" stroke-linejoin="round" fill="url(#a)" transform="translate(7 14)"/>
+    <path d="M40.54 32.37L71.5 63.5m-29.98 49.1l22-7.34m-21-75.38l45.45-15.64M42.52 80.3l45.45-15.65M10.22 80.3l45.45-16.1m15.83-.7l46.8-14.98M42.52 64.16l45.45-15.64M8.24 31.88l31.28 31.28m1.02 18.64l30.3 30.8M57.67 14.73l7.57 7.1m24.22 42.33l28.83 30.3M55.64 64.18l8.15 8.15m7.7-8.17v45.96m-16-49.6v3.66" class="line" stroke="#FFF"/>
+    <path d="M121 47.37v49.38l-48.86 16.6V102.8l16.3-6.05V63.93l-48.87 16.8v32.6L7 80.73V30.38L55.86 14v11.34l-16.3 5.7v32.9L88.44 46.6V14L121 47.37z" class="line-heavy" stroke="#FFF" stroke-width="5" stroke-linejoin="round"/>
   </g>
 </svg>
