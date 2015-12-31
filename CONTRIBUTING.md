@@ -3,6 +3,14 @@
 If you want to contribute to Hercule, please use a GitHub pull request.
 This is the fastest way for features and fixes to be reviewed and merged it into the code base.
 
+To do this, clone the repo and run:
+
+```bash
+./scripts/init
+```
+
+This will install the necessary dependencies and configure project git hooks.
+
 ## Getting started
 
 The process of submitting a pull request is fairly straightforward and generally follows the same pattern each time:
