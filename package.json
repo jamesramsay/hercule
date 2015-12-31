@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
@@ -74,6 +74,6 @@
     "shelljs": "^0.5.3"
   },
   "publishConfig": {
-    "tag": "next"
+    "tag": "latest"
   }
 }
