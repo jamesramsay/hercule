@@ -6,7 +6,7 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule.svg)](https://codecov.io/github/jamesramsay/hercule)
 [![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
-![Hercule](hercule.png)
+![Hercule](https://cdn.rawgit.com/jamesramsay/hercule/ab29e517e6c12192e9168faa84ab3c92ec711c31/hercule.svg)
 
 Write large markdown documents, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
 
