@@ -1,0 +1,12 @@
+[
+  {
+    "name": "hercule",
+    "msg": "Circular dependency detected",
+    "link":
+    {
+      "hrefType": "file",
+      "href": "../fixtures/circular-references/fox.md"
+    },
+    "level": 50
+  }
+]

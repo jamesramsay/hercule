@@ -1,20 +1,23 @@
 # Hercule – Markdown Transclusion Tool
 
-[![Join the chat at https://gitter.im/jamesramsay/hercule](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jamesramsay/hercule?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Version](https://img.shields.io/npm/v/hercule.svg)](https://npmjs.com/package/hercule)
+[![License](https://img.shields.io/npm/l/hercule.svg)](https://npmjs.com/package/hercule)
+[![Build Status](https://img.shields.io/travis/jamesramsay/hercule.svg)](https://travis-ci.org/jamesramsay/hercule)
+[![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule.svg)](https://codecov.io/github/jamesramsay/hercule)
+[![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
-[![Build Status](https://travis-ci.org/jamesramsay/hercule.svg?branch=master)](https://travis-ci.org/jamesramsay/hercule)
-[![Coverage Status](https://coveralls.io/repos/jamesramsay/hercule/badge.svg)](https://coveralls.io/r/jamesramsay/hercule)
-[![Dependency Status](https://david-dm.org/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
+![Hercule](hercule.png)
 
-![Hercule logo](hercule.png)
+Write large markdown documents, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
 
-Write large markdown documents, including API Blueprints, while keeping things DRY (don't repeat yourself).
+Hercule is a command-line tool and library for transcluding markdown, [API Blueprint](http://apiblueprint.org), and plaintext. This allows complex and repetitive documents to be written as smaller logical documents, for improved consistency, reuse, and separation of concerns.
 
-```bash
-hercule src/document.md -o document.md
-```
-
-Hercule is a command-line tool and library for transcluding markdown documents, including API documentation written in [API Blueprint](http://apiblueprint.org) format. With Hercule you can easily break complex documents into smaller logical documents, preventing repetition and improving consistency using transclusion links `:[abstract](src/abstract.md)`.
+- Simple extension of markdown link syntax `:[Title](link.md)` (preceeding colon `:`)
+- Transclude local files
+- Transclude remote (HTTP) files
+- Transclude strings
+- Smart indentation
+- Stream, Async, Sync APIs
 
 -----
 
@@ -26,122 +29,135 @@ Hercule is used by [Adslot](http://adslot.com) to help document our APIs in [API
 
 ## Installation
 
-[Node.js](http://nodejs.org) and [NPM](http://npmjs.org) is required.
+You can install Hercule using [npm](http://npmjs.org):
 
-```
-$ npm install -g hercule
-```
-
-Use as a command-line utility:
-
-```
-hercule src/document.md -o document.md
+```bash
+npm install -g hercule
 ```
 
-Or use as a library:
+## Usage
+
+You can use Hercule as a command-line utility:
+
+```bash
+hercule src/blueprint.md -o output.md
+```
+
+Hercule supports processing input from stdin, and writing to stdout:
+
+```
+cat src/blueprint.md | hercule | less
+```
+
+Or you can use Hercule as a library:
 
 ```javascript
 var hercule = require('hercule');
 
-hercule.transcludeString("# Title\n\n:[abstract](abstract.md)", function(output) {
-  return console.log(output);
-});
+var output = hercule.transcludeStringSync("# Title\n\n:[abstract](abstract.md)");
+console.log(output);
 ```
 
-## Basic use: file transclusion
+Following examples use ES2015 syntax.
+
+## Transclusion Syntax
+
+### Basic transclusion (local files and remote HTTP files)
 
 Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
 
-```markdown
-This is an :[example link](foo.md).
+
+```javascript
+import {transcludeStringSync} from 'hercule';
+
+const input = 'This is an :[example link](foo.md).';
+
+const output = transcludeStringSync(input);
+console.log(output);
+// This is an example transclusion.
 ```
 
-Output from `hercule examples/basic/main.md`:
-
-```
-This is an example transclusion.
-```
-
-Extending the standard Markdown link syntax means that most other markdown parsers will treat them as normal links.
+Extending the standard Markdown link syntax means most markdown parsers will treat Hercule's transclusion links as standard Markdown links.
 For example, Github handles transclusion links in this manner.
 
-## Basic use: remote file (http) transclusion
+Hercule is also able to transclude HTTP links.
 
-Hercule is able to transclude HTTP references also.
-This done by simply providing the URL as the link.
+```javascript
+import {transcludeStringSync} from 'hercule';
 
-```markdown
-Jackdaws love my :[size](https://gist.githubusercontent.com/jamesramsay/e869c0164a187cc756d4/raw/5e6052f67b6bf87c6862e3e17e1a646cf31cbe16/size.md) sphinx of quartz.
+const input = 'Jackdaws love my :[size](https://raw.githubusercontent.com/jamesramsay/hercule/master/test/fixtures/basic/size.md) sphinx of quartz.';
+
+const output = hercule.transcludeStringSync(input);
+console.log(output);
+// Jackdaws love my big sphinx of quartz.
 ```
 
-Output from `hercule test/fixtures/test-http-live/jackdaw.md`:
+### Placeholders and overriding references
 
-```
-Jackdaws love my big sphinx of quartz.
-```
+Placeholders (e.g. `:[foo](bar)`) allow you create a target for transclusion without specifying the link in the document.
+A parent document can then override the placeholder with the desired link.
 
-## Advanced use: placeholders and references
+Placeholders and references can be helpful for increasing the _'dryness'_ of your source documents,
+or allowing environmental variables to be passed into the document during processing.
 
-As well as basic file transclusion, Hercule supports placeholders and references.
-Placeholders and references may be useful for increasing the _'dryness'_ of your source documents.
+```javascript
+import {transcludeStringSync} from 'hercule';
 
-Example placeholder link in `examples/advanced/foo.md`:
+const input = ':[foo](bar)';
+const options = {
+  references: [{
+    placeholder: 'bar',
+    href: 'fizz buzz',
+    hrefType: 'string'
+  }]
+};
 
-```markdown
-is an :[example placeholder](bar)
-```
-
-In this example `bar` is being used as a placeholder link.
-When transcluding `foo.md`, the placeholder can be targeted by a reference file or string.
-
-```markdown
-This document :[example link with string reference](foo.md bar:"example foobar!")
-```
-
-Output from `hercule examples/advanced/main.md`:
-
-```
-This document is an example foobar!
+const output = transcludeStringSync(input, options);
+console.log(output);
+// fizz buzz
 ```
 
 References are passed down to any nested transclusion links.
 
-## Advanced use: default placeholders
+### Default placeholders
 
 Sometimes a file might be used in multiple contexts, some contexts requiring references and others not.
 Default placeholders help handle this situation more conveniently.
 
 The following example uses Apiary's [Markdown Syntax for Object Notation (MSON)](https://github.com/apiaryio/mson).
 
-```markdown
-## Properties
+```mson
+## Ingredient (object)
 
 - id: 1 (number, required)
 - name: Cucumber (string, required)
 - description: Essential for tzatziki (string, :[is required](required || "optional"))
 ```
 
-Output from `hercule examples/default/main.md` without reference `required`:
+```javascript
+import {transcludeStringSync} from 'hercule';
 
-```markdown
-## Properties
+const inputRequired = ':[Required Ingredient](cucmber.mson required:"required")';
+const inputDefault = ':[Optional Ingredient](cucmber.mson)';
 
-- id: 1 (number, required)
-- name: Cucumber (string, required)
-- description: Essential for tzatziki (string, optional)
+const outputRequired = transcludeStringSync(inputRequired);
+console.log(outputRequired);
+// ## Recipe (object)
+//
+// - id: 1 (number, required)
+// - name: Cucumber (string, required)
+// - description: Essential for tzatziki (string, required)
+
+const outputDefault = transcludeStringSync(inputDefault);
+console.log(outputDefault);
+// ## Recipe (object)
+//
+// - id: 1 (number, required)
+// - name: Cucumber (string, required)
+// - description: Essential for tzatziki (string, optional)
 ```
 
-Output from `hercule examples/default/main-override.md` with reference `required`:
-
-```markdown
-## Properties
-
-- id: 1 (number, required)
-- name: Cucumber (string, required)
-- description: Essential for tzatziki (string, required)
-```
-
-## Whitespace sensitivity
+### Whitespace sensitivity
 
 Leading whitespace is significant in Markdown.
 Hercule preserves whitespace at the beginning of each line.
@@ -155,15 +171,129 @@ Binary sort example:
 
 Each line of `snippet.c` will be indented with the whitespace preceding it.
 
-----
+## Documentation
 
-## Acknowledgments
+Some functions are available in both sync and async varieties.
 
-Special thanks:
+- [`transclude`](#transclude)
+- [`transcludeString`](#transcludeString), `transcludeStringSync`
+- [`transcludeFile`](#transcludeFile), `transcludeFileSync`
 
-- [@zdne](https://github.com/zdne) for your feedback and ideas, particularly on syntax
-- [@MichaelHirn](https://github.com/MichaelHirn) for contributions including the default link behaviour
+Note synchronous interfaces rely on [`execFileSync`](https://nodejs.org/api/child_process.html#child_process_child_process_execfilesync_file_args_options) which is only available with node 0.12 and above.
+Async interfaces should work with node 0.10 and above.
 
-Related projects:
+---------------------------------------
 
-- [Grunt Hercule](https://github.com/chesleybrown/grunt-hercule): a Grunt task that wraps hercule
+<a name="transclude" />
+
+### transcludeStream([options], [log])
+
+Returns a duplex stream.
+
+__Arguments__
+
+- `options` - An object of options to be applied when processing input.
+  - `relativePath` - A path to which the transclusion links within input stream are relative.
+  - `references` - A collection of references which be considered when resolving each transclusion link.
+    Each reference must contain `placeholder`, `href`, and `hrefType`.
+    - `placeholder` - A string used to locate the target(s) for transclusion.
+    - `href` - A link which will be trancluded according to its `hrefType`.
+    - `hrefType` - `file`, `http`, or `string`
+  - `parents` - A collection of fully qualified file paths of the input used to detect and prevent circular transclusion.
+- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
+  - `warn(object, message)` - A note on something that should be looked at eventually.
+  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
+
+__Examples__
+
+```javascript
+import {trancludeStream} from 'hercule';
+
+const trancluder = new trancludeStream();
+
+// assuming input is a readable stream and output is a writable stream
+input.pipe(transcluder).pipe(output);
+```
+
+---------------------------------------
+
+<a name="transcludeString" />
+
+### transcludeString(str, [options], [log], callback)
+
+Transcludes the input `str`, and `callback` is called when finished.
+
+__Arguments__
+
+- `str` - A string to process.
+- `options` - An object of options to be applied when processing input.
+  - `relativePath` - A path to which the transclusion links within input `str` are relative.
+- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
+  - `warn(object, message)` - A note on something that should be looked at eventually.
+  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
+- `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
+  has been processed. `callback` will be passed an error and the processed output.
+
+Omit the callback if using `transcludeStringSync`.
+
+__Examples__
+
+```javascript
+// async
+import {trancludeString} from 'hercule';
+
+trancludeString(':[foo](bar.md)', (output) => {
+  console.log(output);
+});
+
+```
+
+```javascript
+// sync
+import {trancludeStringSync} from 'hercule';
+
+var output = trancludeFileSync('bar.md');
+console.log(output);
+
+```
+
+---------------------------------------
+
+<a name="transcludeFile" />
+
+### transcludeFile(filepath, [options], [log], callback)
+
+Transcludes the file at the provided `filepath`, and `callback` is called when finished.
+
+__Arguments__
+
+- `filepath` - A path to a file to process.
+- `options` - An object of options to be applied when processing input.
+  - `relativePath` - A path to which the input `filepath` is relative.
+- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
+  - `warn(object, message)` - A note on something that should be looked at eventually.
+  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
+- `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
+  has been processed. `callback` will be passed an error and the processed output.
+
+Omit the callback if using `transcludeFileSync`.
+
+__Examples__
+
+```javascript
+// async
+import {trancludeFile} from 'hercule';
+
+trancludeFileSync('foo.md', (output) => {
+  console.log(output);
+});
+
+```
+
+```javascript
+// sync
+import {trancludeFileSync} from 'hercule';
+
+var output = trancludeFileSync('foo.md');
+console.log(output);
+```
