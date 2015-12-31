@@ -13,10 +13,6 @@ script:
 - npm run test-$TEST_SUITE
 after_success:
 - npm run codecov
-cache:
-  directories:
-  - node_modules
-  - test/modules
 deploy:
   provider: npm
   email: git@jwr.vc
