@@ -70,7 +70,7 @@ export default function ResolveStream(grammar, options, log = DEFAULT_LOG) {
     try {
       link = grammar.parse(rawLink);
     } catch (err) {
-      log.warn({err, link: rawLink}, `Link could not be parsed`);
+      log.error({err, link: rawLink}, `Link could not be parsed`);
       this.push(chunk);
       return cb();
     }
