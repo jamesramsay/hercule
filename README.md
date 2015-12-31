@@ -6,7 +6,7 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule.svg)](https://codecov.io/github/jamesramsay/hercule)
 [![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
-![Hercule](https://cdn.rawgit.com/jamesramsay/hercule/ab29e517e6c12192e9168faa84ab3c92ec711c31/hercule.svg)
+[![Hercule](https://cdn.rawgit.com/jamesramsay/hercule/40421d427a0947abe0d5b8e23b5ac14a78f3ac23/hercule.svg)](https://www.npmjs.com/package/hercule)
 
 Write large markdown documents, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
 
@@ -21,7 +21,7 @@ Hercule is a command-line tool and library for transcluding markdown, [API Bluep
 
 -----
 
-[![Adslot](adslot.png)](http://adslot.com/)
+[![Adslot](https://cdn.rawgit.com/jamesramsay/hercule/40421d427a0947abe0d5b8e23b5ac14a78f3ac23/adslot.svg)](http://adslot.com/)
 
 Hercule is used by [Adslot](http://adslot.com) to help document our APIs in [API Blueprint](http://apiblueprint.org) more efficiently and more accurately. We also use [Apiary](http://apiary.io) to distribute our API documentation and [DREDD](https://github.com/apiaryio/dredd) (a tool by [Apiary](http://apiary.io)) to validate the documentation against implementation.
 

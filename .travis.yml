@@ -9,6 +9,7 @@ env:
 - TEST_SUITE=units
 - TEST_SUITE=integration
 before_install:
+- npm -g install npm@latest
 - npm run install-bats
 before_script:
 - npm run compile
