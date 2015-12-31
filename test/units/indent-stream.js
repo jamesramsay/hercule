@@ -1,5 +1,5 @@
 import test from 'ava';
-import IndentStream from '../lib/indent-stream';
+import IndentStream from '../../lib/indent-stream';
 
 
 test.cb('should handle no input', (t) => {

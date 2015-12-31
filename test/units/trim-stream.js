@@ -1,5 +1,5 @@
 import test from 'ava';
-import TrimStream from '../lib/trim-stream';
+import TrimStream from '../../lib/trim-stream';
 
 
 test.cb('should handle no input', (t) => {

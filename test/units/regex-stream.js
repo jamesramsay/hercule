@@ -1,6 +1,6 @@
 import test from 'ava';
-import {LINK_REGEXP, LINK_MATCH, LINK_GROUP, WHITESPACE_GROUP} from '../lib/config';
-import RegexStream from '../lib/regex-stream';
+import {LINK_REGEXP, LINK_MATCH, LINK_GROUP, WHITESPACE_GROUP} from '../../lib/config';
+import RegexStream from '../../lib/regex-stream';
 
 
 test.cb('should find handle empty buffer', (t) => {
