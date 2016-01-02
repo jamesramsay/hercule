@@ -57,7 +57,8 @@
     "duplexer2": "^0.1.4",
     "lodash": "^3.10.1",
     "request": "^2.65.0",
-    "through2": "^2.0.0"
+    "through2": "^2.0.0",
+    "through2-get": "^0.0.2"
   },
   "devDependencies": {
     "ava": "^0.9.1",
