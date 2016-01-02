@@ -1,12 +1,12 @@
 import _ from 'lodash';
 import duplexer from 'duplexer2';
 import through2 from 'through2';
+import get from 'through2-get';
 
 import RegexStream from './regex-stream';
 import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
-import Get from './through2-get';
 import grammar from './transclude-parser';
 import {LINK_REGEXP, LINK_MATCH, WHITESPACE_GROUP} from './config';
 
@@ -37,7 +37,7 @@ export default function Transcluder(opt, log) {
   const resolver = new ResolveStream(grammar, null, log);
   const inflater = new InflateStream(null, log);
   const indenter = new IndentStream(null, log);
-  const stringify = new Get('content');
+  const stringify = get('content');
 
   tokenizer
   .pipe(resolver)
