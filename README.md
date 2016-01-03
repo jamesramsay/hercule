@@ -2,8 +2,8 @@
 
 [![Version](https://img.shields.io/npm/v/hercule.svg)](https://npmjs.com/package/hercule)
 [![License](https://img.shields.io/npm/l/hercule.svg)](https://npmjs.com/package/hercule)
-[![Build Status](https://img.shields.io/travis/jamesramsay/hercule.svg)](https://travis-ci.org/jamesramsay/hercule)
-[![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule.svg)](https://codecov.io/github/jamesramsay/hercule)
+[![Build Status](https://img.shields.io/travis/jamesramsay/hercule/master.svg)](https://travis-ci.org/jamesramsay/hercule)
+[![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule/master.svg)](https://codecov.io/github/jamesramsay/hercule)
 [![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
 [![Hercule](https://cdn.rawgit.com/jamesramsay/hercule/40421d427a0947abe0d5b8e23b5ac14a78f3ac23/hercule.svg)](https://www.npmjs.com/package/hercule)
