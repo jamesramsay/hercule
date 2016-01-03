@@ -46,14 +46,13 @@ test.cb('should skip input without link', (t) => {
 test.cb('should parse input simple link', (t) => {
   const input = {
     content: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
-    relativePath: 'test',
     references: [],
     link: {
       href: 'animal.md',
     },
   };
   const expected = {
-    href: 'test/animal.md',
+    href: 'animal.md',
     hrefType: 'file',
   };
   const testStream = new ResolveStream(grammar);
@@ -152,6 +151,33 @@ test.cb('should handle parse error', (t) => {
     link: {
       href: 'animal.md foo:bar:"exception!"',
     },
+  };
+  const testStream = new ResolveStream(grammar);
+
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
+      t.same(chunk, input);
+    }
+  });
+
+  testStream.on('end', function end() {
+    t.end();
+  });
+
+  testStream.write(input);
+  testStream.end();
+});
+
+
+test.cb('should resolve link relative to file', (t) => {
+  const input = {
+    content: ':[](animal.md)',
+    relativePath: 'foo',
+  };
+  const expected = {
+    href: 'foo/animal.md',
+    hrefType: 'file',
   };
   const testStream = new ResolveStream(grammar);
 
