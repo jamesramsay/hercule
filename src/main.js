@@ -10,7 +10,7 @@ import dashdash from 'dashdash';
 import bunyan from 'bunyan';
 import Transcluder from './transclude-stream';
 
-import {BUNYAN_DEFAULTS} from './config';
+import { BUNYAN_DEFAULTS } from './config';
 
 let opts;
 let log;
@@ -76,13 +76,13 @@ function main() {
     options.relativePath = opts.relative;
   } else {
     // Reading input from file
-    inputStream = fs.createReadStream(opts._args[0], {encoding: 'utf8'});
+    inputStream = fs.createReadStream(opts._args[0], { encoding: 'utf8' });
     options.relativePath = path.dirname(opts._args[0]);
   }
 
   if (opts.output) {
     // Writing output to file
-    outputStream = fs.createWriteStream(opts.output, {encoding: 'utf8'});
+    outputStream = fs.createWriteStream(opts.output, { encoding: 'utf8' });
   } else {
     // Writing output to stdout
     outputStream = process.stdout;

@@ -2,7 +2,7 @@ import through2 from 'through2';
 import path from 'path';
 import _ from 'lodash';
 
-import {DEFAULT_LOG} from './config';
+import { DEFAULT_LOG } from './config';
 
 /**
 * Input stream: (object)
@@ -33,7 +33,7 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
   function resolve(unresolvedLink, references = [], relativePath = '') {
     let link = unresolvedLink.primary;
     const fallback = unresolvedLink.fallback;
-    const override = _.find(references, {'placeholder': link.href}) || fallback;
+    const override = _.find(references, { 'placeholder': link.href }) || fallback;
 
     if (override) {
       link = _.pick(override, ['href', 'hrefType']);
@@ -63,7 +63,7 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
     try {
       link = grammar.parse(rawLink);
     } catch (err) {
-      log.error({err, link: rawLink}, `Link could not be parsed`);
+      log.error({ err, link: rawLink }, `Link could not be parsed`);
       this.push(chunk);
       return cb();
     }
@@ -71,7 +71,7 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
     references = _.unique([...link.references, ...parentRefs], true);
     link = resolve(link, parentRefs, relativePath);
 
-    this.push(_.assign(chunk, {[options.output]: link}, {references}));
+    this.push(_.assign(chunk, { [options.output]: link }, { references }));
     return cb();
   }
 

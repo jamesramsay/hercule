@@ -19,6 +19,7 @@ function relog(log, level, body, message) {
   log[LOG_LEVELS[level]](body, message);
 }
 
+export const TranscludeStream = Transcluder;
 
 export function transcludeString(...args) {
   const input = args.shift();
@@ -50,7 +51,7 @@ export function transcludeFile(...args) {
   const [options, log] = args;
 
   const transclude = new Transcluder(options, log);
-  const inputStream = fs.createReadStream(input, {encoding: 'utf8'});
+  const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
 
   transclude.on('readable', function read() {
@@ -68,7 +69,7 @@ export function transcludeFile(...args) {
 }
 
 
-export function transcludeFileSync(input, {relativePath}, log) {
+export function transcludeFileSync(input, { relativePath }, log) {
   const options = {
     cwd: __dirname,
     timeout: SYNC_TIMEOUT,
@@ -89,10 +90,10 @@ export function transcludeFileSync(input, {relativePath}, log) {
 }
 
 
-export function transcludeStringSync(input, {relativePath}, log) {
+export function transcludeStringSync(input, { relativePath }, log) {
   const options = {
+    input,
     cwd: __dirname,
-    input: input,
     timeout: SYNC_TIMEOUT,
   };
   const args = ['--relative', relativePath, '--reporter', 'json'];

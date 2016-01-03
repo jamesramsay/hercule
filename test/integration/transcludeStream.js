@@ -5,7 +5,7 @@ import path from 'path';
 import through2 from 'through2';
 import bunyan from 'bunyan';
 
-import Transcluder from '../../lib/transclude-stream';
+import { TranscludeStream } from '../../lib/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 
@@ -39,11 +39,11 @@ test.beforeEach((t) => {
 
 _.forEach((fixtures.fixtures), function testFixture(fixture) {
   test.cb(`should transclude ${fixture.name}`, (t) => {
-    const input = fs.createReadStream(fixture.inputFile, {encoding: 'utf8'});
+    const input = fs.createReadStream(fixture.inputFile, { encoding: 'utf8' });
     const options = {
       relativePath: path.dirname(fixture.inputFile),
     };
-    const transclude = new Transcluder(options, t.context.log);
+    const transclude = new TranscludeStream(options, t.context.log);
     let outputString = '';
 
     transclude.on('readable', function read() {
