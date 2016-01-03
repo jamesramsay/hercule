@@ -4,16 +4,15 @@ import _ from 'lodash';
 import through2 from 'through2';
 import bunyan from 'bunyan';
 
-import {transcludeFileSync} from '../../lib/hercule';
+import { transcludeFileSync } from '../../lib/hercule';
 import fixtures from '../fixtures';
 
 let major;
 let minor;
-let patch;
 
-[major, minor, patch] = process.versions.node.split('.');
+[major, minor] = process.versions.node.split('.');
 
-if (major == 0 && minor < 12) {
+if (major < 1 && minor < 12) {
   test(`synchronous support not available < 0.12`, (t) => {
     t.pass();
   });

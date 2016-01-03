@@ -68,7 +68,7 @@ Hercule extends the Markdown inline link syntax with a leading colon (`:`) to de
 
 
 ```javascript
-import {transcludeStringSync} from 'hercule';
+import { transcludeStringSync } from 'hercule';
 
 const input = 'This is an :[example link](foo.md).';
 
@@ -83,7 +83,7 @@ For example, Github handles transclusion links in this manner.
 Hercule is also able to transclude HTTP links.
 
 ```javascript
-import {transcludeStringSync} from 'hercule';
+import { transcludeStringSync } from 'hercule';
 
 const input = 'Jackdaws love my :[size](https://raw.githubusercontent.com/jamesramsay/hercule/master/test/fixtures/basic/size.md) sphinx of quartz.';
 
@@ -101,7 +101,7 @@ Placeholders and references can be helpful for increasing the _'dryness'_ of you
 or allowing environmental variables to be passed into the document during processing.
 
 ```javascript
-import {transcludeStringSync} from 'hercule';
+import { transcludeStringSync } from 'hercule';
 
 const input = ':[foo](bar)';
 const options = {
@@ -135,7 +135,7 @@ The following example uses Apiary's [Markdown Syntax for Object Notation (MSON)]
 ```
 
 ```javascript
-import {transcludeStringSync} from 'hercule';
+import { transcludeStringSync } from 'hercule';
 
 const inputRequired = ':[Required Ingredient](cucmber.mson required:"required")';
 const inputDefault = ':[Optional Ingredient](cucmber.mson)';
@@ -207,9 +207,9 @@ __Arguments__
 __Examples__
 
 ```javascript
-import {trancludeStream} from 'hercule';
+import { TranscludeStream } from 'hercule';
 
-const trancluder = new trancludeStream();
+const trancluder = new TranscludeStream();
 
 // assuming input is a readable stream and output is a writable stream
 input.pipe(transcluder).pipe(output);
@@ -240,7 +240,7 @@ __Examples__
 
 ```javascript
 // async
-import {trancludeString} from 'hercule';
+import { trancludeString } from 'hercule';
 
 trancludeString(':[foo](bar.md)', (output) => {
   console.log(output);
@@ -250,7 +250,7 @@ trancludeString(':[foo](bar.md)', (output) => {
 
 ```javascript
 // sync
-import {trancludeStringSync} from 'hercule';
+import { trancludeStringSync } from 'hercule';
 
 var output = trancludeFileSync('bar.md');
 console.log(output);
@@ -282,7 +282,7 @@ __Examples__
 
 ```javascript
 // async
-import {trancludeFile} from 'hercule';
+import { trancludeFile } from 'hercule';
 
 trancludeFileSync('foo.md', (output) => {
   console.log(output);
@@ -292,7 +292,7 @@ trancludeFileSync('foo.md', (output) => {
 
 ```javascript
 // sync
-import {trancludeFileSync} from 'hercule';
+import { trancludeFileSync } from 'hercule';
 
 var output = trancludeFileSync('foo.md');
 console.log(output);

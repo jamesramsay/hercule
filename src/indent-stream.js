@@ -32,7 +32,7 @@ export default function IndentStream(opt) {
     }
 
     content = content.replace(/\n/g, `\n${indent}`);
-    output = _.assign(chunk, {[options.output]: content});
+    output = _.assign(chunk, { [options.output]: content });
 
     this.push(output);
     return cb();
