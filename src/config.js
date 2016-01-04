@@ -1,5 +1,4 @@
 import path from 'path';
-import _ from 'lodash';
 
 const APP_NAME = 'hercule';
 
