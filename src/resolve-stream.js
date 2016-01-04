@@ -33,7 +33,7 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
   function resolve(unresolvedLink, references, relativePath) {
     let link = unresolvedLink.primary;
     const fallback = unresolvedLink.fallback;
-    const override = _.find(references, { 'placeholder': link.href });
+    const override = _.find(references, { placeholder: link.href });
 
     if (override || fallback) {
       link = _.pick(override || fallback, ['href', 'hrefType']);
@@ -68,9 +68,10 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
       return cb();
     }
 
-    references = _.map(link.references, (ref) => {
-      if (ref.hrefType === 'file') ref.href = path.join(relativePath, ref.href);
-      return ref;
+    references = _.map(link.references, ({ placeholder, href, hrefType }) => {
+      let relativeHref = href;
+      if (hrefType === 'file') relativeHref = path.join(relativePath, href);
+      return { placeholder, hrefType, href: relativeHref };
     });
 
     references = _.unique([...references, ...parentRefs], true);
