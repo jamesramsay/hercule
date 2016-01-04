@@ -31,6 +31,12 @@ export const BUNYAN_DEFAULTS = {
   json: {
     name: APP_NAME,
     streams: [{
+      stream: process.stdout,
+    }],
+  },
+  ['json-err']: {
+    name: APP_NAME,
+    streams: [{
       stream: process.stderr,
     }],
   },

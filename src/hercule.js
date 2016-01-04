@@ -74,7 +74,7 @@ export function transcludeFileSync(input, { relativePath }, log) {
     cwd: __dirname,
     timeout: SYNC_TIMEOUT,
   };
-  const args = [input, '--reporter', 'json'];
+  const args = [input, '--reporter', 'json-err'];
   const result = childProcess.spawnSync('../bin/hercule', args, options);
   const outputContent = result.stdout.toString();
   const outputLogs = result.stderr.toString().split('\n');
@@ -96,7 +96,7 @@ export function transcludeStringSync(input, { relativePath }, log) {
     cwd: __dirname,
     timeout: SYNC_TIMEOUT,
   };
-  const args = ['--relative', relativePath, '--reporter', 'json'];
+  const args = ['--relative', relativePath, '--reporter', 'json-err'];
   const result = childProcess.spawnSync('../bin/hercule', args, options);
   const outputContent = result.stdout.toString();
   const outputLogs = result.stderr.toString().split('\n');
