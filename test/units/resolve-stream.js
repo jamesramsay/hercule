@@ -22,7 +22,6 @@ test.cb('should handle no input', (t) => {
 test.cb('should skip input without link', (t) => {
   const input = {
     content: 'The quick brown fox jumps over the lazy dog./n',
-    references: [],
   };
   const testStream = new ResolveStream(grammar);
 
@@ -46,7 +45,6 @@ test.cb('should skip input without link', (t) => {
 test.cb('should parse input simple link', (t) => {
   const input = {
     content: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
-    references: [],
     link: {
       href: 'animal.md',
     },
@@ -118,21 +116,35 @@ test.cb('should parse input with overriding link', (t) => {
 test.cb('should parse input with fallback link', (t) => {
   const input = {
     content: 'The quick brown :[](animal) jumps over the lazy dog./n',
-    references: [],
     link: {
       href: 'animal || "fox" feline:cat.md food:cheese.md',
     },
   };
   const expected = {
-    href: 'fox',
-    hrefType: 'string',
+    content: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    references: [
+      {
+        placeholder: 'feline',
+        href: 'cat.md',
+        hrefType: 'file',
+      },
+      {
+        placeholder: 'food',
+        href: 'cheese.md',
+        hrefType: 'file',
+      },
+    ],
+    link: {
+      href: 'fox',
+      hrefType: 'string',
+    },
   };
   const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.link, expected);
+      t.same(chunk, expected);
     }
   });
 
@@ -173,18 +185,26 @@ test.cb('should handle parse error', (t) => {
 test.cb('should resolve link relative to file', (t) => {
   const input = {
     content: ':[](animal.md)',
+    link: {
+      href: 'animal.md',
+    },
     relativePath: 'foo',
   };
   const expected = {
-    href: 'foo/animal.md',
-    hrefType: 'file',
+    content: ':[](animal.md)',
+    references: [],
+    link: {
+      href: 'foo/animal.md',
+      hrefType: 'file',
+    },
+    relativePath: 'foo',
   };
   const testStream = new ResolveStream(grammar);
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.link, input.link);
+      t.same(chunk, expected);
     }
   });
 
