@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import _ from 'lodash';
 import through2 from 'through2';
 import duplexer from 'duplexer2';
@@ -45,7 +46,7 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
             href: _.get(match, `[${LINK_GROUP}]`),
           },
           indent: _([chunk.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
-          relativePath: chunk.relativePath,
+          relativePath: path.dirname(link.href),
           parents: [link.href, ...chunk.parents],
           references: [...chunk.references],
         };
