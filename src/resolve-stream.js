@@ -30,16 +30,16 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
 
-  function resolve(unresolvedLink, references = [], relativePath = '') {
+  function resolve(unresolvedLink, references, relativePath) {
     let link = unresolvedLink.primary;
     const fallback = unresolvedLink.fallback;
-    const override = _.find(references, { 'placeholder': link.href }) || fallback;
+    const override = _.find(references, { 'placeholder': link.href });
 
-    if (override) {
-      link = _.pick(override, ['href', 'hrefType']);
+    if (override || fallback) {
+      link = _.pick(override || fallback, ['href', 'hrefType']);
     }
 
-    if (link.hrefType === 'file') {
+    if (!override && link.hrefType === 'file') {
       link.href = path.join(relativePath, link.href);
     }
 
@@ -49,8 +49,8 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
 
   function transform(chunk, encoding, cb) {
     const rawLink = _.get(chunk, options.input);
-    const relativePath = _.get(chunk, `relativePath`);
-    const parentRefs = _.get(chunk, `references`);
+    const relativePath = _.get(chunk, `relativePath`) || '';
+    const parentRefs = _.get(chunk, `references`) || [];
     let link;
     let references;
 
@@ -68,7 +68,12 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
       return cb();
     }
 
-    references = _.unique([...link.references, ...parentRefs], true);
+    references = _.map(link.references, (ref) => {
+      if (ref.hrefType === 'file') ref.href = path.join(relativePath, ref.href);
+      return ref;
+    });
+
+    references = _.unique([...references, ...parentRefs], true);
     link = resolve(link, parentRefs, relativePath);
 
     this.push(_.assign(chunk, { [options.output]: link }, { references }));

@@ -1,1 +1,1 @@
-Jackdaws love my :[size link](size.md) sphinx of quartz.
+Jackdaws love my :[size link](size.md) sphinx of :[material](material || "gold").
