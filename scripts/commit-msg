@@ -4,7 +4,7 @@ require("shelljs/make");
 var semver = require("semver");
 'use strict';
 
-var TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade):/;
+var TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade|chore\(upgrade\)):/;
 var ISSUE_REGEX = /\((?:fixes|refs) #\d+(?:.*(?:fixes|refs) #\d+)*\)$/;
 
 /**
@@ -56,8 +56,8 @@ function getBranches() {
 function checkGitCommit() {
   var commitMsgs, failed;
 
-  if (hasBranch("master-v2")) {
-    commitMsgs = splitCommandResultToLines(execSilent("git log HEAD --not master-v2 --format=format:%s --no-merges"));
+  if (hasBranch("master")) {
+    commitMsgs = splitCommandResultToLines(execSilent("git log HEAD --not master --format=format:%s --no-merges"));
   } else {
     commitMsgs = [execSilent("git log -1 --format=format:%s --no-merges")];
   }
@@ -96,8 +96,8 @@ function checkGitCommit() {
       failed = true;
     }
 
-    // Check for an issue reference at end (unless it's a documentation commit)
-    if (!/^Docs:/.test(commitMsgs[0])) {
+    // Check for an issue reference at end (unless it's a documentation or upgrade commit)
+    if (!/^(Docs|Upgrade|chore\(upgrade\)):/.test(commitMsgs[0])) {
       if (!ISSUE_REGEX.test(commitMsgs[0])) {
         echo([" - Commit summary must end with with one of:",
           "    '(fixes #1234)'",
