@@ -44,7 +44,7 @@ test.cb('should skip input without link', (t) => {
 
 test.cb('should parse input simple link', (t) => {
   const input = {
-    content: 'The quick brown :[](animal.md) jumps over the lazy dog./n',
+    content: ':[](animal.md)',
     link: {
       href: 'animal.md',
     },
@@ -72,11 +72,58 @@ test.cb('should parse input simple link', (t) => {
 });
 
 
+test.cb('should parse input with overrides', (t) => {
+  const input = {
+    content: ':[](animal animal:wolf.md food:"cheese" remote:http://github.com/example.md null:)',
+    link: {
+      href: 'animal animal:wolf.md food:"cheese" remote:http://github.com/example.md null:',
+    },
+  };
+  const expected = [
+    {
+      placeholder: 'animal',
+      href: 'wolf.md',
+      hrefType: 'file',
+    },
+    {
+      placeholder: 'food',
+      href: 'cheese',
+      hrefType: 'string',
+    },
+    {
+      placeholder: 'remote',
+      href: 'http://github.com/example.md',
+      hrefType: 'http',
+    },
+    {
+      placeholder: 'null',
+      href: '',
+      hrefType: 'string',
+    },
+  ];
+  const testStream = new ResolveStream(grammar);
+
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
+      t.same(chunk.references, expected);
+    }
+  });
+
+  testStream.on('end', function end() {
+    t.end();
+  });
+
+  testStream.write(input);
+  testStream.end();
+});
+
+
 test.cb('should parse input with overriding link', (t) => {
   const input = {
-    content: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    content: ':[](animal animal:wolf.md)',
     link: {
-      href: 'animal animal:wolf.md food:cheese.md',
+      href: 'animal animal:wolf.md',
     },
     references: [
       {
@@ -115,13 +162,13 @@ test.cb('should parse input with overriding link', (t) => {
 
 test.cb('should parse input with fallback link', (t) => {
   const input = {
-    content: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    content: ':[](animal || "fox" feline:cat.md food:cheese.md)',
     link: {
       href: 'animal || "fox" feline:cat.md food:cheese.md',
     },
   };
   const expected = {
-    content: 'The quick brown :[](animal) jumps over the lazy dog./n',
+    content: ':[](animal || "fox" feline:cat.md food:cheese.md)',
     references: [
       {
         placeholder: 'feline',
