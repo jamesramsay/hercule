@@ -45,25 +45,27 @@ test.cb('should skip input without link', (t) => {
 
 test.cb('should inflate input with file link', (t) => {
   const input = {
-    content: ':[Example](size.md)',
+    content: ':[Example](index.md)',
     link: {
-      href: path.join(__dirname, '../fixtures/local-link/size.md'),
+      href: path.join(__dirname, '../fixtures/local-link/index.md'),
       hrefType: 'file',
     },
     parents: [],
     references: [],
   };
-  const expected = 'big';
+  const expected = 'Jackdaws love my big sphinx of quartz.';
   const testStream = new InflateStream();
+  let output = '';
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
+      output += chunk.content;
     }
   });
 
   testStream.on('end', function end() {
+    t.same(output, expected);
     t.end();
   });
 
