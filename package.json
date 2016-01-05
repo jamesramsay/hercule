@@ -5,8 +5,8 @@
   "main": "./lib/hercule",
   "scripts": {
     "test": "npm run test-units && npm run test-integration && npm run test-cli",
-    "test-units": "nyc --reporter=json ava test/units",
-    "test-integration": "ava test/integration",
+    "test-units": "nyc --reporter=json ava --verbose test/units",
+    "test-integration": "ava --verbose test/integration",
     "test-cli": "./test/modules/bin/bats test/bats",
     "pretest": "npm run compile",
     "posttest": "npm run lint && npm run check-commit",
@@ -15,7 +15,10 @@
     "compile": "babel src --out-dir lib --source-maps && pegjs src/transclude.pegjs lib/transclude-parser.js",
     "lint": "eslint ./src ./test",
     "install-bats": "./scripts/install-bats",
-    "check-commit": "./scripts/commit-msg"
+    "check-commit": "./scripts/commit-msg",
+    "release:major": "npm version major && git push --follow-tags",
+    "release:minor": "npm version minor && git push --follow-tags",
+    "release:patch": "npm version patch && git push --follow-tags"
   },
   "config": {
     "nyc": {
