@@ -4,7 +4,7 @@ require("shelljs/make");
 var semver = require("semver");
 'use strict';
 
-var TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade|chore\(upgrade\)):/;
+var TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade|chore\(package\)):/;
 var ISSUE_REGEX = /\((?:fixes|refs) #\d+(?:.*(?:fixes|refs) #\d+)*\)$/;
 
 /**
@@ -25,44 +25,12 @@ function splitCommandResultToLines(result) {
     return result.trim().split("\n");
 }
 
-/**
- * Check if the branch name is valid
- * @param {string} branchName Branch name to check
- * @returns {boolean} true is branch exists
- * @private
- */
-function hasBranch(branchName) {
-    var branches = getBranches();
-    return branches.indexOf(branchName) !== -1;
-}
-
-/**
- * Returns all the branch names
- * @returns {string[]} branch names
- * @private
- */
-function getBranches() {
-    var branchesRaw = splitCommandResultToLines(execSilent("git branch --list")),
-        branches = [],
-        branchName;
-
-    for (var i = 0; i < branchesRaw.length; i++) {
-        branchName = branchesRaw[i].replace(/^\*(.*)/, "$1").trim();
-        branches.push(branchName);
-    }
-    return branches;
-}
-
 function checkGitCommit() {
   var commitMsgs, failed;
 
-  if (hasBranch("master")) {
-    commitMsgs = splitCommandResultToLines(execSilent("git log HEAD --not master --format=format:%s --no-merges"));
-  } else {
-    commitMsgs = [execSilent("git log -1 --format=format:%s --no-merges")];
-  }
+  echo("Validating commit message...");
 
-  echo("Validating Commit Message");
+  commitMsgs = [execSilent("git log -1 --format=format:%s --no-merges")];
 
   // No commit since master should not cause test to fail
   if (commitMsgs[0] === "") {
@@ -97,7 +65,7 @@ function checkGitCommit() {
     }
 
     // Check for an issue reference at end (unless it's a documentation or upgrade commit)
-    if (!/^(Docs|Upgrade|chore\(upgrade\)):/.test(commitMsgs[0])) {
+    if (!/^(Docs|Upgrade|chore\(package\)):/.test(commitMsgs[0])) {
       if (!ISSUE_REGEX.test(commitMsgs[0])) {
         echo([" - Commit summary must end with with one of:",
           "    '(fixes #1234)'",
