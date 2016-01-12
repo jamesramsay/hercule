@@ -74,7 +74,7 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
       return { placeholder, hrefType, href: relativeHref };
     });
 
-    references = _.unique([...references, ...parentRefs], true);
+    references = _.uniq([...references, ...parentRefs], true);
     link = resolve(link, parentRefs, relativePath);
 
     this.push(_.assign(chunk, { [options.output]: link }, { references }));
