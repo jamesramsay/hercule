@@ -46,7 +46,7 @@ if (major < 1 && minor < 12) {
 
   _.forEach((fixtures.fixtures), (fixture) => {
     // Exclude http tests because mocking won't cover sub-process
-    if (_.contains(['http-link', 'http-deep-nesting'], fixture.name)) return;
+    if (_.includes(['http-link', 'http-deep-nesting'], fixture.name)) return;
 
     test(`should transclude ${fixture.name}`, (t) => {
       const options = {
