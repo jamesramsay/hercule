@@ -32,6 +32,8 @@ export function transcludeString(...args) {
   const transclude = new Transcluder(options, log);
   let outputString = '';
 
+  transclude.on('error', (err) => cb(err));
+
   transclude.on('readable', function read() {
     let content = null;
     while ((content = this.read()) !== null) {
@@ -39,7 +41,7 @@ export function transcludeString(...args) {
     }
   });
 
-  transclude.on('end', () => cb(outputString));
+  transclude.on('end', () => cb(null, outputString));
 
   transclude.write(input, 'utf8');
   transclude.end();
@@ -55,6 +57,10 @@ export function transcludeFile(...args) {
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
 
+  inputStream.on('error', (err) => cb(err));
+
+  transclude.on('error', (err) => cb(err));
+
   transclude.on('readable', function read() {
     let content = null;
     while ((content = this.read()) !== null) {
@@ -62,7 +68,7 @@ export function transcludeFile(...args) {
     }
   });
 
-  transclude.on('end', () => cb(outputString));
+  transclude.on('end', () => cb(null, outputString));
 
   inputStream.pipe(transclude);
 }

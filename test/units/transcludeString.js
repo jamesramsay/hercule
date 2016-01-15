@@ -5,7 +5,8 @@ import { transcludeString } from '../../lib/hercule';
 test.cb('should transclude with only required arguments', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const expected = 'The quick brown fox jumps over the lazy dog.';
-  transcludeString(input, (output) => {
+  transcludeString(input, (err, output) => {
+    t.same(err, null);
     t.same(output, expected);
     t.end();
   });
@@ -14,7 +15,8 @@ test.cb('should transclude with only required arguments', (t) => {
 test.cb('should transclude with optional relativePath argument', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const expected = 'The quick brown fox jumps over the lazy dog.';
-  transcludeString(input, { relativePath: 'test' }, (output) => {
+  transcludeString(input, { relativePath: 'test' }, (err, output) => {
+    t.same(err, null);
     t.same(output, expected);
     t.end();
   });
@@ -27,7 +29,8 @@ test.cb('should transclude with optional log handler', (t) => {
     error: () => t.fail(),
     warn: () => t.fail(),
   };
-  transcludeString(input, null, logger, (output) => {
+  transcludeString(input, null, logger, (err, output) => {
+    t.same(err, null);
     t.same(output, expected);
     t.end();
   });
