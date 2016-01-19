@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-require("shelljs/make");
+require('shelljs/make');
 
-var semver = require("semver");
+var semver = require('semver');
 'use strict';
 
 var TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade|chore\(package\)):/;
-var ISSUE_REGEX = /\((?:fixes|refs) #\d+(?:.*(?:fixes|refs) #\d+)*\)$/;
 
 /**
  * Executes a command and returns the output instead of printing it to stdout.
@@ -13,7 +12,7 @@ var ISSUE_REGEX = /\((?:fixes|refs) #\d+(?:.*(?:fixes|refs) #\d+)*\)$/;
  * @returns {string} The result of the executed command.
  */
 function execSilent(cmd) {
-    return exec(cmd, { silent: true }).output;
+  return exec(cmd, { silent: true }).output;
 }
 
 /**
@@ -22,59 +21,48 @@ function execSilent(cmd) {
  * @returns {array} The separated lines.
  */
 function splitCommandResultToLines(result) {
-    return result.trim().split("\n");
+  return result.trim().split('\n');
 }
 
 function checkGitCommit() {
   var commitMsgs, failed;
 
-  echo("Validating commit message...");
+  echo('Validating commit message...');
 
-  commitMsgs = [execSilent("git log -1 --format=format:%s --no-merges")];
+  commitMsgs = [execSilent('git log -1 --format=format:%s --no-merges')];
 
   // No commit since master should not cause test to fail
-  if (commitMsgs[0] === "") {
+  if (commitMsgs[0] === '') {
     return;
   }
 
   // Check for more than one commit
   if (commitMsgs.length > 1) {
-    echo(" - More than one commit found, please squash.");
+    echo(' - More than one commit found, please squash.');
     failed = true;
   }
 
   // Only check non-release messages
   if (!semver.valid(commitMsgs[0]) && !/^Revert /.test(commitMsgs[0])) {
-    if (commitMsgs[0].slice(0, commitMsgs[0].indexOf("\n")).length > 72) {
-      echo(" - First line of commit message must not exceed 72 characters");
+    if (commitMsgs[0].slice(0, commitMsgs[0].indexOf('\n')).length > 72) {
+      echo(' - First line of commit message must not exceed 72 characters');
       failed = true;
     }
 
     // Check for tag at start of message
     if (!TAG_REGEX.test(commitMsgs[0])) {
-      echo([" - Commit summary must start with one of:",
-        "    'Fix:'",
-        "    'Update:'",
-        "    'Breaking:'",
-        "    'Docs:'",
-        "    'Build:'",
-        "    'New:'",
-        "    'Upgrade:'",
-        "   Please refer to the contribution guidelines for more details."].join("\n"));
+      echo([' - Commit summary must start with one of:',
+        '    "Fix:"',
+        '    "Update:"',
+        '    "Breaking:"',
+        '    "Docs:"',
+        '    "Build:"',
+        '    "New:"',
+        '    "Upgrade:"',
+        '   Please refer to the contribution guidelines for more details.'].join('\n'));
       failed = true;
     }
 
-    // Check for an issue reference at end (unless it's a documentation or upgrade commit)
-    if (!/^(Docs|Upgrade|chore\(package\)):/.test(commitMsgs[0])) {
-      if (!ISSUE_REGEX.test(commitMsgs[0])) {
-        echo([" - Commit summary must end with with one of:",
-          "    '(fixes #1234)'",
-          "    '(refs #1234)'",
-          "   Where '1234' is the issue being addressed.",
-          "   Please refer to the contribution guidelines for more details."].join("\n"));
-        failed = true;
-      }
-    }
   }
 
   if (failed) {
