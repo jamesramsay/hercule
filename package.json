@@ -5,7 +5,7 @@
   "main": "./lib/hercule",
   "scripts": {
     "test": "npm run test-units && npm run test-integration && npm run test-cli",
-    "test-units": "nyc --reporter=json ava --verbose test/units",
+    "test-units": "nyc --cache --reporter=json ava --verbose test/units",
     "test-integration": "ava --verbose test/integration",
     "test-cli": "./test/modules/bin/bats test/bats",
     "pretest": "npm run compile",
