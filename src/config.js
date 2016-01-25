@@ -10,7 +10,7 @@ export const SUPPORTED_LINK_TYPES = [
 
 // Log into the void, so that providing a logger is optional
 export const DEFAULT_LOG = {
-  error: () => {},
+  error: () => null,
 };
 
 // Link detection (including leading whitespace)

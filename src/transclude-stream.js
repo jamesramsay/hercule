@@ -24,24 +24,20 @@ export default function Transcluder(opt, log) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
   const tokenizerOptions = {
     leaveBehind: `${WHITESPACE_GROUP}`,
-    token: (match) => {
-      return {
-        content: _.get(match, `[0]`),
-        link: {
-          href: _.get(match, `[${LINK_GROUP}]`),
-        },
-        indent: _([options.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
-        relativePath: options.relativePath,
-        references: options.references || [],
-        parents: options.parents || [],
-      };
-    },
-    separator: (separator) => {
-      return {
-        content: separator,
-        indent: options.indent,
-      };
-    },
+    token: (match) => ({
+      content: _.get(match, `[0]`),
+      link: {
+        href: _.get(match, `[${LINK_GROUP}]`),
+      },
+      indent: _([options.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
+      relativePath: options.relativePath,
+      references: options.references || [],
+      parents: options.parents || [],
+    }),
+    separator: (separator) => ({
+      content: separator,
+      indent: options.indent,
+    }),
   };
   const tokenizer = regexpTokenizer(tokenizerOptions, LINK_REGEXP);
   const resolver = new ResolveStream(grammar, null, log);

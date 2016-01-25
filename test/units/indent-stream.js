@@ -9,7 +9,7 @@ test.cb('should handle no input', (t) => {
     if (this.read() !== null) t.fail();
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -32,7 +32,7 @@ test.cb('should not modify input without whitespace', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -55,7 +55,7 @@ test.cb('should not modify input without new lines', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -82,7 +82,7 @@ test.cb('should only indent text after each new line', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
