@@ -9,7 +9,7 @@ test.cb('should handle no input', (t) => {
     if (this.read() !== null) t.fail();
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -30,7 +30,7 @@ test.cb('should not modify input without trailing new line', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.same(output, input);
     t.end();
   });
@@ -52,7 +52,7 @@ test.cb('should not modify input with internal new lines', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.same(output, input);
     t.end();
   });
@@ -75,7 +75,7 @@ test.cb('should only trim trailing new line', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.same(output, expect);
     t.end();
   });

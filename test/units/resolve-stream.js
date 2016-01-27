@@ -10,7 +10,7 @@ test.cb('should handle no input', (t) => {
     if (this.read() !== null) t.fail();
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -32,7 +32,7 @@ test.cb('should skip input without link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -62,7 +62,7 @@ test.cb('should parse input simple link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -110,7 +110,7 @@ test.cb('should parse input with overrides', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -151,7 +151,7 @@ test.cb('should parse input with overriding link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -195,7 +195,7 @@ test.cb('should parse input with fallback link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -220,7 +220,7 @@ test.cb('should handle parse error', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -255,7 +255,7 @@ test.cb('should resolve link relative to file', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 

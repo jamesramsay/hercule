@@ -37,7 +37,7 @@ test.beforeEach((t) => {
 });
 
 
-_.forEach((fixtures.fixtures), function testFixture(fixture) {
+_.forEach((fixtures.fixtures), (fixture) => {
   test.cb(`should transclude ${fixture.name}`, (t) => {
     const input = fs.createReadStream(fixture.inputFile, { encoding: 'utf8' });
     const options = {
@@ -53,7 +53,7 @@ _.forEach((fixtures.fixtures), function testFixture(fixture) {
       }
     });
 
-    transclude.on('end', function end() {
+    transclude.on('end', () => {
       t.same(outputString, fixture.expectedOutput);
       t.same(t.context.logOutput, fixture.expectedLogOutput);
       t.end();

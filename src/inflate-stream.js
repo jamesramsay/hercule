@@ -39,24 +39,20 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
     const trimmer = new TrimStream();
     const tokenizerOptions = {
       leaveBehind: `${WHITESPACE_GROUP}`,
-      token: (match) => {
-        return {
-          content: _.get(match, `[0]`),
-          link: {
-            href: _.get(match, `[${LINK_GROUP}]`),
-          },
-          indent: _([chunk.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
-          relativePath: path.dirname(link.href),
-          parents: [link.href, ...chunk.parents],
-          references: [...chunk.references],
-        };
-      },
-      separator: (separator) => {
-        return {
-          content: separator,
-          indent: chunk.indent,
-        };
-      },
+      token: (match) => ({
+        content: _.get(match, `[0]`),
+        link: {
+          href: _.get(match, `[${LINK_GROUP}]`),
+        },
+        indent: _([chunk.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
+        relativePath: path.dirname(link.href),
+        parents: [link.href, ...chunk.parents],
+        references: [...chunk.references],
+      }),
+      separator: (separator) => ({
+        content: separator,
+        indent: chunk.indent,
+      }),
     };
     const tokenizer = regexpTokenizer(tokenizerOptions, LINK_REGEXP);
 
@@ -107,11 +103,9 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
       }
     });
 
-    inflater.on('end', function inputEnded() {
-      return cb();
-    });
+    inflater.on('end', () => cb());
 
-    input.on('error', function inputError(err) {
+    input.on('error', (err) => {
       log.error({ err, link }, 'Could not read file');
       self.push(chunk);
       return cb();

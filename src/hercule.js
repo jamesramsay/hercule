@@ -36,9 +36,7 @@ export function transcludeString(...args) {
     }
   });
 
-  transclude.on('end', function end() {
-    return cb(outputString);
-  });
+  transclude.on('end', () => cb(outputString));
 
   transclude.write(input, 'utf8');
   transclude.end();
@@ -61,9 +59,7 @@ export function transcludeFile(...args) {
     }
   });
 
-  transclude.on('end', function end() {
-    return cb(outputString);
-  });
+  transclude.on('end', () => cb(outputString));
 
   inputStream.pipe(transclude);
 }

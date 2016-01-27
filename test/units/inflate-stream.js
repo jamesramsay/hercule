@@ -11,7 +11,7 @@ test.cb('should handle no input', (t) => {
     if (this.read() !== null) t.fail();
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -33,7 +33,7 @@ test.cb('should skip input without link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.pass();
     t.end();
   });
@@ -64,7 +64,7 @@ test.cb('should inflate input with file link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.same(output, expected);
     t.end();
   });
@@ -94,7 +94,7 @@ test.cb('should skip input with invalid file link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -121,7 +121,7 @@ test.cb('should inflate input with string link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -152,7 +152,7 @@ test.cb('should inflate input with http link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -183,7 +183,7 @@ test.cb('should skip input with invalid http link', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -210,7 +210,7 @@ test.cb('should not make modifications if hrefType is unrecognised', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
@@ -238,7 +238,7 @@ test.cb('should skip circular references', (t) => {
     }
   });
 
-  testStream.on('end', function end() {
+  testStream.on('end', () => {
     t.end();
   });
 
