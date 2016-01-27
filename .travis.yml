@@ -6,6 +6,8 @@ node_js:
 - '0.10'
 sudo: false
 before_install:
+# https://github.com/npm/npm/issues/11283
+- npm set progress=false
 - npm -g install npm@latest
 - npm run install-bats
 before_script:
