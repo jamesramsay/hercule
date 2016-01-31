@@ -13,7 +13,7 @@
 }
 
 @test "transcluding stdin" {
-  result="$(cat ./test/fixtures/local-link/index.md | ./bin/hercule --relative ./test/fixtures/local-link)"
+  result="$(cat ./test/fixtures/local-link/index.md | ./bin/hercule --relativePath ./test/fixtures/local-link)"
   expected="Jackdaws love my big sphinx of quartz."
   [ "$result" == "$expected" ]
 }

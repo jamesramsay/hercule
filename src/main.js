@@ -29,7 +29,7 @@ const parser = dashdash.createParser({
       helpArg: 'FILE',
     },
     {
-      names: ['relative', 'r'],
+      names: ['relativePath', 'r'],
       type: 'string',
       help: 'Relative path. stdin will be parsed relative to this path.',
     },
@@ -73,9 +73,10 @@ function main() {
   if (opts._args.length === 0) {
     // Reading input from stdin
     inputStream = process.stdin;
-    options.relativePath = opts.relative;
+    options.relativePath = opts.relativePath;
   } else {
     // Reading input from file
+    // TODO: handle file error!
     inputStream = fs.createReadStream(opts._args[0], { encoding: 'utf8' });
     options.relativePath = path.dirname(opts._args[0]);
   }
