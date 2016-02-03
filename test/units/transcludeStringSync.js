@@ -28,11 +28,11 @@ test(`should transclude with optional relativePath argument`, (t) => {
 });
 
 test(`should transclude with optional log handler`, (t) => {
-  const input = 'The quick brown fox jumps over the lazy dog.';
-  const expected = 'The quick brown fox jumps over the lazy dog.';
+  const input = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of quartz.';
+  const expected = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of quartz.';
   const logger = {
-    error: () => t.fail(),
-    warn: () => t.fail(),
+    error: () => t.pass(),
+    warn: () => t.pass(),
   };
   const output = transcludeStringSync(input, null, logger);
   t.same(output, expected);

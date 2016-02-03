@@ -29,11 +29,11 @@ test(`should transclude with optional relativePath argument`, (t) => {
 });
 
 test(`should transclude with optional log handler`, (t) => {
-  const input = path.join(__dirname, '../fixtures/no-link/index.md');
-  const expected = 'The quick brown fox jumps over the lazy dog.\n';
+  const input = path.join(__dirname, '../fixtures/invalid-link/index.md');
+  const expected = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of quartz.\n';
   const logger = {
-    error: () => t.fail(),
-    warn: () => t.fail(),
+    error: () => t.pass(),
+    warn: () => t.pass(),
   };
   const output = transcludeFileSync(input, null, logger);
   t.same(output, expected);
