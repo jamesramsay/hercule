@@ -78,7 +78,7 @@
     "nyc": "^5.1.0",
     "pegjs": "^0.9.0",
     "semver": "^5.1.0",
-    "shelljs": "^0.5.3"
+    "shelljs": "^0.6.0"
   },
   "publishConfig": {
     "tag": "latest"
