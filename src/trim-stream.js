@@ -15,13 +15,12 @@ export default function TrimStream() {
 
   function transform(chunk, encoding, cb) {
     const input = chunk.toString('utf8');
-    let output;
 
     // Combine buffer and new input
     inputBuffer = inputBuffer.concat(input);
 
     // Return everything but the last character
-    output = inputBuffer.slice(0, -1);
+    const output = inputBuffer.slice(0, -1);
     inputBuffer = inputBuffer.slice(-1);
 
     this.push(output);

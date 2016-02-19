@@ -7,13 +7,10 @@ import bunyan from 'bunyan';
 import { transcludeFileSync } from '../../lib/hercule';
 import fixtures from '../fixtures';
 
-let major;
-let minor;
-
-[major, minor] = process.versions.node.split('.');
+const [major, minor] = process.versions.node.split('.');
 
 if (major < 1 && minor < 12) {
-  test.only(`synchronous support not available < 0.12`, (t) => {
+  test.only('synchronous support not available < 0.12', (t) => {
     t.pass();
   });
 }

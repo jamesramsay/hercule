@@ -13,7 +13,6 @@ import Transcluder from './transclude-stream';
 import { BUNYAN_DEFAULTS } from './config';
 
 let opts;
-let log;
 
 const parser = dashdash.createParser({
   options: [
@@ -57,18 +56,16 @@ if (opts.help) {
 
 
 function main() {
-  let transclude;
   let inputStream;
   let outputStream;
-  let bunyanOptions;
   const options = {
     relativePath: '',
     parents: [],
     parentRefs: [],
   };
 
-  bunyanOptions = BUNYAN_DEFAULTS[opts.reporter] || BUNYAN_DEFAULTS.file;
-  log = bunyan.createLogger(bunyanOptions);
+  const bunyanOptions = BUNYAN_DEFAULTS[opts.reporter] || BUNYAN_DEFAULTS.file;
+  const log = bunyan.createLogger(bunyanOptions);
 
   if (opts._args.length === 0) {
     // Reading input from stdin
@@ -89,7 +86,7 @@ function main() {
     outputStream = process.stdout;
   }
 
-  transclude = new Transcluder(options, log);
+  const transclude = new Transcluder(options, log);
 
   inputStream.pipe(transclude).pipe(outputStream);
 }
