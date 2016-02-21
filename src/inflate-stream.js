@@ -40,7 +40,7 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
     const tokenizerOptions = {
       leaveBehind: `${WHITESPACE_GROUP}`,
       token: (match) => ({
-        content: _.get(match, `[0]`),
+        content: _.get(match, '[0]'),
         link: {
           href: _.get(match, `[${LINK_GROUP}]`),
         },
@@ -61,13 +61,12 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
     return duplexer({ objectMode: true }, trimmer, inflater);
   }
 
-
+  // eslint-disable-next-line consistent-return
   function transform(chunk, encoding, cb) {
     const link = chunk[options.input];
     const parents = chunk.parents;
     const self = this;
     let input;
-    let inflater;
 
     if (!link) {
       this.push(chunk);
@@ -92,7 +91,7 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
     }
 
     // Inflate local or remote file streams
-    inflater = inflateDuplex(chunk, link);
+    const inflater = inflateDuplex(chunk, link);
     if (link.hrefType === 'file') input = fs.createReadStream(link.href, { encoding: 'utf8' });
     if (link.hrefType === 'http') input = request.get(link.href);
 

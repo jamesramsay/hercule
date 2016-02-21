@@ -24,7 +24,6 @@ export default function IndentStream(opt) {
   function transform(chunk, encoding, cb) {
     const indent = _.get(chunk, options.indent);
     let content = _.get(chunk, options.input);
-    let output;
 
     if (!indent) {
       this.push(chunk);
@@ -32,7 +31,7 @@ export default function IndentStream(opt) {
     }
 
     content = content.replace(/\n/g, `\n${indent}`);
-    output = _.assign(chunk, { [options.output]: content });
+    const output = _.assign(chunk, { [options.output]: content });
 
     this.push(output);
     return cb();

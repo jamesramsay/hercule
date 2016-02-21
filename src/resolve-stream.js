@@ -49,8 +49,8 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
 
   function transform(chunk, encoding, cb) {
     const rawLink = _.get(chunk, options.input);
-    const relativePath = _.get(chunk, `relativePath`) || '';
-    const parentRefs = _.get(chunk, `references`) || [];
+    const relativePath = _.get(chunk, 'relativePath') || '';
+    const parentRefs = _.get(chunk, 'references') || [];
     let link;
     let references;
 
@@ -63,7 +63,7 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
     try {
       link = grammar.parse(rawLink);
     } catch (err) {
-      log.error({ err, link: rawLink }, `Link could not be parsed`);
+      log.error({ err, link: rawLink }, 'Link could not be parsed');
       this.push(chunk);
       return cb();
     }

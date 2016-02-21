@@ -25,7 +25,7 @@ export default function Transcluder(opt, log) {
   const tokenizerOptions = {
     leaveBehind: `${WHITESPACE_GROUP}`,
     token: (match) => ({
-      content: _.get(match, `[0]`),
+      content: _.get(match, '[0]'),
       link: {
         href: _.get(match, `[${LINK_GROUP}]`),
       },
