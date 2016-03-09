@@ -1,0 +1,15 @@
+{
+  "name": "hercule-gulp-example",
+  "version": "0.0.1",
+  "description": "Example integration of gulp and hercule.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Ramsay",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "hercule": "^2.0.5",
+    "through2": "^2.0.1"
+  }
+}
