@@ -175,7 +175,7 @@ Each line of `snippet.c` will be indented with the whitespace preceding it.
 
 Some functions are available in both sync and async varieties.
 
-- [`transclude`](#transclude)
+- [`TranscludeStream`](#transclude)
 - [`transcludeString`](#transcludeString), `transcludeStringSync`
 - [`transcludeFile`](#transcludeFile), `transcludeFileSync`
 
@@ -186,7 +186,7 @@ Async interfaces should work with node 0.10 and above.
 
 <a name="transclude" />
 
-### transcludeStream([options], [log])
+### TranscludeStream([options], [log])
 
 Returns a duplex stream.
 
