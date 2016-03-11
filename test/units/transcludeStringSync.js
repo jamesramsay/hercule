@@ -5,6 +5,7 @@ import { transcludeStringSync } from '../../lib/hercule';
 const [major, minor] = process.versions.node.split('.');
 
 if (major < 1 && minor < 12) {
+  // eslint-disable-next-line ava/no-only-test
   test.only('synchronous support not available < 0.12', (t) => {
     t.pass();
   });
