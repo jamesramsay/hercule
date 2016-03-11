@@ -10,7 +10,7 @@ import fixtures from '../fixtures';
 import './_mock';
 
 
-test.beforeEach((t) => {
+test.beforeEach('prepare log monitor', (t) => {
   t.context.logOutput = [];
   t.context.logStream = through2.obj();
 
