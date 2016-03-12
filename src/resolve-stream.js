@@ -26,7 +26,7 @@ const DEFAULT_OPTIONS = {
 };
 
 
-export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
+export default function ResolveStream(grammar, opt, log = DEFAULT_LOG, linkPaths = []) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
 
@@ -76,6 +76,8 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG) {
 
     references = _.uniq([...references, ...parentRefs], true);
     link = resolve(link, parentRefs, relativePath);
+
+    linkPaths.push(link.href);
 
     this.push(_.assign(chunk, { [options.output]: link }, { references }));
     return cb();
