@@ -12,7 +12,8 @@ _.forEach((fixtures.fixtures), (fixture) => {
       relativePath: path.resolve(__dirname, '../fixtures', fixture.name),
     };
 
-    transcludeFile(fixture.inputFile, options, (output) => {
+    transcludeFile(fixture.inputFile, options, (err, output) => {
+      t.same(err, null);
       t.same(output, fixture.expectedOutput);
       t.end();
     });

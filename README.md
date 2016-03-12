@@ -242,7 +242,7 @@ __Examples__
 // async
 import { trancludeString } from 'hercule';
 
-trancludeString(':[foo](bar.md)', (output) => {
+trancludeString(':[foo](bar.md)', (err, output) => {
   console.log(output);
 });
 
@@ -284,7 +284,7 @@ __Examples__
 // async
 import { trancludeFile } from 'hercule';
 
-trancludeFileSync('foo.md', (output) => {
+trancludeFileSync('foo.md', (err, output) => {
   console.log(output);
 });
 
