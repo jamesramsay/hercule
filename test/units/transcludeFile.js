@@ -1,5 +1,6 @@
 import test from 'ava';
 import path from 'path';
+import _ from 'lodash';
 
 import { transcludeFile } from '../../lib/hercule';
 
@@ -57,6 +58,22 @@ test.cb('should provide pathList if variable provided', (t) => {
     t.same(output, expected);
     t.regex(pathList[0], /fixtures\/local-link\/size\.md/);
     t.same(pathList.length, 1);
+    t.end();
+  });
+});
+
+test.cb('should support tokenizer options', (t) => {
+  const input = path.join(__dirname, '../fixtures/_aglio/index.md');
+  const expected = 'Jackdaws love my\n\nbig\n\nsphinx\n\nof quartz.\n';
+  const options = {
+    relativePath: path.join(__dirname, '../fixtures/_aglio'),
+    linkRegExp: new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))|()( *<!-- include\((.*)\) -->)/gm),
+    linkMatch: (match) => _.get(match, '[3]') || _.get(match, '[6]'),
+  };
+
+  transcludeFile(input, options, (err, output) => {
+    t.same(err, null);
+    t.same(output, expected);
     t.end();
   });
 });

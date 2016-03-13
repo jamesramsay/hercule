@@ -9,7 +9,7 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
 import grammar from './transclude-parser';
-import { DEFAULT_LOG, LINK_REGEXP, LINK_GROUP, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES } from './config';
+import { DEFAULT_LOG, linkRegExp, linkMatch, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES } from './config';
 
 /**
 * Input stream: object
@@ -37,24 +37,30 @@ export default function InflateStream(opt, log = DEFAULT_LOG, linkPaths) {
     const resolver = new ResolveStream(grammar, null, log, linkPaths);
     const inflater = new InflateStream(null, log);
     const trimmer = new TrimStream();
-    const tokenizerOptions = {
-      leaveBehind: `${WHITESPACE_GROUP}`,
-      token: (match) => ({
+
+    function token(match) {
+      const tk = {
         content: _.get(match, '[0]'),
         link: {
-          href: _.get(match, `[${LINK_GROUP}]`),
+          href: _.isFunction(options.linkMatch) ? options.linkMatch(match) : linkMatch(match),
         },
         indent: _([chunk.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
         relativePath: path.dirname(link.href),
         parents: [link.href, ...chunk.parents],
         references: [...chunk.references],
-      }),
+      };
+      return tk;
+    }
+
+    const tokenizerOptions = {
+      leaveBehind: `${WHITESPACE_GROUP}`,
+      token,
       separator: (separator) => ({
         content: separator,
         indent: chunk.indent,
       }),
     };
-    const tokenizer = regexpTokenizer(tokenizerOptions, LINK_REGEXP);
+    const tokenizer = regexpTokenizer(tokenizerOptions, options.linkRegExp || linkRegExp);
 
     trimmer.pipe(tokenizer).pipe(resolver).pipe(inflater);
 
