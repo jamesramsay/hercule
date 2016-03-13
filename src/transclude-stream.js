@@ -20,7 +20,7 @@ const DEFAULT_OPTIONS = {
   output: 'content',
 };
 
-export default function Transcluder(opt, log) {
+export default function Transcluder(opt, log, linkPaths) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
   const tokenizerOptions = {
     leaveBehind: `${WHITESPACE_GROUP}`,
@@ -40,8 +40,8 @@ export default function Transcluder(opt, log) {
     }),
   };
   const tokenizer = regexpTokenizer(tokenizerOptions, LINK_REGEXP);
-  const resolver = new ResolveStream(grammar, null, log);
-  const inflater = new InflateStream(null, log);
+  const resolver = new ResolveStream(grammar, null, log, linkPaths);
+  const inflater = new InflateStream(null, log, linkPaths);
   const indenter = new IndentStream(null, log);
   const stringify = get('content');
 

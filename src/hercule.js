@@ -27,9 +27,9 @@ export const TranscludeStream = Transcluder;
 export function transcludeString(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options, log] = args;
+  const [options, log, linkPaths] = args;
 
-  const transclude = new Transcluder(options, log);
+  const transclude = new Transcluder(options, log, linkPaths);
   let outputString = '';
 
   transclude.on('error', (err) => cb(err));
@@ -51,9 +51,9 @@ export function transcludeString(...args) {
 export function transcludeFile(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options, log] = args;
+  const [options, log, linkPaths] = args;
 
-  const transclude = new Transcluder(options, log);
+  const transclude = new Transcluder(options, log, linkPaths);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
 

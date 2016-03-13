@@ -39,9 +39,24 @@ test.cb('should transclude with optional log handler', (t) => {
 
 test.cb('should return error if file doesn\'t exist', (t) => {
   const input = path.join('i-dont-exist.md');
-  transcludeFile(input, null, (err, output) => {
+  transcludeFile(input, null, null, (err, output) => {
     t.ok(err);
     t.notOk(output);
+    t.end();
+  });
+});
+
+test.cb('should provide pathList if variable provided', (t) => {
+  const input = path.join(__dirname, '../fixtures/local-link/index.md');
+  const options = { relativePath: path.join(__dirname, '../fixtures/local-link') };
+  const expected = 'Jackdaws love my big sphinx of quartz.\n';
+  const pathList = [];
+
+  transcludeFile(input, options, null, pathList, (err, output) => {
+    t.same(err, null);
+    t.same(output, expected);
+    t.regex(pathList[0], /fixtures\/local-link\/size\.md/);
+    t.same(pathList.length, 1);
     t.end();
   });
 });

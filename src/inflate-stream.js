@@ -30,11 +30,11 @@ const DEFAULT_OPTIONS = {
   output: 'content',
 };
 
-export default function InflateStream(opt, log = DEFAULT_LOG) {
+export default function InflateStream(opt, log = DEFAULT_LOG, linkPaths) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
   function inflateDuplex(chunk, link) {
-    const resolver = new ResolveStream(grammar, null, log);
+    const resolver = new ResolveStream(grammar, null, log, linkPaths);
     const inflater = new InflateStream(null, log);
     const trimmer = new TrimStream();
     const tokenizerOptions = {
@@ -73,7 +73,6 @@ export default function InflateStream(opt, log = DEFAULT_LOG) {
       return cb();
     }
 
-    // ES2016: Array.includes()
     if (_(parents).includes(link.href)) {
       log.error({ link }, 'Circular dependency detected');
       this.push(chunk);
