@@ -6,36 +6,35 @@ import ResolveStream from '../../lib/resolve-stream';
 test.cb('should handle no input', (t) => {
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    if (this.read() !== null) t.fail();
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      if (this.read() !== null) t.fail();
+    })
+    .on('error', () => t.fail())
+    .on('end', () => {
+      t.pass();
+      t.end();
+    });
 
   testStream.end();
 });
 
 
 test.cb('should skip input without link', (t) => {
-  const input = {
-    content: 'The quick brown fox jumps over the lazy dog./n',
-  };
+  const input = { content: 'The quick brown fox jumps over the lazy dog./n' };
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.notOk(chunk.link);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.notOk(chunk.link);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -55,17 +54,16 @@ test.cb('should parse input simple link', (t) => {
   };
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.link, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.link, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -103,16 +101,16 @@ test.cb('should parse input with overrides', (t) => {
   ];
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.references, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.references, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -144,16 +142,16 @@ test.cb('should parse input with overriding link', (t) => {
   };
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.link, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.link, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -188,23 +186,23 @@ test.cb('should parse input with fallback link', (t) => {
   };
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
 });
 
 
-test.cb('should handle parse error', (t) => {
+test.cb('should emit error on invalid transclusion link', (t) => {
   const input = {
     content: ':[](animal.md foo:bar:"exception!")',
     link: {
@@ -213,16 +211,16 @@ test.cb('should handle parse error', (t) => {
   };
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk, input);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(2);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk, input);
+      }
+    })
+    .on('error', () => t.pass())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -248,16 +246,16 @@ test.cb('should resolve link relative to file', (t) => {
   };
   const testStream = new ResolveStream(grammar);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();

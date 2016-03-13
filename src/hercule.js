@@ -5,22 +5,6 @@ import _ from 'lodash';
 import Transcluder from './transclude-stream';
 
 const SYNC_TIMEOUT = 10000;
-const LOG_OMIT = ['name', 'hostname', 'pid', 'time', 'v', 'msg'];
-const LOG_LEVELS = {
-  10: 'trace',
-  20: 'debug',
-  30: 'info',
-  40: 'warn',
-  50: 'error',
-};
-
-function relog(log, message) {
-  const msg = message.msg;
-  const level = message.level;
-  const body = _.omit(message, LOG_OMIT);
-
-  log[LOG_LEVELS[level]](body, msg);
-}
 
 export const TranscludeStream = Transcluder;
 
@@ -31,17 +15,17 @@ export function transcludeString(...args) {
 
   const transclude = new Transcluder(options, log, linkPaths);
   let outputString = '';
+  let cbErr = null;
 
-  transclude.on('error', (err) => cb(err));
-
-  transclude.on('readable', function read() {
-    let content = null;
-    while ((content = this.read()) !== null) {
-      outputString += content.toString('utf8');
-    }
-  });
-
-  transclude.on('end', () => cb(null, outputString));
+  transclude
+    .on('readable', function read() {
+      let content = null;
+      while ((content = this.read()) !== null) {
+        outputString += content.toString('utf8');
+      }
+    })
+    .on('error', (err) => (cbErr = err))
+    .on('end', () => cb(cbErr, outputString));
 
   transclude.write(input, 'utf8');
   transclude.end();
@@ -51,33 +35,30 @@ export function transcludeString(...args) {
 export function transcludeFile(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options, log, linkPaths] = args;
+  const [options, linkPaths] = args;
 
-  const transclude = new Transcluder(options, log, linkPaths);
+  const transclude = new Transcluder(options, linkPaths);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
+  let cbErr = null;
 
   inputStream.on('error', (err) => cb(err));
 
-  transclude.on('error', (err) => cb(err));
-
-  transclude.on('readable', function read() {
-    let content = null;
-    while ((content = this.read()) !== null) {
-      outputString += content;
-    }
-  });
-
-  transclude.on('end', () => cb(null, outputString));
+  transclude
+    .on('readable', function read() {
+      let content = null;
+      while ((content = this.read()) !== null) {
+        outputString += content;
+      }
+    })
+    .on('error', (err) => (cbErr = err))
+    .on('end', () => cb(cbErr, outputString));
 
   inputStream.pipe(transclude);
 }
 
 
-export function transcludeFileSync(...args) {
-  const input = args.shift();
-  const [options, log] = args;
-
+export function transcludeFileSync(input, options) {
   const syncOptions = { cwd: __dirname, timeout: SYNC_TIMEOUT };
   const syncArgs = [input, '--reporter', 'json-err'];
 
@@ -87,18 +68,15 @@ export function transcludeFileSync(...args) {
 
   const result = childProcess.spawnSync('../bin/hercule', syncArgs, syncOptions);
   const outputContent = result.stdout.toString();
-  const outputLogs = result.stderr.toString().split('\n');
+  const err = result.stderr.toString();
 
-  _.compact(outputLogs).map(JSON.parse).forEach((message) => relog(log, message));
+  if (err) throw new Error(JSON.parse(err).msg);
 
   return outputContent;
 }
 
 
-export function transcludeStringSync(...args) {
-  const input = args.shift();
-  const [options, log] = args;
-
+export function transcludeStringSync(input, options) {
   const syncOptions = { input, cwd: __dirname, timeout: SYNC_TIMEOUT };
   const syncArgs = ['--reporter', 'json-err'];
 
@@ -108,9 +86,9 @@ export function transcludeStringSync(...args) {
 
   const result = childProcess.spawnSync('../bin/hercule', syncArgs, syncOptions);
   const outputContent = result.stdout.toString();
-  const outputLogs = result.stderr.toString().split('\n');
+  const err = result.stderr.toString();
 
-  _.compact(outputLogs).map(JSON.parse).forEach((message) => relog(log, message));
+  if (err) throw new Error(JSON.parse(err).msg);
 
   return outputContent;
 }
