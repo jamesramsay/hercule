@@ -1,6 +1,5 @@
 import test from 'ava';
 import path from 'path';
-import _ from 'lodash';
 
 import { transcludeFile } from '../../lib/hercule';
 
@@ -35,17 +34,17 @@ test.cb('should return error if file doesn\'t exist', (t) => {
   });
 });
 
-// test.cb('should return error if circular dependency found', (t) => {
-//   const input = path.join(__dirname, '../fixtures/circular-references/index.md');
-//   const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
-//   transcludeFile(input, options, (err, output) => {
-//     t.ok(err);
-//     t.same(err.msg, 'Circular dependency detected');
-//     t.regex(err.path, /fixtures\/circular-references\/fox.md/);
-//     t.notOk(output);
-//     t.end();
-//   });
-// });
+test.cb('should return error if circular dependency found', (t) => {
+  const input = path.join(__dirname, '../fixtures/circular-references/index.md');
+  const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
+  const expected = 'The quick brown :[fox](fox.md) jumps over the lazy dog.\n';
+  transcludeFile(input, options, (err, output) => {
+    t.same(err.msg, 'Circular dependency detected');
+    t.regex(err.path, /fixtures\/circular-references\/fox.md/);
+    t.same(output, expected);
+    t.end();
+  });
+});
 
 test.cb('should provide pathList if variable provided', (t) => {
   const input = path.join(__dirname, '../fixtures/local-link/index.md');
@@ -68,7 +67,7 @@ test.cb('should support tokenizer options', (t) => {
   const options = {
     relativePath: path.join(__dirname, '../fixtures/_aglio'),
     linkRegExp: new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))|()( *<!-- include\((.*)\) -->)/gm),
-    linkMatch: (match) => _.get(match, '[3]') || _.get(match, '[6]'),
+    linkMatch: (match) => match[3] || match[6],
   };
 
   transcludeFile(input, options, (err, output) => {

@@ -17,7 +17,7 @@ export function defaultToken(match, options, whitespace) {
   return {
     content: match[MATCH_GROUP],
     link: { href: _.isFunction(options.linkMatch) ? options.linkMatch(match) : match[LINK_GROUP] },
-    indent: _([whitespace, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
+    indent: _.filter([whitespace, match[WHITESPACE_GROUP]], _.isString).join(''),
     relativePath: options.relativePath,
     references: options.references || [],
     parents: options.parents || [],

@@ -76,7 +76,7 @@ export default function ResolveStream(grammar, opt, linkPaths = []) {
       return { placeholder, hrefType, href: relativeHref };
     });
 
-    references = _.uniq([...references, ...parentRefs], true);
+    references = _.uniq([...references, ...parentRefs]);
     link = resolve(link, parentRefs, relativePath);
 
     linkPaths.push(link.href);

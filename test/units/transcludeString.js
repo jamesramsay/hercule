@@ -1,5 +1,4 @@
 import test from 'ava';
-import _ from 'lodash';
 
 import { transcludeString } from '../../lib/hercule';
 
@@ -41,7 +40,7 @@ test.cb('should support tokenizer options', (t) => {
   const expected = 'The quick brown fox jumps over the lazy dog.';
   const options = {
     linkRegExp: new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))|()( *<!-- include\((.*)\) -->)/gm),
-    linkMatch: (match) => _.get(match, '[3]') || _.get(match, '[6]'),
+    linkMatch: (match) => match[3] || match[6],
   };
 
   transcludeString(input, options, (err, output) => {
