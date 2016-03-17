@@ -1,19 +1,24 @@
 #!/usr/bin/env bats
 
 @test "transcluding local files" {
-  result="$(./bin/hercule ./test/fixtures/local-link/index.md)"
-  expected="Jackdaws love my big sphinx of quartz."
-  [ "$result" == "$expected" ]
+  run ./bin/hercule ./test/fixtures/local-link/index.md
+  [ "$status" -eq 0 ]
+  [ "$output" == "Jackdaws love my big sphinx of quartz." ]
 }
 
 @test "transcluding complex local files" {
-  result="$(./bin/hercule ./test/fixtures/advanced/index.md)"
-  expected="The quick brown fox jumps over the lazy dog."
-  [ "$result" == "$expected" ]
+  run ./bin/hercule ./test/fixtures/advanced/index.md
+  [ "$status" -eq 0 ]
+  [ "$output" == "The quick brown fox jumps over the lazy dog." ]
 }
 
 @test "transcluding stdin" {
-  result="$(cat ./test/fixtures/local-link/index.md | ./bin/hercule --relativePath ./test/fixtures/local-link)"
-  expected="Jackdaws love my big sphinx of quartz."
-  [ "$result" == "$expected" ]
+  output=$(cat ./test/fixtures/local-link/index.md | ./bin/hercule --relativePath ./test/fixtures/local-link)
+  [ $? -eq 0 ]
+  [ "$output" == "Jackdaws love my big sphinx of quartz." ]
+}
+
+@test "transcluding bad input" {
+  run ./bin/hercule ./test/fixtures/invalid-link/index.md
+  [ "$status" -eq 1 ]
 }

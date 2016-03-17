@@ -83,7 +83,12 @@ function main() {
   const transclude = new Transcluder(options);
 
   transclude.on('error', (err) => {
-    process.stderr.write(JSON.stringify(err));
+    if (opts.reporter === 'json-err') {
+      process.stderr.write(JSON.stringify(err));
+    } else {
+      process.stdout.write(`\n\nERROR: ${err.msg} (${err.path})\n`);
+      process.exit(1);
+    }
   });
 
   inputStream.pipe(transclude).pipe(outputStream);
