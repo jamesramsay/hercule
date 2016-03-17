@@ -70,7 +70,7 @@ export default function InflateStream(opt, linkPaths) {
       return cb();
     }
 
-    if (_(parents).includes(link.href)) {
+    if (_.includes(parents, link.href)) {
       this.push(chunk);
       this.emit('error', {
         msg: 'Circular dependency detected',
@@ -79,7 +79,7 @@ export default function InflateStream(opt, linkPaths) {
       return cb();
     }
 
-    if (_(SUPPORTED_LINK_TYPES).includes(link.hrefType) === false) {
+    if (_.includes(SUPPORTED_LINK_TYPES, link.hrefType) === false) {
       this.push(chunk);
       return cb();
     }
