@@ -1,0 +1,7 @@
+{
+  "plan": 3,
+  "error": {
+    "msg": "Could not read file",
+    "path": "fixtures/invalid-link/i-dont-exist.md"
+  }
+}

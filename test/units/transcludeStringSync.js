@@ -25,13 +25,12 @@ test('should transclude with optional relativePath argument', (t) => {
   t.same(output, expected);
 });
 
-test('should transclude with optional log handler', (t) => {
+test('should throw error with invalid link', (t) => {
   const input = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of quartz.';
-  const expected = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of quartz.';
-  const logger = {
-    error: () => t.pass(),
-    warn: () => t.pass(),
-  };
-  const output = transcludeStringSync(input, null, logger);
-  t.same(output, expected);
+  try {
+    transcludeStringSync(input);
+    t.fail();
+  } catch (ex) {
+    t.same(ex.message, 'Could not read file');
+  }
 });

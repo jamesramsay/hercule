@@ -6,37 +6,37 @@ import InflateStream from '../../lib/inflate-stream';
 
 test.cb('should handle no input', (t) => {
   const testStream = new InflateStream();
-
-  testStream.on('readable', function read() {
-    if (this.read() !== null) t.fail();
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
+  testStream
+    .on('readable', function read() {
+      if (this.read() !== null) t.fail();
+    })
+    .on('error', () => t.fail())
+    .on('end', () => {
+      t.pass();
+      t.end();
+    });
 
   testStream.end();
 });
 
 
 test.cb('should skip input without link', (t) => {
-  const input = {
-    content: 'The quick brown fox jumps over the lazy dog./n',
-  };
+  const input = { content: 'The quick brown fox jumps over the lazy dog./n' };
   const testStream = new InflateStream();
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.notOk(chunk.link);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
+  t.plan(2);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.notOk(chunk.link);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => {
+      t.pass();
+      t.end();
+    });
 
   testStream.write(input);
   testStream.end();
@@ -57,24 +57,25 @@ test.cb('should inflate input with file link', (t) => {
   const testStream = new InflateStream();
   let output = '';
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output += chunk.content;
-    }
-  });
-
-  testStream.on('end', () => {
-    t.same(output, expected);
-    t.end();
-  });
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        output += chunk.content;
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => {
+      t.same(output, expected);
+      t.end();
+    });
 
   testStream.write(input);
   testStream.end();
 });
 
 
-test.cb('should skip input with invalid file link', (t) => {
+test.cb('should emit error with invalid file link', (t) => {
   const input = {
     content: ':[Example](size.md)',
     link: {
@@ -84,19 +85,21 @@ test.cb('should skip input with invalid file link', (t) => {
     parents: [],
     references: [],
   };
-  const expected = ':[Example](size.md)';
   const testStream = new InflateStream();
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(3);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.content, input.content);
+      }
+    })
+    .on('error', (err) => {
+      t.same(err.msg, 'Could not read file');
+      t.regex(err.path, /i-dont-exist\.md/);
+    })
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -114,16 +117,15 @@ test.cb('should inflate input with string link', (t) => {
   const expected = 'tiny';
   const testStream = new InflateStream();
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.content, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -145,23 +147,22 @@ test.cb('should inflate input with http link', (t) => {
 
   nock('http://github.com').get('/size.md').reply(200, 'big\n');
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.content, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
 });
 
 
-test.cb('should skip input with invalid http link', (t) => {
+test.cb('should emit error with invalid http link', (t) => {
   const input = {
     content: ':[Example](size.md)',
     link: {
@@ -171,21 +172,21 @@ test.cb('should skip input with invalid http link', (t) => {
     parents: [],
     references: [],
   };
-  const expected = ':[Example](size.md)';
   const testStream = new InflateStream();
 
   nock('http://github.com').get('/i-dont-exist.md').reply(404);
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(1);
+  testStream
+    .on('readable', function read() {
+      if (this.read() !== null) t.fail();
+    })
+    .on('error', (err) => {
+      // TODO: Requires https://github.com/pgte/nock/issues/469
+      // t.same(err.msg, 'Circular dependency detected');
+      t.regex(err.path, /i-dont-exist\.md/);
+    })
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
@@ -203,23 +204,22 @@ test.cb('should not make modifications if hrefType is unrecognised', (t) => {
   const expected = ':[Example](size.md)';
   const testStream = new InflateStream();
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.content, expected);
+      }
+    })
+    .on('error', () => t.fail())
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
 });
 
 
-test.cb('should skip circular references', (t) => {
+test.cb('should emit error on circular references', (t) => {
   const input = {
     content: ':[Example](size.md)',
     link: {
@@ -231,16 +231,19 @@ test.cb('should skip circular references', (t) => {
   const expected = ':[Example](size.md)';
   const testStream = new InflateStream();
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.same(chunk.content, expected);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
+  t.plan(3);
+  testStream
+    .on('readable', function read() {
+      let chunk = null;
+      while ((chunk = this.read()) !== null) {
+        t.same(chunk.content, expected);
+      }
+    })
+    .on('error', (err) => {
+      t.same(err.msg, 'Circular dependency detected');
+      t.same(err.path, 'size.md');
+    })
+    .on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();

@@ -211,6 +211,11 @@ import { TranscludeStream } from 'hercule';
 
 const trancluder = new TranscludeStream();
 
+transcluder.on('error', (err) => {
+  // Handle exceptions like dead links
+  console.log(err);
+});
+
 // assuming input is a readable stream and output is a writable stream
 input.pipe(transcluder).pipe(output);
 ```
@@ -243,6 +248,8 @@ __Examples__
 import { trancludeString } from 'hercule';
 
 trancludeString(':[foo](bar.md)', (err, output) => {
+  // Handle exceptions like dead links
+  if (err) console.log(err)
   console.log(output);
 });
 
@@ -252,9 +259,13 @@ trancludeString(':[foo](bar.md)', (err, output) => {
 // sync
 import { trancludeStringSync } from 'hercule';
 
-var output = trancludeFileSync('bar.md');
-console.log(output);
-
+try {
+  var output = trancludeFileSync('bar.md');
+  console.log(output);
+} catch (ex) {
+  // Handle exceptions like dead links
+  console.log(ex);
+}
 ```
 
 ---------------------------------------
@@ -285,6 +296,8 @@ __Examples__
 import { trancludeFile } from 'hercule';
 
 trancludeFileSync('foo.md', (err, output) => {
+  // Handle exceptions like dead links
+  if (err) console.log(err)
   console.log(output);
 });
 
@@ -294,6 +307,11 @@ trancludeFileSync('foo.md', (err, output) => {
 // sync
 import { trancludeFileSync } from 'hercule';
 
-var output = trancludeFileSync('foo.md');
-console.log(output);
+try {
+  var output = trancludeFileSync('foo.md');
+  console.log(output);
+} catch (ex) {
+  // Handle exceptions like dead links
+  console.log(ex);
+}
 ```

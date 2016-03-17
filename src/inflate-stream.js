@@ -9,7 +9,7 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
 import grammar from './transclude-parser';
-import { DEFAULT_LOG, linkRegExp, linkMatch, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES } from './config';
+import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES } from './config';
 
 /**
 * Input stream: object
@@ -30,36 +30,27 @@ const DEFAULT_OPTIONS = {
   output: 'content',
 };
 
-export default function InflateStream(opt, log = DEFAULT_LOG, linkPaths) {
+export default function InflateStream(opt, linkPaths) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
   function inflateDuplex(chunk, link) {
-    const resolver = new ResolveStream(grammar, null, log, linkPaths);
-    const inflater = new InflateStream(null, log);
+    const resolver = new ResolveStream(grammar, null, linkPaths);
+    const inflater = new InflateStream();
     const trimmer = new TrimStream();
 
     function token(match) {
-      const tk = {
-        content: _.get(match, '[0]'),
-        link: {
-          href: _.isFunction(options.linkMatch) ? options.linkMatch(match) : linkMatch(match),
-        },
-        indent: _([chunk.indent, match[WHITESPACE_GROUP]]).filter(_.isString).value().join(''),
+      return _.merge(defaultToken(match, options, chunk.indent), {
         relativePath: path.dirname(link.href),
-        parents: [link.href, ...chunk.parents],
         references: [...chunk.references],
-      };
-      return tk;
+        parents: [link.href, ...chunk.parents],
+      });
     }
 
-    const tokenizerOptions = {
-      leaveBehind: `${WHITESPACE_GROUP}`,
-      token,
-      separator: (separator) => ({
-        content: separator,
-        indent: chunk.indent,
-      }),
-    };
+    function separator(match) {
+      return _.merge(defaultSeparator(match), { indent: chunk.indent });
+    }
+
+    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
     const tokenizer = regexpTokenizer(tokenizerOptions, options.linkRegExp || linkRegExp);
 
     trimmer.pipe(tokenizer).pipe(resolver).pipe(inflater);
@@ -80,8 +71,11 @@ export default function InflateStream(opt, log = DEFAULT_LOG, linkPaths) {
     }
 
     if (_(parents).includes(link.href)) {
-      log.error({ link }, 'Circular dependency detected');
       this.push(chunk);
+      this.emit('error', {
+        msg: 'Circular dependency detected',
+        path: link.href,
+      });
       return cb();
     }
 
@@ -100,20 +94,31 @@ export default function InflateStream(opt, log = DEFAULT_LOG, linkPaths) {
     if (link.hrefType === 'file') input = fs.createReadStream(link.href, { encoding: 'utf8' });
     if (link.hrefType === 'http') input = request.get(link.href);
 
-    inflater.on('readable', function inputReadable() {
-      let content;
-      while ((content = this.read()) !== null) {
-        self.push(content);
-      }
-    });
+    input
+      .on('error', (err) => {
+        this.push(chunk);
+        this.emit('error', _.merge(err, { msg: 'Could not read file' }));
+        cb();
+      })
+      .on('response', (res) => {
+        if (res.statusCode !== 200) {
+          this.emit('error', { msg: res.statusMessage, path: link.href });
+          cb();
+        }
+      });
 
-    inflater.on('end', () => cb());
-
-    input.on('error', (err) => {
-      log.error({ err, link }, 'Could not read file');
-      self.push(chunk);
-      return cb();
-    });
+    inflater
+      .on('readable', function inputReadable() {
+        let content;
+        while ((content = this.read()) !== null) {
+          self.push(content);
+        }
+      })
+      .on('error', (err) => {
+        this.emit('error', err);
+        cb();
+      })
+      .on('end', () => cb());
 
     input.pipe(inflater);
   }

@@ -7,10 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import dashdash from 'dashdash';
-import bunyan from 'bunyan';
 import Transcluder from './transclude-stream';
-
-import { BUNYAN_DEFAULTS } from './config';
 
 let opts;
 
@@ -64,9 +61,6 @@ function main() {
     parentRefs: [],
   };
 
-  const bunyanOptions = BUNYAN_DEFAULTS[opts.reporter] || BUNYAN_DEFAULTS.file;
-  const log = bunyan.createLogger(bunyanOptions);
-
   if (opts._args.length === 0) {
     // Reading input from stdin
     inputStream = process.stdin;
@@ -86,7 +80,11 @@ function main() {
     outputStream = process.stdout;
   }
 
-  const transclude = new Transcluder(options, log);
+  const transclude = new Transcluder(options);
+
+  transclude.on('error', (err) => {
+    process.stderr.write(JSON.stringify(err));
+  });
 
   inputStream.pipe(transclude).pipe(outputStream);
 }

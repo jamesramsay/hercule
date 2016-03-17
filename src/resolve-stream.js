@@ -2,8 +2,6 @@ import through2 from 'through2';
 import path from 'path';
 import _ from 'lodash';
 
-import { DEFAULT_LOG } from './config';
-
 /**
 * Input stream: (object)
 * - link (object, required)
@@ -26,7 +24,7 @@ const DEFAULT_OPTIONS = {
 };
 
 
-export default function ResolveStream(grammar, opt, log = DEFAULT_LOG, linkPaths = []) {
+export default function ResolveStream(grammar, opt, linkPaths = []) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
 
@@ -63,8 +61,12 @@ export default function ResolveStream(grammar, opt, log = DEFAULT_LOG, linkPaths
     try {
       link = grammar.parse(rawLink);
     } catch (err) {
-      log.error({ err, link: rawLink }, 'Link could not be parsed');
       this.push(chunk);
+      this.emit('error', {
+        msg: 'Link could not be parsed',
+        path: rawLink,
+        error: err,
+      });
       return cb();
     }
 
