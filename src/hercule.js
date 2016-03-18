@@ -11,9 +11,9 @@ export const TranscludeStream = Transcluder;
 export function transcludeString(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options, log, linkPaths] = args;
+  const [options, linkPaths] = args;
 
-  const transclude = new Transcluder(options, log, linkPaths);
+  const transclude = new Transcluder(options, linkPaths);
   let outputString = '';
   let cbErr = null;
 

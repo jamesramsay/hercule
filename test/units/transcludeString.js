@@ -35,17 +35,16 @@ test.cb('should provide pathList if variable provided', (t) => {
   });
 });
 
-test.cb('should support tokenizer options', (t) => {
-  const input = 'The quick brown fox jumps over the lazy dog.';
-  const expected = 'The quick brown fox jumps over the lazy dog.';
+test.cb('should return errors with tokenizer options', (t) => {
+  const input = '# Title\n<!-- include(test1.apib) -->\nSome content...\n';
   const options = {
-    linkRegExp: new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))|()( *<!-- include\((.*)\) -->)/gm),
-    linkMatch: (match) => match[3] || match[6],
+    linkRegExp: new RegExp(/(^[\t ]*)?(?:(\:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
+    linkMatch: (match) => match[3] || match[5],
   };
 
   transcludeString(input, options, (err, output) => {
-    t.same(err, null);
-    t.same(output, expected);
+    t.ok(err.message);
+    t.same(output, input);
     t.end();
   });
 });
