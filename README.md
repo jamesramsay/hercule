@@ -1,4 +1,4 @@
-# Hercule – Markdown Transclusion Tool
+# Hercule – Transclusion Tool
 
 [![Version](https://img.shields.io/npm/v/hercule.svg)](https://npmjs.com/package/hercule)
 [![License](https://img.shields.io/npm/l/hercule.svg)](https://npmjs.com/package/hercule)
@@ -6,30 +6,28 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule/master.svg)](https://codecov.io/github/jamesramsay/hercule)
 [![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
 
-[![Hercule](https://cdn.rawgit.com/jamesramsay/hercule/40421d427a0947abe0d5b8e23b5ac14a78f3ac23/hercule.svg)](https://www.npmjs.com/package/hercule)
+<a href="https://www.npmjs.com/package/hercule">
+  <img src="https://cdn.rawgit.com/jamesramsay/hercule/16c858e8048830bd058ed632e59a988d67845029/hercule.svg" alt="Hercule" width="128px">
+</a>
 
 Write large markdown documents, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
 
 Hercule is a command-line tool and library for transcluding markdown, [API Blueprint](http://apiblueprint.org), and plaintext. This allows complex and repetitive documents to be written as smaller logical documents, for improved consistency, reuse, and separation of concerns.
 
-- Simple extension of markdown link syntax `:[Title](link.md)` (preceeding colon `:`)
+- Simple extension of markdown link syntax `:[Title](link.md)` (preceding colon `:`)
 - Transclude local files
 - Transclude remote (HTTP) files
 - Transclude strings
 - Smart indentation
 - Stream, Async, Sync APIs
 
------
-
-[![Adslot](https://cdn.rawgit.com/jamesramsay/hercule/40421d427a0947abe0d5b8e23b5ac14a78f3ac23/adslot.svg)](http://adslot.com/)
-
-Hercule is used by [Adslot](http://adslot.com) to help document our APIs in [API Blueprint](http://apiblueprint.org) more efficiently and more accurately. We also use [Apiary](http://apiary.io) to distribute our API documentation and [DREDD](https://github.com/apiaryio/dredd) (a tool by [Apiary](http://apiary.io)) to validate the documentation against implementation.
+Note: synchronous API is only available in node 0.12 and above.
 
 -----
 
 ## Installation
 
-You can install Hercule using [npm](http://npmjs.org):
+Install Hercule using [npm](http://npmjs.org):
 
 ```bash
 npm install -g hercule
@@ -58,14 +56,13 @@ var output = hercule.transcludeStringSync("# Title\n\n:[abstract](abstract.md)")
 console.log(output);
 ```
 
-Following examples use ES2015 syntax.
-
 ## Transclusion Syntax
+
+The following examples use ES2015 syntax.
 
 ### Basic transclusion (local files and remote HTTP files)
 
 Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
-
 
 ```javascript
 import { transcludeStringSync } from 'hercule';
@@ -186,7 +183,7 @@ Async interfaces should work with node 0.10 and above.
 
 <a name="transclude" />
 
-### TranscludeStream([options], [log])
+### TranscludeStream([options], [pathList])
 
 Returns a duplex stream.
 
@@ -200,9 +197,8 @@ __Arguments__
     - `href` - A link which will be trancluded according to its `hrefType`.
     - `hrefType` - `file`, `http`, or `string`
   - `parents` - A collection of fully qualified file paths of the input used to detect and prevent circular transclusion.
-- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
-  - `warn(object, message)` - A note on something that should be looked at eventually.
-  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
+- `pathList` - An array (typically empty) which the path of every transclusion will be appended to.
+  This is helpful for generating a watch list for live reloading.
 
 __Examples__
 
@@ -224,7 +220,7 @@ input.pipe(transcluder).pipe(output);
 
 <a name="transcludeString" />
 
-### transcludeString(str, [options], [log], callback)
+### transcludeString(str, [options], [pathList], callback)
 
 Transcludes the input `str`, and `callback` is called when finished.
 
@@ -233,13 +229,12 @@ __Arguments__
 - `str` - A string to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the transclusion links within input `str` are relative.
-- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
-  - `warn(object, message)` - A note on something that should be looked at eventually.
-  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
+- `pathList` - An array (typically empty) which the path of every transclusion will be appended to.
+  This is helpful for generating a watch list for live reloading.
 - `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
   has been processed. `callback` will be passed an error and the processed output.
 
-Omit the callback if using `transcludeStringSync`.
+Omit the `callback` and `pathList` if using `transcludeStringSync`.
 
 __Examples__
 
@@ -272,7 +267,7 @@ try {
 
 <a name="transcludeFile" />
 
-### transcludeFile(filepath, [options], [log], callback)
+### transcludeFile(filepath, [options], [pathList], callback)
 
 Transcludes the file at the provided `filepath`, and `callback` is called when finished.
 
@@ -281,13 +276,12 @@ __Arguments__
 - `filepath` - A path to a file to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the input `filepath` is relative.
-- `log` - An object of log handling functions. Messages will only be logged once at the corresponding level.
-  - `warn(object, message)` - A note on something that should be looked at eventually.
-  - `error(object, message)` - A fatal error occurred, but was caught, that should be looked at promptly.
+- `pathList` - An array (typically empty) which the path of every transclusion will be appended to.
+  This is helpful for generating a watch list for live reloading.
 - `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
   has been processed. `callback` will be passed an error and the processed output.
 
-Omit the callback if using `transcludeFileSync`.
+Omit the `callback` and `pathList` if using `transcludeFileSync`.
 
 __Examples__
 

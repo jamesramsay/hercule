@@ -1,14 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+<svg viewBox="0 0 304 282" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
-    <linearGradient x1="0%" y1="0%" y2="100%" id="a">
-      <stop stop-color="#1E1D73" offset="0%"/>
-      <stop stop-color="#53A0FE" offset="50%"/>
-      <stop stop-color="#00ABAD" offset="100%"/>
-    </linearGradient>
+    <style>
+      @media all and (max-width: 256px) {
+        #border_white { stroke-width: 12; }
+        #border_blue  { stroke-width: 3; }
+        .border_inner { stroke-width: 2; }
+      }
+      @media all and (max-width: 128px) {
+        #border_white { stroke-width: 16; }
+        #border_blue  { stroke-width: 4; }
+        .border_inner { stroke-width: 3; }
+      }
+      @media all and (max-width: 92px) {
+        #border_white { stroke-width: 24; }
+        #border_blue  { stroke-width: 6; }
+        .border_inner { stroke-width: 4; }
+      }
+      @media all and (max-width: 64px) {
+        #border_white { stroke-width: 32; }
+        #border_blue  { stroke-width: 8; }
+        .border_inner { stroke-width: 0; }
+      }
+      @media all and (max-width: 48px) {
+        #border_white { stroke-width: 38; }
+        #border_blue  { stroke-width: 10; }
+        .border_inner { stroke-width: 0; }
+      }
+  </style>
   </defs>
-  <g fill="none" fill-rule="evenodd" stroke-linecap="square">
-    <path d="M111 34.6v46.8L64.7 97.1l-7.5-7.63-23.34 7.64L3 66.27V18.5L49.28 3l8.45 7.82L80.13 3 111 34.6z" class="background" stroke="url(#a)" stroke-width="20" stroke-linejoin="round" fill="url(#a)" transform="translate(7 14)"/>
-    <path d="M40.54 32.37L71.5 63.5m-29.98 49.1l22-7.34m-21-75.38l45.45-15.64M42.52 80.3l45.45-15.65M10.22 80.3l45.45-16.1m15.83-.7l46.8-14.98M42.52 64.16l45.45-15.64M8.24 31.88l31.28 31.28m1.02 18.64l30.3 30.8M57.67 14.73l7.57 7.1m24.22 42.33l28.83 30.3M55.64 64.18l8.15 8.15m7.7-8.17v45.96m-16-49.6v3.66" class="line" stroke="#FFF"/>
-    <path d="M121 47.37v49.38l-48.86 16.6V102.8l16.3-6.05V63.93l-48.87 16.8v32.6L7 80.73V30.38L55.86 14v11.34l-16.3 5.7v32.9L88.44 46.6V14L121 47.37z" class="line-heavy" stroke="#FFF" stroke-width="5" stroke-linejoin="round"/>
+  <defs>
+    <path id="a" d="M293.78 84.48v128L164.38 257v-28.43l47.32-16.1V129L82.1 173.74V257L0 173.52v-128L129.4 1v28.74L82.3 45.52V129l129.4-44.74V1l82.08 83.48z" />
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <g class="border_inner" opacity=".2" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 184.52L134.4 140l82.08 83.48L87.08 268 5 184.52z" fill="#83C9CB"/>
+      <path d="M87.1 184.52L216.47 140l82.1 83.48L169.17 268l-82.1-83.48z" fill="#00B1B1"/>
+      <path d="M135.78 140V12L6.38 56.52v128L135.8 140z" fill="#2C0078"/>
+      <path d="M298.57 223.48v-128L216.47 12v128l82.1 83.48z" fill="#1E1D73"/>
+    </g>
+    <g opacity=".4">
+      <path d="M155.14 33.1L134.4 12v128l20.74 21.1v-128z" fill="#2C0078"/>
+      <path d="M155.14 33.1L216.48 12v128l-61.34 21.1v-128z" fill="#2C0078"/>
+      <path d="M216.48 223.45V95.5l-61.34-62.4v128l61.34 62.35zM87.1 56.58v127.94l68.04-23.42v-128L87.1 56.58z" fill="#2C0078"/>
+      <path class="border_inner" d="M216.48 223.48v-128L134.38 12v128l82.1 83.48z" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="border_inner" d="M216.48 140V12L87.08 56.52v128L216.5 140z" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g opacity=".4">
+      <path d="M148.42 118.9l68.06-23.42v128l-68.06 23.42v-128zm0 0L87.1 56.52v128l61.32 62.38v-128z" fill="#83C9CB"/>
+      <path d="M148.42 118.9v128l20.75 21.1V140l-20.75-21.1zm0 128v-128L87.1 140v128l61.32-21.1z" fill="#83C9CB"/>
+      <path class="border_inner" d="M216.48 223.48v-128L87.08 140v128l129.4-44.52z" stroke="#FFF"/>
+      <path class="border_inner" d="M169.17 268V140L87.1 56.52v128L169.16 268z" stroke="#FFF"/>
+    </g>
+    <g class="border_inner" opacity=".4" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 56.52L134.4 12l82.08 83.48L87.08 140 5 56.52z" fill="#83C9CB"/>
+      <path d="M87.1 56.52L216.47 12l82.1 83.48L169.17 140l-82.1-83.48z" fill="#53A0FD"/>
+      <path d="M87.1 268V140L5 56.52v128L87.1 268z" fill="#0BD3D2"/>
+      <path d="M298.57 223.48v-128L169.17 140v128l129.4-44.52z" fill="#53A0FD"/>
+    </g>
+    <g transform="translate(5 12)">
+      <use id="border_white" stroke="#FFF" stroke-width="10" xlink:href="#a"/>
+      <use id="border_blue" stroke="#1E1D73" stroke-width="2" xlink:href="#a"/>
+    </g>
   </g>
 </svg>
