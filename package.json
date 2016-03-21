@@ -3,6 +3,9 @@
   "version": "3.0.1",
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
+  "browser": {
+    "./lib/inflaters/local.js": "./lib/inflaters/local-browser.js"
+  },
   "scripts": {
     "test": "npm run test-units && npm run test-integration && npm run test-cli",
     "test-units": "nyc --cache --reporter=json ava --verbose test/units",
