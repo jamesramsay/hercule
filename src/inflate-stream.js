@@ -1,13 +1,15 @@
-import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import through2 from 'through2';
 import duplexer from 'duplexer2';
-import request from 'request';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
+
+import localInflater from './inflaters/local';
+import httpInflater from './inflaters/http';
+
 import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, LINK_TYPES } from './config';
 
 /**
@@ -90,21 +92,8 @@ export default function InflateStream(opt, linkPaths) {
 
     // Inflate local or remote file streams
     const inflater = inflateDuplex(chunk, link);
-    if (link.hrefType === LINK_TYPES.LOCAL) input = fs.createReadStream(link.href, { encoding: 'utf8' });
-    if (link.hrefType === LINK_TYPES.HTTP) input = request.get(link.href);
-
-    input
-      .on('error', (err) => {
-        this.push(chunk);
-        this.emit('error', _.merge(err, { msg: 'Could not read file' }));
-        cb();
-      })
-      .on('response', (res) => {
-        if (res.statusCode !== 200) {
-          this.emit('error', { msg: res.statusMessage, path: link.href });
-          cb();
-        }
-      });
+    if (link.hrefType === LINK_TYPES.LOCAL) input = localInflater.call(this, link.href, chunk, cb);
+    if (link.hrefType === LINK_TYPES.HTTP) input = httpInflater.call(this, link.href, chunk, cb);
 
     inflater
       .on('readable', function inputReadable() {

@@ -183,7 +183,7 @@ test.cb('should emit error with invalid http link', (t) => {
     })
     .on('error', (err) => {
       // TODO: Requires https://github.com/pgte/nock/issues/469
-      // t.same(err.msg, 'Circular dependency detected');
+      // t.same(err.msg, '404 error or something');
       t.regex(err.path, /i-dont-exist\.md/);
     })
     .on('end', () => t.end());
