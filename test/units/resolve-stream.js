@@ -1,10 +1,9 @@
 import test from 'ava';
-import grammar from '../../lib/transclude-parser';
 import ResolveStream from '../../lib/resolve-stream';
 
 
 test.cb('should handle no input', (t) => {
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream
@@ -23,7 +22,7 @@ test.cb('should handle no input', (t) => {
 
 test.cb('should skip input without link', (t) => {
   const input = { content: 'The quick brown fox jumps over the lazy dog./n' };
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream
@@ -52,7 +51,7 @@ test.cb('should parse input simple link', (t) => {
     href: 'animal.md',
     hrefType: 'file',
   };
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream
@@ -99,7 +98,7 @@ test.cb('should parse input with overrides', (t) => {
       hrefType: 'string',
     },
   ];
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream
@@ -140,7 +139,7 @@ test.cb('should parse input with overriding link', (t) => {
     href: 'fox.md',
     hrefType: 'file',
   };
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream
@@ -184,7 +183,7 @@ test.cb('should parse input with fallback link', (t) => {
       hrefType: 'string',
     },
   };
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream
@@ -209,7 +208,7 @@ test.cb('should emit error on invalid transclusion link', (t) => {
       href: 'animal.md foo:bar:"exception!"',
     },
   };
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(2);
   testStream
@@ -244,7 +243,7 @@ test.cb('should resolve link relative to file', (t) => {
     },
     relativePath: 'foo',
   };
-  const testStream = new ResolveStream(grammar);
+  const testStream = new ResolveStream();
 
   t.plan(1);
   testStream

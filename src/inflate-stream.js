@@ -8,7 +8,6 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
-import grammar from './transclude-parser';
 import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES } from './config';
 
 /**
@@ -34,7 +33,7 @@ export default function InflateStream(opt, linkPaths) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
   function inflateDuplex(chunk, link) {
-    const resolver = new ResolveStream(grammar, null, linkPaths);
+    const resolver = new ResolveStream(link.href, linkPaths);
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
 
