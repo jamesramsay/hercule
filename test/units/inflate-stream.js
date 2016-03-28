@@ -48,7 +48,7 @@ test.cb('should inflate input with file link', (t) => {
     content: ':[Example](index.md)',
     link: {
       href: path.join(__dirname, '../fixtures/local-link/index.md'),
-      hrefType: 'file',
+      hrefType: 'local',
     },
     parents: [],
     references: [],
@@ -80,7 +80,7 @@ test.cb('should emit error with invalid file link', (t) => {
     content: ':[Example](size.md)',
     link: {
       href: path.join(__dirname, '/i-dont-exist.md'),
-      hrefType: 'file',
+      hrefType: 'local',
     },
     parents: [],
     references: [],
@@ -183,7 +183,7 @@ test.cb('should emit error with invalid http link', (t) => {
     })
     .on('error', (err) => {
       // TODO: Requires https://github.com/pgte/nock/issues/469
-      // t.same(err.msg, 'Circular dependency detected');
+      // t.same(err.msg, '404 error or something');
       t.regex(err.path, /i-dont-exist\.md/);
     })
     .on('end', () => t.end());
@@ -224,7 +224,7 @@ test.cb('should emit error on circular references', (t) => {
     content: ':[Example](size.md)',
     link: {
       href: 'size.md',
-      hrefType: 'file',
+      hrefType: 'local',
     },
     parents: ['size.md'],
   };

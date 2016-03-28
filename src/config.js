@@ -1,10 +1,10 @@
 import _ from 'lodash';
 
-export const SUPPORTED_LINK_TYPES = [
-  'string',
-  'file',
-  'http',
-];
+export const LINK_TYPES = {
+  LOCAL: 'local',
+  HTTP: 'http',
+  STRING: 'string',
+};
 
 // Link detection (including leading whitespace)
 export const linkRegExp = new RegExp(/(^[\t ]*)?(\:\[.*?\]\((.*?)\))/gm);

@@ -49,7 +49,7 @@ test.cb('should parse input simple link', (t) => {
   };
   const expected = {
     href: 'animal.md',
-    hrefType: 'file',
+    hrefType: 'local',
   };
   const testStream = new ResolveStream();
 
@@ -80,7 +80,7 @@ test.cb('should parse input with overrides', (t) => {
     {
       placeholder: 'animal',
       href: 'wolf.md',
-      hrefType: 'file',
+      hrefType: 'local',
     },
     {
       placeholder: 'food',
@@ -126,18 +126,18 @@ test.cb('should parse input with overriding link', (t) => {
       {
         placeholder: 'animal',
         href: 'fox.md',
-        hrefType: 'file',
+        hrefType: 'local',
       },
       {
         placeholder: 'food',
         href: 'cheese.md',
-        hrefType: 'file',
+        hrefType: 'local',
       },
     ],
   };
   const expected = {
     href: 'fox.md',
-    hrefType: 'file',
+    hrefType: 'local',
   };
   const testStream = new ResolveStream();
 
@@ -170,12 +170,12 @@ test.cb('should parse input with fallback link', (t) => {
       {
         placeholder: 'feline',
         href: 'cat.md',
-        hrefType: 'file',
+        hrefType: 'local',
       },
       {
         placeholder: 'food',
         href: 'cheese.md',
-        hrefType: 'file',
+        hrefType: 'local',
       },
     ],
     link: {
@@ -239,7 +239,7 @@ test.cb('should resolve link relative to file', (t) => {
     references: [],
     link: {
       href: 'foo/animal.md',
-      hrefType: 'file',
+      hrefType: 'local',
     },
     relativePath: 'foo',
   };
