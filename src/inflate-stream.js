@@ -8,7 +8,7 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
-import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, SUPPORTED_LINK_TYPES } from './config';
+import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, LINK_TYPES } from './config';
 
 /**
 * Input stream: object
@@ -78,20 +78,20 @@ export default function InflateStream(opt, linkPaths) {
       return cb();
     }
 
-    if (_.includes(SUPPORTED_LINK_TYPES, link.hrefType) === false) {
+    if (_.includes(_.values(LINK_TYPES), link.hrefType) === false) {
       this.push(chunk);
       return cb();
     }
 
-    if (link.hrefType === 'string') {
+    if (link.hrefType === LINK_TYPES.STRING) {
       this.push(_.assign(chunk, { [options.output]: link.href }));
       return cb();
     }
 
     // Inflate local or remote file streams
     const inflater = inflateDuplex(chunk, link);
-    if (link.hrefType === 'file') input = fs.createReadStream(link.href, { encoding: 'utf8' });
-    if (link.hrefType === 'http') input = request.get(link.href);
+    if (link.hrefType === LINK_TYPES.LOCAL) input = fs.createReadStream(link.href, { encoding: 'utf8' });
+    if (link.hrefType === LINK_TYPES.HTTP) input = request.get(link.href);
 
     input
       .on('error', (err) => {

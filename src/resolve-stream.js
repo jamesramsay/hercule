@@ -3,6 +3,7 @@ import path from 'path';
 import _ from 'lodash';
 
 import grammar from './transclude-parser';
+import { LINK_TYPES } from './config';
 
 /**
 * Input stream: (object)
@@ -38,7 +39,7 @@ function resolve(unresolvedLink, references, relativePath) {
   const override = _.find(references, { placeholder: primary.href });
   const link = _.pick(override || fallback || primary, ['href', 'hrefType']);
 
-  if (!override && link.hrefType === 'file') {
+  if (!override && link.hrefType === LINK_TYPES.LOCAL) {
     link.href = path.join(relativePath, link.href);
   }
 
@@ -52,7 +53,7 @@ function parse(rawLink, relativePath) {
 
   // Make references relative
   const parsedReferences = _.map(parsedLink.references, ({ placeholder, href, hrefType }) => {
-    const relativeHref = (hrefType === 'file') ? path.join(relativePath, href) : href;
+    const relativeHref = (hrefType === LINK_TYPES.LOCAL) ? path.join(relativePath, href) : href;
     return { placeholder, hrefType, href: relativeHref };
   });
 

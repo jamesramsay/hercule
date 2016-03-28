@@ -18,13 +18,13 @@ placeholder = p:[a-zA-Z0-9]+ {
   return p.join("");
 }
 
-primary = httpLink / fileLink / stringLink / reset
+primary = httpLink / localLink / stringLink / reset
 
-fallback = httpLink / fileLink / stringLink
+fallback = httpLink / localLink / stringLink
 
-fileLink = f:[^ ()\"]+ {
+localLink = f:[^ ()\"]+ {
   return {
-    "hrefType": "file",
+    "hrefType": "local",
     "href": f.join("")
   };
 }
