@@ -6,7 +6,6 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
-import grammar from './transclude-parser';
 import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
 /**
@@ -22,6 +21,7 @@ const DEFAULT_OPTIONS = {
 
 export default function Transcluder(opt, linkPaths) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
+  const source = options.source;
 
   function token(match) {
     return defaultToken(match, options);
@@ -33,7 +33,7 @@ export default function Transcluder(opt, linkPaths) {
 
   const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
   const tokenizer = regexpTokenizer(tokenizerOptions, options.linkRegExp || linkRegExp);
-  const resolver = new ResolveStream(grammar, null, linkPaths);
+  const resolver = new ResolveStream(source, linkPaths);
   const inflater = new InflateStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch }, linkPaths);
   const indenter = new IndentStream();
   const stringify = get('content');
