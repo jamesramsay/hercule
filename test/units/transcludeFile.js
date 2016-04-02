@@ -34,13 +34,25 @@ test.cb('should return error if file doesn\'t exist', (t) => {
   });
 });
 
-test.cb('should return error if circular dependency found', (t) => {
+test.cb('should return one error if circular dependency found', (t) => {
   const input = path.join(__dirname, '../fixtures/circular-references/index.md');
   const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
   const expected = 'The quick brown :[fox](fox.md) jumps over the lazy dog.\n';
   transcludeFile(input, options, (err, output) => {
     t.same(err.msg, 'Circular dependency detected');
     t.regex(err.path, /fixtures\/circular-references\/fox.md/);
+    t.same(output, expected);
+    t.end();
+  });
+});
+
+test.cb('should return one error if invalid links found', (t) => {
+  const input = path.join(__dirname, '../fixtures/invalid-link/index.md');
+  const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
+  const expected = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
+  transcludeFile(input, options, (err, output) => {
+    t.same(err.msg, 'Could not read file');
+    t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
     t.same(output, expected);
     t.end();
   });

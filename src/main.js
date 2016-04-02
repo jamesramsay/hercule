@@ -87,8 +87,8 @@ function main() {
       process.stderr.write(JSON.stringify(err));
     } else {
       process.stdout.write(`\n\nERROR: ${err.msg} (${err.path})\n`);
-      process.exit(1);
     }
+    process.exit(1);
   });
 
   inputStream.pipe(transclude).pipe(outputStream);
