@@ -12,9 +12,6 @@ _.forEach((fixtures.fixtures), (fixture) => {
     const options = { relativePath: path.resolve(__dirname, '../fixtures', fixture.name) };
     const config = fixture.expectedConfig;
 
-    // TODO: ava plan
-    // if (fixture.expectedConfig.plan > 0) t.plan(fixture.expectedConfig.plan);
-
     transcludeString(fixture.input, options, (err, output) => {
       if (err) {
         t.same(err.msg, config.error.msg);

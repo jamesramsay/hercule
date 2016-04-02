@@ -1,4 +1,5 @@
 import test from 'ava';
+import path from 'path';
 
 import { transcludeString } from '../../lib/hercule';
 
@@ -31,6 +32,17 @@ test.cb('should provide pathList if variable provided', (t) => {
     t.same(err, null);
     t.same(output, expected);
     t.same(pathList.length, 0);
+    t.end();
+  });
+});
+
+test.cb('should return one error if invalid links found', (t) => {
+  const input = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
+  const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
+  transcludeString(input, options, (err, output) => {
+    t.same(err.msg, 'Could not read file');
+    t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
+    t.same(output, input);
     t.end();
   });
 });

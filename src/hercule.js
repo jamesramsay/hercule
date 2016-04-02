@@ -24,7 +24,9 @@ export function transcludeString(...args) {
         outputString += content.toString('utf8');
       }
     })
-    .on('error', (err) => (cbErr = err))
+    .on('error', (err) => {
+      if (!cbErr) cbErr = err;
+    })
     .on('end', () => cb(cbErr, outputString));
 
   transclude.write(input, 'utf8');
@@ -51,7 +53,9 @@ export function transcludeFile(...args) {
         outputString += content;
       }
     })
-    .on('error', (err) => (cbErr = err))
+    .on('error', (err) => {
+      if (!cbErr) cbErr = err;
+    })
     .on('end', () => cb(cbErr, outputString));
 
   inputStream.pipe(transclude);
