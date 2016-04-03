@@ -220,7 +220,7 @@ input.pipe(transcluder).pipe(output);
 
 <a name="transcludeString" />
 
-### transcludeString(str, [options], [pathList], callback)
+### transcludeString(str, [options], callback)
 
 Transcludes the input `str`, and `callback` is called when finished.
 
@@ -266,7 +266,7 @@ try {
 
 <a name="transcludeFile" />
 
-### transcludeFile(filepath, [options], [pathList], callback)
+### transcludeFile(filepath, [options], callback)
 
 Transcludes the file at the provided `filepath`, and `callback` is called when finished.
 
