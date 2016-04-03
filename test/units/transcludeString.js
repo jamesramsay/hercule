@@ -23,15 +23,15 @@ test.cb('should transclude with optional relativePath argument', (t) => {
   });
 });
 
-test.cb('should provide pathList if variable provided', (t) => {
-  const input = 'The quick brown fox jumps over the lazy dog.';
-  const expected = 'The quick brown fox jumps over the lazy dog.';
-  const pathList = [];
+test.cb('should return sourceList', (t) => {
+  const input = 'Jackdaws love my :[size link](size.md) sphinx of quartz.';
+  const options = { relativePath: path.join(__dirname, '../fixtures/local-link') };
+  const expected = 'Jackdaws love my big sphinx of quartz.';
 
-  transcludeString(input, null, pathList, (err, output) => {
+  transcludeString(input, options, (err, output, sourceList) => {
     t.same(err, null);
     t.same(output, expected);
-    t.same(pathList.length, 0);
+    t.same(sourceList.length, 1);
     t.end();
   });
 });

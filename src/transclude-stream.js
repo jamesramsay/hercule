@@ -19,9 +19,10 @@ const DEFAULT_OPTIONS = {
   output: 'content',
 };
 
-export default function Transcluder(opt, linkPaths) {
+export default function Transcluder(opt) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
   const source = options.source;
+  const sourcePaths = [];
 
   function token(match) {
     return defaultToken(match, options);
@@ -33,8 +34,8 @@ export default function Transcluder(opt, linkPaths) {
 
   const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
   const tokenizer = regexpTokenizer(tokenizerOptions, options.linkRegExp || linkRegExp);
-  const resolver = new ResolveStream(source, linkPaths);
-  const inflater = new InflateStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch }, linkPaths);
+  const resolver = new ResolveStream(source);
+  const inflater = new InflateStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
   const indenter = new IndentStream();
   const stringify = get('content');
 
@@ -54,6 +55,14 @@ export default function Transcluder(opt, linkPaths) {
   inflater.on('error', (err) => {
     transcluder.emit('error', err);
     inflater.end();
+  });
+
+  resolver.on('source', (filepath) => {
+    sourcePaths.push(filepath);
+  });
+
+  transcluder.on('end', () => {
+    transcluder.emit('sources', sourcePaths);
   });
 
   return transcluder;

@@ -31,11 +31,11 @@ const DEFAULT_OPTIONS = {
   output: 'content',
 };
 
-export default function InflateStream(opt, linkPaths) {
+export default function InflateStream(opt) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
 
   function inflateDuplex(chunk, link) {
-    const resolver = new ResolveStream(link.href, linkPaths);
+    const resolver = new ResolveStream(link.href);
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
 

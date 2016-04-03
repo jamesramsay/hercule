@@ -229,12 +229,11 @@ __Arguments__
 - `str` - A string to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the transclusion links within input `str` are relative.
-- `pathList` - An array (typically empty) which the path of every transclusion will be appended to.
-  This is helpful for generating a watch list for live reloading.
-- `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
-  has been processed. `callback` will be passed an error and the processed output.
+- `callback(err, [output], [sourcePaths])` - A callback which is called after the input `str` has been processed.
+  `callback` will be passed an error, processed output and array of source document file paths.
 
-Omit the `callback` and `pathList` if using `transcludeStringSync`.
+
+Omit the `callback` if using `transcludeStringSync`. Only `output` will be returned.
 
 __Examples__
 
@@ -276,12 +275,10 @@ __Arguments__
 - `filepath` - A path to a file to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the input `filepath` is relative.
-- `pathList` - An array (typically empty) which the path of every transclusion will be appended to.
-  This is helpful for generating a watch list for live reloading.
-- `callback(err, [output])` - A callback which is called after the file at the provided `filepath`
-  has been processed. `callback` will be passed an error and the processed output.
+- `callback(err, [output], [sourcePaths])` - A callback which is called after the file at the provided `filepath`
+  has been processed. `callback` will be passed an error, processed output and array of source document file paths.
 
-Omit the `callback` and `pathList` if using `transcludeFileSync`.
+Omit the `callback` if using `transcludeFileSync`. Only `output` will be returned.
 
 __Examples__
 

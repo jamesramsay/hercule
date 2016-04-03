@@ -58,17 +58,16 @@ test.cb('should return one error if invalid links found', (t) => {
   });
 });
 
-test.cb('should provide pathList if variable provided', (t) => {
+test.cb('should return sourceList', (t) => {
   const input = path.join(__dirname, '../fixtures/local-link/index.md');
   const options = { relativePath: path.join(__dirname, '../fixtures/local-link') };
   const expected = 'Jackdaws love my big sphinx of quartz.\n';
-  const pathList = [];
 
-  transcludeFile(input, options, pathList, (err, output) => {
+  transcludeFile(input, options, (err, output, sourceList) => {
     t.same(err, null);
     t.same(output, expected);
-    t.regex(pathList[0], /fixtures\/local-link\/size\.md/);
-    t.same(pathList.length, 1);
+    t.regex(sourceList[0], /fixtures\/local-link\/size\.md/);
+    t.same(sourceList.length, 1);
     t.end();
   });
 });

@@ -60,7 +60,7 @@ function parse(rawLink, relativePath) {
   return { parsedLink, parsedReferences };
 }
 
-export default function ResolveStream(sourceFile, sourcePaths = []) {
+export default function ResolveStream() {
   function transform(chunk, encoding, cb) {
     const rawLink = _.get(chunk, ['link', 'href']);
     const relativePath = _.get(chunk, 'relativePath') || '';
@@ -85,9 +85,7 @@ export default function ResolveStream(sourceFile, sourcePaths = []) {
     const references = _.uniq([...parsedReferences, ...parentRefs]);
     const link = resolve(parsedLink, parentRefs, relativePath);
 
-    // Add the resolved link path to the array of all source paths
-    sourcePaths.push(link.href);
-
+    this.emit('source', link.href);
     this.push(_.assign(chunk, { link, references }));
     return cb();
   }
