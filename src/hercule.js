@@ -11,10 +11,11 @@ export const TranscludeStream = Transcluder;
 export function transcludeString(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options, linkPaths] = args;
+  const [options] = args;
 
-  const transclude = new Transcluder(options, linkPaths);
+  const transclude = new Transcluder(options);
   let outputString = '';
+  let sourcePaths;
   let cbErr = null;
 
   transclude
@@ -27,7 +28,8 @@ export function transcludeString(...args) {
     .on('error', (err) => {
       if (!cbErr) cbErr = err;
     })
-    .on('end', () => cb(cbErr, outputString));
+    .on('sources', (srcPaths) => (sourcePaths = srcPaths))
+    .on('end', () => cb(cbErr, outputString, sourcePaths));
 
   transclude.write(input, 'utf8');
   transclude.end();
@@ -37,11 +39,12 @@ export function transcludeString(...args) {
 export function transcludeFile(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options, linkPaths] = args;
+  const [options] = args;
 
-  const transclude = new Transcluder(options, linkPaths);
+  const transclude = new Transcluder(options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
+  let sourcePaths;
   let cbErr = null;
 
   inputStream.on('error', (err) => cb(err));
@@ -56,7 +59,8 @@ export function transcludeFile(...args) {
     .on('error', (err) => {
       if (!cbErr) cbErr = err;
     })
-    .on('end', () => cb(cbErr, outputString));
+    .on('sources', (srcPaths) => (sourcePaths = srcPaths))
+    .on('end', () => cb(cbErr, outputString, sourcePaths));
 
   inputStream.pipe(transclude);
 }
