@@ -26,6 +26,6 @@ export function defaultToken(match, options, whitespace) {
 
 export function defaultSeparator(match) {
   return {
-    content: match,
+    content: match[0],
   };
 }
