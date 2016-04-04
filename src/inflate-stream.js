@@ -10,7 +10,7 @@ import TrimStream from './trim-stream';
 import localInflater from './inflaters/local';
 import httpInflater from './inflaters/http';
 
-import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, LINK_TYPES } from './config';
+import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, LINK_TYPES } from './config';
 
 /**
 * Input stream: object
@@ -26,74 +26,81 @@ import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, LINK_TYPE
 * Input and output properties can be altered by providing options
 */
 
-const DEFAULT_OPTIONS = {
-  input: 'link',
-  output: 'content',
-};
 
 export default function InflateStream(opt) {
-  const options = _.merge({}, DEFAULT_OPTIONS, opt);
+  const options = _.merge({}, opt);
 
-  function inflateDuplex(chunk, link) {
-    const resolver = new ResolveStream(link.href);
+  function inflateDuplex(chunk, source) {
+    const resolver = new ResolveStream();
     const inflater = new InflateStream();
     const trimmer = new TrimStream();
 
     function token(match) {
-      return _.merge(defaultToken(match, options, chunk.indent), {
-        relativePath: path.dirname(link.href),
-        references: [...chunk.references],
-        parents: [link.href, ...chunk.parents],
-      });
+      return _.merge(
+        defaultToken(match, options, chunk.indent),
+        {
+          relativePath: path.dirname(source),
+          references: [...chunk.references],
+          parents: [source, ...chunk.parents],
+        }
+      );
     }
 
     function separator(match) {
-      return _.merge(defaultSeparator(match), { indent: chunk.indent });
+      return _.merge(
+        defaultSeparator(match),
+        {
+          indent: chunk.indent,
+        }
+      );
     }
 
-    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
-    const tokenizer = regexpTokenizer(tokenizerOptions, options.linkRegExp || linkRegExp);
+    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, source, token, separator };
+    const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
+    const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
 
     trimmer.pipe(tokenizer).pipe(resolver).pipe(inflater);
 
     return duplexer({ objectMode: true }, trimmer, inflater);
   }
 
+  function isSupportedLink(linkPath, linkType) {
+    return !(_.isUndefined(linkPath)) && _.includes(_.values(LINK_TYPES), linkType);
+  }
+
   // eslint-disable-next-line consistent-return
   function transform(chunk, encoding, cb) {
-    const link = chunk[options.input];
-    const parents = chunk.parents;
+    const linkPath = _.get(chunk, ['link', 'href']);
+    const linkType = _.get(chunk, ['link', 'hrefType']);
+    const parents = _.get(chunk, 'parents');
     const self = this;
     let input;
 
-    if (!link) {
+    if (!isSupportedLink(linkPath, linkType)) {
       this.push(chunk);
       return cb();
     }
 
-    if (_.includes(parents, link.href)) {
+    if (parents && _.includes(parents, linkPath)) {
       this.push(chunk);
       this.emit('error', {
         msg: 'Circular dependency detected',
-        path: link.href,
+        path: linkPath,
       });
       return cb();
     }
 
-    if (_.includes(_.values(LINK_TYPES), link.hrefType) === false) {
-      this.push(chunk);
-      return cb();
-    }
+    if (linkType === LINK_TYPES.STRING) input = linkPath;
+    if (linkType === LINK_TYPES.LOCAL) input = localInflater.call(this, linkPath, chunk, cb);
+    if (linkType === LINK_TYPES.HTTP) input = httpInflater.call(this, linkPath, chunk, cb);
 
-    if (link.hrefType === LINK_TYPES.STRING) {
-      this.push(_.assign(chunk, { [options.output]: link.href }));
+    if (_.isString(input)) {
+      this.push(_.assign(chunk, { content: input }));
       return cb();
     }
 
     // Inflate local or remote file streams
-    const inflater = inflateDuplex(chunk, link);
-    if (link.hrefType === LINK_TYPES.LOCAL) input = localInflater.call(this, link.href, chunk, cb);
-    if (link.hrefType === LINK_TYPES.HTTP) input = httpInflater.call(this, link.href, chunk, cb);
+    const inflater = inflateDuplex(chunk, linkPath);
 
     inflater
       .on('readable', function inputReadable() {

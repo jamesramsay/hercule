@@ -6,7 +6,7 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 import ResolveStream from './resolve-stream';
 import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
-import { linkRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
+import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
 /**
 * Input stream: string
@@ -33,7 +33,8 @@ export default function Transcluder(opt) {
   }
 
   const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
-  const tokenizer = regexpTokenizer(tokenizerOptions, options.linkRegExp || linkRegExp);
+  const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
+  const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
   const resolver = new ResolveStream(source);
   const inflater = new InflateStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
   const indenter = new IndentStream();
