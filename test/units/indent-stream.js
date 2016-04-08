@@ -28,7 +28,7 @@ test.cb('should not modify input without whitespace', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk, input);
+      t.deepEqual(chunk, input);
     }
   });
 
@@ -51,7 +51,7 @@ test.cb('should not modify input without new lines', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk, input);
+      t.deepEqual(chunk, input);
     }
   });
 
@@ -78,7 +78,7 @@ test.cb('should only indent text after each new line', (t) => {
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.same(chunk, expect);
+      t.deepEqual(chunk, expect);
     }
   });
 

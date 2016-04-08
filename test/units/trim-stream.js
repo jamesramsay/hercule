@@ -31,7 +31,7 @@ test.cb('should not modify input without trailing new line', (t) => {
   });
 
   testStream.on('end', () => {
-    t.same(output, input);
+    t.deepEqual(output, input);
     t.end();
   });
 
@@ -53,7 +53,7 @@ test.cb('should not modify input with internal new lines', (t) => {
   });
 
   testStream.on('end', () => {
-    t.same(output, input);
+    t.deepEqual(output, input);
     t.end();
   });
 
@@ -76,7 +76,7 @@ test.cb('should only trim trailing new line', (t) => {
   });
 
   testStream.on('end', () => {
-    t.same(output, expect);
+    t.deepEqual(output, expect);
     t.end();
   });
 
