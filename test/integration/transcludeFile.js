@@ -13,11 +13,11 @@ _.forEach((fixtures.fixtures), (fixture) => {
 
     transcludeFile(fixture.inputFile, options, (err, output) => {
       if (err) {
-        t.same(err.msg, config.error.msg);
+        t.deepEqual(err.msg, config.error.msg);
         t.regex(err.path, new RegExp(config.error.path));
       } else {
-        t.same(err, null);
-        t.same(output, fixture.expectedOutput);
+        t.deepEqual(err, null);
+        t.deepEqual(output, fixture.expectedOutput);
       }
       t.end();
     });
