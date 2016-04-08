@@ -25,11 +25,11 @@ _.forEach((fixtures.fixtures), (fixture) => {
       })
       .on('error', (err) => {
         // All errors should include a message and path
-        t.same(err.msg, config.error.msg);
+        t.deepEqual(err.msg, config.error.msg);
         t.regex(err.path, new RegExp(config.error.path));
       })
       .on('end', () => {
-        t.same(outputString, fixture.expectedOutput);
+        t.deepEqual(outputString, fixture.expectedOutput);
         t.end();
       });
 

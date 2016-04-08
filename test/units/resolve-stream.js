@@ -29,7 +29,7 @@ test.cb('should skip input without link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.notOk(chunk.link);
+        t.falsy(chunk.link);
       }
     })
     .on('error', () => t.fail())
@@ -58,7 +58,7 @@ test.cb('should parse input simple link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.link, expected);
+        t.deepEqual(chunk.link, expected);
       }
     })
     .on('error', () => t.fail())
@@ -105,7 +105,7 @@ test.cb('should parse input with overrides', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.references, expected);
+        t.deepEqual(chunk.references, expected);
       }
     })
     .on('error', () => t.fail())
@@ -146,7 +146,7 @@ test.cb('should parse input with overriding link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.link, expected);
+        t.deepEqual(chunk.link, expected);
       }
     })
     .on('error', () => t.fail())
@@ -190,7 +190,7 @@ test.cb('should parse input with fallback link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk, expected);
+        t.deepEqual(chunk, expected);
       }
     })
     .on('error', () => t.fail())
@@ -215,7 +215,7 @@ test.cb('should emit error on invalid transclusion link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk, input);
+        t.deepEqual(chunk, input);
       }
     })
     .on('error', () => t.pass())
@@ -250,7 +250,7 @@ test.cb('should resolve link relative to file', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk, expected);
+        t.deepEqual(chunk, expected);
       }
     })
     .on('error', () => t.fail())

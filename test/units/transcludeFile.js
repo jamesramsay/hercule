@@ -7,8 +7,8 @@ test.cb('should transclude with only required arguments', (t) => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
   const expected = 'The quick brown fox jumps over the lazy dog.\n';
   transcludeFile(input, (err, output) => {
-    t.same(err, null);
-    t.same(output, expected);
+    t.deepEqual(err, null);
+    t.deepEqual(output, expected);
     t.end();
   });
 });
@@ -17,8 +17,8 @@ test.cb('should transclude with optional relativePath argument', (t) => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
   const expected = 'The quick brown fox jumps over the lazy dog.\n';
   transcludeFile(input, { relativePath: 'test' }, (err, output) => {
-    t.same(err, null);
-    t.same(output, expected);
+    t.deepEqual(err, null);
+    t.deepEqual(output, expected);
     t.end();
   });
 });
@@ -26,10 +26,10 @@ test.cb('should transclude with optional relativePath argument', (t) => {
 test.cb('should return error if file doesn\'t exist', (t) => {
   const input = path.join('i-dont-exist.md');
   transcludeFile(input, (err, output) => {
-    t.ok(err);
-    // t.same(err.msg, 'TODO');
-    t.same(err.path, 'i-dont-exist.md');
-    t.notOk(output);
+    t.truthy(err);
+    // t.deepEqual(err.msg, 'TODO');
+    t.deepEqual(err.path, 'i-dont-exist.md');
+    t.falsy(output);
     t.end();
   });
 });
@@ -39,9 +39,9 @@ test.cb('should return one error if circular dependency found', (t) => {
   const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
   const expected = 'The quick brown :[fox](fox.md) jumps over the lazy dog.\n';
   transcludeFile(input, options, (err, output) => {
-    t.same(err.msg, 'Circular dependency detected');
+    t.deepEqual(err.msg, 'Circular dependency detected');
     t.regex(err.path, /fixtures\/circular-references\/fox.md/);
-    t.same(output, expected);
+    t.deepEqual(output, expected);
     t.end();
   });
 });
@@ -51,9 +51,9 @@ test.cb('should return one error if invalid links found', (t) => {
   const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
   const expected = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
   transcludeFile(input, options, (err, output) => {
-    t.same(err.msg, 'Could not read file');
+    t.deepEqual(err.msg, 'Could not read file');
     t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
-    t.same(output, expected);
+    t.deepEqual(output, expected);
     t.end();
   });
 });
@@ -64,10 +64,10 @@ test.cb('should return sourceList', (t) => {
   const expected = 'Jackdaws love my big sphinx of quartz.\n';
 
   transcludeFile(input, options, (err, output, sourceList) => {
-    t.same(err, null);
-    t.same(output, expected);
+    t.deepEqual(err, null);
+    t.deepEqual(output, expected);
     t.regex(sourceList[0], /fixtures\/local-link\/size\.md/);
-    t.same(sourceList.length, 1);
+    t.deepEqual(sourceList.length, 1);
     t.end();
   });
 });
@@ -82,8 +82,8 @@ test.cb('should support tokenizer options', (t) => {
   };
 
   transcludeFile(input, options, (err, output) => {
-    t.same(err, null);
-    t.same(output, expected);
+    t.deepEqual(err, null);
+    t.deepEqual(output, expected);
     t.end();
   });
 });

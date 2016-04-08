@@ -23,10 +23,10 @@ _.forEach((fixtures.fixtures), (fixture) => {
     const config = fixture.expectedConfig;
     try {
       const output = transcludeStringSync(fixture.input, options);
-      t.same(output, fixture.expectedOutput);
+      t.deepEqual(output, fixture.expectedOutput);
     } catch (ex) {
       if (config.error) {
-        t.same(ex.message, config.error.msg);
+        t.deepEqual(ex.message, config.error.msg);
       } else {
         t.fail();
       }
