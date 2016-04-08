@@ -16,14 +16,14 @@ test('should transclude with only required arguments', (t) => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
   const expected = 'The quick brown fox jumps over the lazy dog.\n';
   const output = transcludeFileSync(input);
-  t.same(output, expected);
+  t.deepEqual(output, expected);
 });
 
 test('should transclude with optional relativePath argument', (t) => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
   const expected = 'The quick brown fox jumps over the lazy dog.\n';
   const output = transcludeFileSync(input, { relativePath: 'test' });
-  t.same(output, expected);
+  t.deepEqual(output, expected);
 });
 
 test('should throw error with invalid link', (t) => {
@@ -32,6 +32,6 @@ test('should throw error with invalid link', (t) => {
     transcludeFileSync(input);
     t.fail();
   } catch (ex) {
-    t.same(ex.message, 'Could not read file');
+    t.deepEqual(ex.message, 'Could not read file');
   }
 });

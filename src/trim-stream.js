@@ -20,8 +20,8 @@ export default function TrimStream() {
     inputBuffer = inputBuffer.concat(input);
 
     // Return everything but the last character
-    const output = inputBuffer.slice(0, -1);
-    inputBuffer = inputBuffer.slice(-1);
+    const output = inputBuffer.slice(0, -1); // eslint-disable-line lodash/prefer-lodash-method
+    inputBuffer = inputBuffer.slice(-1); // eslint-disable-line lodash/prefer-lodash-method
 
     this.push(output);
     return cb();

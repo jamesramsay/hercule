@@ -29,7 +29,7 @@ test.cb('should skip input without link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.notOk(chunk.link);
+        t.falsy(chunk.link);
       }
     })
     .on('error', () => t.fail())
@@ -66,7 +66,7 @@ test.cb('should inflate input with file link', (t) => {
     })
     .on('error', () => t.fail())
     .on('end', () => {
-      t.same(output, expected);
+      t.deepEqual(output, expected);
       t.end();
     });
 
@@ -92,11 +92,11 @@ test.cb('should emit error with invalid file link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.content, input.content);
+        t.deepEqual(chunk.content, input.content);
       }
     })
     .on('error', (err) => {
-      t.same(err.msg, 'Could not read file');
+      t.deepEqual(err.msg, 'Could not read file');
       t.regex(err.path, /i-dont-exist\.md/);
     })
     .on('end', () => t.end());
@@ -121,7 +121,7 @@ test.cb('should inflate input with string link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.content, expected);
+        t.deepEqual(chunk.content, expected);
       }
     })
     .on('error', () => t.fail())
@@ -151,7 +151,7 @@ test.cb('should inflate input with http link', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.content, expected);
+        t.deepEqual(chunk.content, expected);
       }
     })
     .on('error', () => t.fail())
@@ -183,7 +183,7 @@ test.cb('should emit error with invalid http link', (t) => {
     })
     .on('error', (err) => {
       // TODO: Requires https://github.com/pgte/nock/issues/469
-      // t.same(err.msg, '404 error or something');
+      // t.deepEqual(err.msg, '404 error or something');
       t.regex(err.path, /i-dont-exist\.md/);
     })
     .on('end', () => t.end());
@@ -208,7 +208,7 @@ test.cb('should not make modifications if hrefType is unrecognised', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.content, expected);
+        t.deepEqual(chunk.content, expected);
       }
     })
     .on('error', () => t.fail())
@@ -236,12 +236,12 @@ test.cb('should emit error on circular references', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.same(chunk.content, expected);
+        t.deepEqual(chunk.content, expected);
       }
     })
     .on('error', (err) => {
-      t.same(err.msg, 'Circular dependency detected');
-      t.same(err.path, 'size.md');
+      t.deepEqual(err.msg, 'Circular dependency detected');
+      t.deepEqual(err.path, 'size.md');
     })
     .on('end', () => t.end());
 
