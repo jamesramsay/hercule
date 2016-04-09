@@ -78,7 +78,7 @@ export function transcludeFileSync(input, options) {
   const outputContent = result.stdout.toString();
   const err = result.stderr.toString();
 
-  if (err) throw new Error(JSON.parse(err).msg);
+  if (err) throw new Error('Could not transclude file');
 
   return outputContent;
 }
@@ -96,7 +96,7 @@ export function transcludeStringSync(input, options) {
   const outputContent = result.stdout.toString();
   const err = result.stderr.toString();
 
-  if (err) throw new Error(JSON.parse(err).msg);
+  if (err) throw new Error('Could not transclude input');
 
   return outputContent;
 }

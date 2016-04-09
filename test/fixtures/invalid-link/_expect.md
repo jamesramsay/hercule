@@ -1,1 +1,1 @@
-Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)
+Jackdaws love my  sphinx of 

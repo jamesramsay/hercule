@@ -13,7 +13,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
 
     transcludeFile(fixture.inputFile, options, (err, output) => {
       if (err) {
-        t.deepEqual(err.msg, config.error.msg);
+        t.deepEqual(err.message, config.error.message);
         t.regex(err.path, new RegExp(config.error.path));
       } else {
         t.deepEqual(err, null);

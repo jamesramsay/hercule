@@ -25,7 +25,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
       })
       .on('error', (err) => {
         // All errors should include a message and path
-        t.deepEqual(err.msg, config.error.msg);
+        t.deepEqual(err.message, config.error.message);
         t.regex(err.path, new RegExp(config.error.path));
       })
       .on('end', () => {

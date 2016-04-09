@@ -1,93 +1,54 @@
-import through2 from 'through2';
-import path from 'path';
 import _ from 'lodash';
-
-import grammar from './transclude-parser';
-import { LINK_TYPES } from './config';
+import through2 from 'through2';
+import { parseTransclude, resolveReferences } from './resolve';
 
 /**
-* Input stream: (object)
-* - link (object, required)
-*   - href (string, required)
+* Input: (object)
+* - link (object)
 * - relativePath (string)
-* - references (array, required)
-*   - (object)
-*     - placeholder (string, required)
-*     - href (string, required)
-*     - hrefType (enum, required)
-*     - source (string)
-*     - original (object)
-*       - line (integer, required)
-*       - column (integer, required)
-* - parents (array, required)
+* - references (array[Reference])
+*   - placeholder (string)
+*   - link (string)
+*   - relativePath (string)
+* - parents (array)
 *
-* Output stream: (object)
-* - link (object, required)
-*   - href (string)
-*   - hrefType (enum)
-* - relativePath (string, optional)
-* - references (array, required) - References extended with any newly parsed references.
-*   - (object) - as above
-* - parents (array, required)
+* Output: (object)
+* - link (string)
+* - relativePath (string)
+* - references (array[Reference])
+* - parents (array)
 *
-* Input and output properties can be altered by providing options
 */
 
-function resolve(unresolvedLink, references, relativePath) {
-  const primary = unresolvedLink.primary;
-  const fallback = unresolvedLink.fallback;
-  const override = _.find(references, { placeholder: primary.href });
-  const link = _.pick(override || fallback || primary, ['href', 'hrefType']);
-
-  if (!override && link.hrefType === LINK_TYPES.LOCAL) {
-    link.href = path.join(relativePath, link.href);
-  }
-
-  return link;
-}
-
-function parse(rawLink, relativePath) {
-  // Parse link body using peg.js grammar
-  // This allows complex links with placeholders, fallbacks, and overrides
-  const parsedLink = grammar.parse(rawLink);
-
-  // Make references relative
-  const parsedReferences = _.map(parsedLink.references, ({ placeholder, href, hrefType }) => {
-    const relativeHref = (hrefType === LINK_TYPES.LOCAL) ? path.join(relativePath, href) : href;
-    return { placeholder, hrefType, href: relativeHref };
-  });
-
-  return { parsedLink, parsedReferences };
-}
-
 export default function ResolveStream() {
+  // eslint-disable-next-line consistent-return
   function transform(chunk, encoding, cb) {
-    const rawLink = _.get(chunk, 'link.href');
-    const relativePath = _.get(chunk, 'relativePath') || '';
+    const transclusionLink = _.get(chunk, 'link');
+    const transclusionRelativePath = _.get(chunk, 'relativePath') || '';
     const parentRefs = _.get(chunk, 'references') || [];
-    let parsedLink;
-    let parsedReferences;
 
-    // No link to parse, move along
-    if (!rawLink) {
+    if (!transclusionLink) {
       this.push(chunk);
       return cb();
     }
 
-    try {
-      ({ parsedLink, parsedReferences } = parse(rawLink, relativePath));
-    } catch (err) {
-      this.push(chunk);
-      this.emit('error', { msg: 'Link could not be parsed', path: rawLink, error: err });
+    // Parses raw transclusion link: primary.link || fallback.link reference.placeholder:reference.link ...
+    parseTransclude(transclusionLink, transclusionRelativePath, (err, primary, fallback, parsedReferences) => {
+      if (err) {
+        this.push(chunk);
+        this.emit('error', { message: 'Link could not be parsed', path: transclusionLink, error: err });
+        return cb();
+      }
+
+      const references = _.uniq([...parsedReferences, ...parentRefs]);
+
+      // References from parent files override primary links, then to fallback if provided and no matching references
+      const { link, relativePath } = resolveReferences(primary, fallback, parentRefs);
+
+      this.emit('source', link);
+      this.push(_.assign(chunk, { link, relativePath, references }));
       return cb();
-    }
-
-    const references = _.uniq([...parsedReferences, ...parentRefs]);
-    const link = resolve(parsedLink, parentRefs, relativePath);
-
-    this.emit('source', link.href);
-    this.push(_.assign(chunk, { link, references }));
-    return cb();
+    });
   }
 
   return through2.obj(transform);

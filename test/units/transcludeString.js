@@ -39,24 +39,23 @@ test.cb('should return sourceList', (t) => {
 test.cb('should return one error if invalid links found', (t) => {
   const input = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
   const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
-  transcludeString(input, options, (err, output) => {
-    t.deepEqual(err.msg, 'Could not read file');
+  transcludeString(input, options, (err) => {
+    t.deepEqual(err.message, 'Could not read file');
     t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
-    t.deepEqual(output, input);
     t.end();
   });
 });
 
-test.cb('should return errors with tokenizer options', (t) => {
+test.cb('should return errors when custom tokenizer options used', (t) => {
   const input = '# Title\n<!-- include(test1.apib) -->\nSome content...\n';
   const options = {
     linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
     linkMatch: (match) => match[3] || match[5],
   };
 
-  transcludeString(input, options, (err, output) => {
-    t.truthy(err.message);
-    t.deepEqual(output, input);
+  transcludeString(input, options, (err) => {
+    t.deepEqual(err.message, 'Could not read file');
+    t.deepEqual(err.path, 'test1.apib');
     t.end();
   });
 });

@@ -12,7 +12,7 @@
     "posttest": "npm run lint && npm run check-commit",
     "coverage": "istanbul report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "cat coverage/coverage-final.json | codecov",
-    "compile": "babel src --out-dir lib --source-maps && pegjs src/transclude.pegjs lib/transclude-parser.js",
+    "compile": "babel src --out-dir lib --source-maps && pegjs src/transclude.pegjs lib/transclude-parser.js && pegjs src/inflater/link.pegjs lib/inflater/link.js",
     "lint": "eslint ./src ./test",
     "install-bats": "./scripts/install-bats",
     "check-commit": "./scripts/commit-msg",
@@ -23,6 +23,7 @@
   "nyc": {
     "exclude": [
       "lib/transclude-parser.js",
+      "lib/inflater/link.js",
       "test"
     ]
   },

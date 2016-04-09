@@ -48,8 +48,7 @@ export default function Transcluder(opt) {
 
   const transcluder = duplexer(tokenizer, stringify);
 
-  resolver.on('error', (err) => {
-    transcluder.emit('error', err);
+  resolver.on('error', () => {
     resolver.end();
   });
 

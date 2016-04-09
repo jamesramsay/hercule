@@ -1,4 +1,3 @@
-import path from 'path';
 import _ from 'lodash';
 import through2 from 'through2';
 import duplexer from 'duplexer2';
@@ -6,17 +5,14 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
 import TrimStream from './trim-stream';
+import resolveLink from './inflater';
 
-import localInflater from './inflaters/local';
-import httpInflater from './inflaters/http';
-
-import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, LINK_TYPES } from './config';
+import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
 /**
 * Input stream: object
-* - link (object, required)
-*   - href (string, required)
-*   - hrefType (enum, required)
+* - link (string, required)
+* - relativePath (string, required)
 * - parents (array, required)
 * - references (array, required)
 *
@@ -26,20 +22,19 @@ import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP, L
 * Input and output properties can be altered by providing options
 */
 
-
 export default function InflateStream(opt) {
   const options = _.merge({}, opt);
 
-  function inflateDuplex(chunk, source) {
-    const resolver = new ResolveStream();
-    const inflater = new InflateStream();
-    const trimmer = new TrimStream();
+  function inflate(chunk, source, sourcePath) {
+    const resolverStream = new ResolveStream();
+    const inflaterStream = new InflateStream();
+    const trimmerStream = new TrimStream();
 
     function token(match) {
       return _.merge(
         defaultToken(match, options, chunk.indent),
         {
-          relativePath: path.dirname(source),
+          relativePath: sourcePath,
           references: [...chunk.references],
           parents: [source, ...chunk.parents],
         }
@@ -47,75 +42,68 @@ export default function InflateStream(opt) {
     }
 
     function separator(match) {
-      return _.merge(
-        defaultSeparator(match),
-        {
-          indent: chunk.indent,
-        }
-      );
+      return defaultSeparator(match, chunk.indent);
     }
 
     const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, source, token, separator };
     const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
-    const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
+    const tokenizerStream = regexpTokenizer(tokenizerOptions, linkRegExp);
 
-    trimmer.pipe(tokenizer).pipe(resolver).pipe(inflater);
+    trimmerStream.pipe(tokenizerStream).pipe(resolverStream).pipe(inflaterStream);
 
-    return duplexer({ objectMode: true }, trimmer, inflater);
-  }
-
-  function isSupportedLink(linkPath, linkType) {
-    return !(_.isUndefined(linkPath)) && _.includes(_.values(LINK_TYPES), linkType);
+    return duplexer({ objectMode: true }, trimmerStream, inflaterStream);
   }
 
   // eslint-disable-next-line consistent-return
   function transform(chunk, encoding, cb) {
-    const linkPath = _.get(chunk, 'link.href');
-    const linkType = _.get(chunk, 'link.hrefType');
-    const parents = _.get(chunk, 'parents');
+    const link = _.get(chunk, 'link');
+    const parents = _.get(chunk, 'parents') || [];
+    const relativePath = _.get(chunk, 'relativePath') || '';
     const self = this;
-    let input;
 
-    if (!isSupportedLink(linkPath, linkType)) {
+    if (!link) {
       this.push(chunk);
       return cb();
     }
 
-    if (parents && _.includes(parents, linkPath)) {
-      this.push(chunk);
-      this.emit('error', {
-        msg: 'Circular dependency detected',
-        path: linkPath,
+    // Resolve link to readable stream
+    // eslint-disable-next-line consistent-return
+    resolveLink(link, relativePath, (err, input, resolvedLink, resolvedRelativePath) => {
+      if (err) {
+        this.push(chunk);
+        this.emit('error', _.merge({ message: 'Link could not be inflated' }, err));
+        return cb();
+      }
+
+      if (_.includes(parents, resolvedLink)) {
+        this.push(chunk);
+        this.emit('error', { message: 'Circular dependency detected', path: link });
+        return cb();
+      }
+
+      const inflater = inflate(chunk, resolvedLink, resolvedRelativePath);
+
+      input.on('error', (inputErr) => {
+        this.emit('error', _.merge({ message: 'Could not read file' }, inputErr));
+        cb();
       });
-      return cb();
-    }
 
-    if (linkType === LINK_TYPES.STRING) input = linkPath;
-    if (linkType === LINK_TYPES.LOCAL) input = localInflater.call(this, linkPath, chunk, cb);
-    if (linkType === LINK_TYPES.HTTP) input = httpInflater.call(this, linkPath, chunk, cb);
-
-    if (_.isString(input)) {
-      this.push(_.assign(chunk, { content: input }));
-      return cb();
-    }
-
-    // Inflate local or remote file streams
-    const inflater = inflateDuplex(chunk, linkPath);
-
-    inflater
-      .on('readable', function inputReadable() {
+      inflater.on('readable', function inputReadable() {
         let content;
         while ((content = this.read()) !== null) {
           self.push(content);
         }
-      })
-      .on('error', (err) => {
-        this.emit('error', err);
-        cb();
-      })
-      .on('end', () => cb());
+      });
 
-    input.pipe(inflater);
+      inflater.on('error', (inflateErr) => {
+        this.emit('error', inflateErr);
+        cb();
+      });
+
+      inflater.on('end', () => cb());
+
+      input.pipe(inflater);
+    });
   }
 
   return through2.obj(transform);

@@ -26,7 +26,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
       t.deepEqual(output, fixture.expectedOutput);
     } catch (ex) {
       if (config.error) {
-        t.deepEqual(ex.message, config.error.msg);
+        t.deepEqual(ex.message, 'Could not transclude input');
       } else {
         t.fail();
       }

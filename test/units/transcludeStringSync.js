@@ -31,6 +31,6 @@ test('should throw error with invalid link', (t) => {
     transcludeStringSync(input);
     t.fail();
   } catch (ex) {
-    t.deepEqual(ex.message, 'Could not read file');
+    t.deepEqual(ex.message, 'Could not transclude input');
   }
 });

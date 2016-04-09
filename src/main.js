@@ -41,13 +41,13 @@ const parser = dashdash.createParser({
 try {
   opts = parser.parse(process.argv);
 } catch (err) {
-  console.log(`hercule: error: ${err.message}`); // eslint-disable-line
+  process.stdout.write(`hercule: error: ${err.message}\n`);
   process.exit(1);
 }
 
 
 if (opts.help) {
-  console.log(`usage: hercule [OPTIONS]\noptions:\n${parser.help({includeEnv: true}).trimRight()}`); // eslint-disable-line
+  process.stdout.write(`usage: hercule [OPTIONS]\noptions:\n${parser.help({ includeEnv: true }).trimRight()}\n`);
   process.exit();
 }
 
@@ -87,7 +87,7 @@ function main() {
     if (opts.reporter === 'json-err') {
       process.stderr.write(JSON.stringify(err));
     } else {
-      process.stdout.write(`\n\nERROR: ${err.msg} (${err.path})\n`);
+      process.stdout.write(`\n\nERROR: ${err.message} (${err.path})\n`);
     }
     process.exit(1);
   });

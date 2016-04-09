@@ -1,5 +1,5 @@
-import path from 'path';
 import test from 'ava';
+import path from 'path';
 import nock from 'nock';
 import InflateStream from '../../lib/inflate-stream';
 
@@ -46,10 +46,8 @@ test.cb('should skip input without link', (t) => {
 test.cb('should inflate input with file link', (t) => {
   const input = {
     content: ':[Example](index.md)',
-    link: {
-      href: path.join(__dirname, '../fixtures/local-link/index.md'),
-      hrefType: 'local',
-    },
+    link: '../fixtures/local-link/index.md',
+    relativePath: __dirname,
     parents: [],
     references: [],
   };
@@ -78,25 +76,20 @@ test.cb('should inflate input with file link', (t) => {
 test.cb('should emit error with invalid file link', (t) => {
   const input = {
     content: ':[Example](size.md)',
-    link: {
-      href: path.join(__dirname, '/i-dont-exist.md'),
-      hrefType: 'local',
-    },
+    link: '/i-dont-exist.md',
+    relativePath: __dirname,
     parents: [],
     references: [],
   };
   const testStream = new InflateStream();
 
-  t.plan(3);
+  t.plan(2);
   testStream
     .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk.content, input.content);
-      }
+      this.read();
     })
     .on('error', (err) => {
-      t.deepEqual(err.msg, 'Could not read file');
+      t.deepEqual(err.message, 'Could not read file');
       t.regex(err.path, /i-dont-exist\.md/);
     })
     .on('end', () => t.end());
@@ -109,10 +102,7 @@ test.cb('should emit error with invalid file link', (t) => {
 test.cb('should inflate input with string link', (t) => {
   const input = {
     content: ':[Example](size.md)',
-    link: {
-      href: 'tiny',
-      hrefType: 'string',
-    },
+    link: '"tiny"',
   };
   const expected = 'tiny';
   const testStream = new InflateStream();
@@ -135,10 +125,7 @@ test.cb('should inflate input with string link', (t) => {
 test.cb('should inflate input with http link', (t) => {
   const input = {
     content: ':[Example](size.md)',
-    link: {
-      href: 'http://github.com/size.md',
-      hrefType: 'http',
-    },
+    link: 'http://github.com/size.md',
     parents: [],
     references: [],
   };
@@ -165,10 +152,7 @@ test.cb('should inflate input with http link', (t) => {
 test.cb('should emit error with invalid http link', (t) => {
   const input = {
     content: ':[Example](size.md)',
-    link: {
-      href: 'http://github.com/i-dont-exist.md',
-      hrefType: 'http',
-    },
+    link: 'http://github.com/i-dont-exist.md',
     parents: [],
     references: [],
   };
@@ -176,14 +160,13 @@ test.cb('should emit error with invalid http link', (t) => {
 
   nock('http://github.com').get('/i-dont-exist.md').reply(404);
 
-  t.plan(1);
+  t.plan(2);
   testStream
     .on('readable', function read() {
       if (this.read() !== null) t.fail();
     })
     .on('error', (err) => {
-      // TODO: Requires https://github.com/pgte/nock/issues/469
-      // t.deepEqual(err.msg, '404 error or something');
+      t.deepEqual(err.message, 'Could not read file');
       t.regex(err.path, /i-dont-exist\.md/);
     })
     .on('end', () => t.end());
@@ -193,42 +176,14 @@ test.cb('should emit error with invalid http link', (t) => {
 });
 
 
-test.cb('should not make modifications if hrefType is unrecognised', (t) => {
-  const input = {
-    content: ':[Example](size.md)',
-    link: {
-      href: 'http://example.com',
-      hrefType: 'null',
-    },
-  };
-  const expected = ':[Example](size.md)';
-  const testStream = new InflateStream();
-
-  testStream
-    .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk.content, expected);
-      }
-    })
-    .on('error', () => t.fail())
-    .on('end', () => t.end());
-
-  testStream.write(input);
-  testStream.end();
-});
-
-
 test.cb('should emit error on circular references', (t) => {
   const input = {
-    content: ':[Example](size.md)',
-    link: {
-      href: 'size.md',
-      hrefType: 'local',
-    },
-    parents: ['size.md'],
+    content: ':[Circular](fox.md)',
+    link: '../fixtures/circular-references/fox.md',
+    relativePath: __dirname,
+    parents: [path.resolve('../fixtures/circular-references/fox.md')],
+    references: [],
   };
-  const expected = ':[Example](size.md)';
   const testStream = new InflateStream();
 
   t.plan(3);
@@ -236,12 +191,12 @@ test.cb('should emit error on circular references', (t) => {
     .on('readable', function read() {
       let chunk = null;
       while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk.content, expected);
+        t.truthy(chunk);
       }
     })
     .on('error', (err) => {
-      t.deepEqual(err.msg, 'Circular dependency detected');
-      t.deepEqual(err.path, 'size.md');
+      t.deepEqual(err.message, 'Circular dependency detected');
+      t.deepEqual(err.path, '../fixtures/circular-references/fox.md');
     })
     .on('end', () => t.end());
 
