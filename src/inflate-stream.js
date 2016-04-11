@@ -70,8 +70,8 @@ export default function InflateStream(opt) {
 
   // eslint-disable-next-line consistent-return
   function transform(chunk, encoding, cb) {
-    const linkPath = _.get(chunk, ['link', 'href']);
-    const linkType = _.get(chunk, ['link', 'hrefType']);
+    const linkPath = _.get(chunk, 'link.href');
+    const linkType = _.get(chunk, 'link.hrefType');
     const parents = _.get(chunk, 'parents');
     const self = this;
     let input;

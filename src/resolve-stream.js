@@ -62,7 +62,7 @@ function parse(rawLink, relativePath) {
 
 export default function ResolveStream() {
   function transform(chunk, encoding, cb) {
-    const rawLink = _.get(chunk, ['link', 'href']);
+    const rawLink = _.get(chunk, 'link.href');
     const relativePath = _.get(chunk, 'relativePath') || '';
     const parentRefs = _.get(chunk, 'references') || [];
     let parsedLink;
