@@ -1,7 +1,9 @@
 node_modules
 lib
-.coveralls.yml
+dist
 coverage
+test/modules*
+
+.coveralls.yml
 .nyc_output
 *.log
-test/modules*

@@ -12,6 +12,7 @@ before_install:
 - npm run install-bats
 before_script:
 - npm run compile
+- npm run browserify
 script:
 - npm test
 after_success:
