@@ -50,7 +50,7 @@ test.cb('should return one error if invalid links found', (t) => {
 test.cb('should return errors with tokenizer options', (t) => {
   const input = '# Title\n<!-- include(test1.apib) -->\nSome content...\n';
   const options = {
-    linkRegExp: new RegExp(/(^[\t ]*)?(?:(\:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
+    linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
     linkMatch: (match) => match[3] || match[5],
   };
 

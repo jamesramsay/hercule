@@ -77,7 +77,7 @@ test.cb('should support tokenizer options', (t) => {
   const expected = 'Jackdaws love my\n\nbig\n\nsphinx\n\nof quartz.\n';
   const options = {
     relativePath: path.join(__dirname, '../fixtures/_aglio'),
-    linkRegExp: new RegExp(/(^[\t ]*)?(?:(\:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
+    linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
     linkMatch: (match) => match[3] || match[5],
   };
 
