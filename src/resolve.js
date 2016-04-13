@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import grammar from './transclude-parser';
+import grammar from './grammar/transclusion-link';
 
 export function resolveReferences(primary, fallback, references) {
   const override = _.find(references, { placeholder: primary.link });

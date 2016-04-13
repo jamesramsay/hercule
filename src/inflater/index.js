@@ -4,7 +4,7 @@ import stringInflater from './string';
 import localInflater from './local';
 import httpInflater from './http';
 
-import grammar from './link';
+import grammar from '../grammar/inflate-link';
 
 /**
 * Resolves a link to a readable stream for transclusion.
