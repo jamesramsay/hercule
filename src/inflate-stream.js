@@ -25,27 +25,27 @@ import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } 
 export default function InflateStream(opt) {
   const options = _.merge({}, opt);
 
-  function inflate(chunk, source, sourcePath) {
+  function inflate(link, relativePath, references, parents, indent) {
     const resolverStream = new ResolveStream();
     const inflaterStream = new InflateStream();
     const trimmerStream = new TrimStream();
 
     function token(match) {
       return _.merge(
-        defaultToken(match, options, chunk.indent),
+        defaultToken(match, options, indent),
         {
-          relativePath: sourcePath,
-          references: [...chunk.references],
-          parents: [source, ...chunk.parents],
+          relativePath,
+          references: [...references],
+          parents: [link, ...parents],
         }
       );
     }
 
     function separator(match) {
-      return defaultSeparator(match, chunk.indent);
+      return defaultSeparator(match, indent);
     }
 
-    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, source, token, separator };
+    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, source: link, token, separator };
     const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
     const tokenizerStream = regexpTokenizer(tokenizerOptions, linkRegExp);
 
@@ -59,6 +59,8 @@ export default function InflateStream(opt) {
     const link = _.get(chunk, 'link');
     const parents = _.get(chunk, 'parents') || [];
     const relativePath = _.get(chunk, 'relativePath') || '';
+    const references = _.get(chunk, 'references') || [];
+    const indent = _.get(chunk, 'indent') || '';
     const self = this;
 
     if (!link) {
@@ -81,7 +83,7 @@ export default function InflateStream(opt) {
         return cb();
       }
 
-      const inflater = inflate(chunk, resolvedLink, resolvedRelativePath);
+      const inflater = inflate(resolvedLink, resolvedRelativePath, references, parents, indent);
 
       input.on('error', (inputErr) => {
         this.emit('error', _.merge({ message: 'Could not read file' }, inputErr));
