@@ -1,4 +1,4 @@
-start = p:primary? " || "? f:fallback? " "? r:reference* {
+start = p:primary " || "? f:fallback? " "? r:reference* {
   return {
     "primary": p,
     "fallback": f,

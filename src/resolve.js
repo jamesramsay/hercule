@@ -16,9 +16,9 @@ export function parseTransclude(transclusionLink, relativePath, cb) {
     parsedLink = grammar.parse(transclusionLink);
 
     // Links are relative to their source
-    parsedReferences = _.map(parsedLink.references, ({ placeholder, link }) => ({ placeholder, link, relativePath }));
-    primary = parsedLink.primary ? { link: parsedLink.primary, relativePath } : null;
+    primary = { link: parsedLink.primary, relativePath };
     fallback = parsedLink.fallback ? { link: parsedLink.fallback, relativePath } : null;
+    parsedReferences = _.map(parsedLink.references, ({ placeholder, link }) => ({ placeholder, link, relativePath }));
   } catch (ex) {
     return cb(ex);
   }
