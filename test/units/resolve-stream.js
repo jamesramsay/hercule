@@ -1,5 +1,27 @@
 import test from 'ava';
+import sinon from 'sinon';
+import { Readable } from 'stream';
+
 import ResolveStream from '../../lib/resolve-stream';
+
+test.before(() => {
+  const foxStream = new Readable;
+  foxStream.push('fox');
+  foxStream.push(null);
+
+  const animalStream = new Readable;
+  animalStream.push(':[bad link](vulpes.md)');
+  animalStream.push(null);
+
+  global.fs = require('fs');
+  const stub = sinon.stub(global.fs, 'createReadStream');
+  stub.withArgs('/foo/fox.md', { encoding: 'utf8' }).returns(foxStream);
+  stub.withArgs('/foo/animal.md', { encoding: 'utf8' }).returns(animalStream);
+});
+
+test.after(() => {
+  global.fs.createReadStream.restore();
+});
 
 
 test.cb('should handle no input', (t) => {
@@ -19,8 +41,7 @@ test.cb('should handle no input', (t) => {
   testStream.end();
 });
 
-
-test.cb('should skip input without link', (t) => {
+test.cb('should handle input without link', (t) => {
   const input = { content: 'The quick brown fox jumps over the lazy dog./n' };
   const testStream = new ResolveStream();
 
@@ -39,204 +60,71 @@ test.cb('should skip input without link', (t) => {
   testStream.end();
 });
 
-
-test.cb('should parse input simple link', (t) => {
+test.cb('should resolve simple link to content and emit source', (t) => {
   const input = {
-    content: ':[](animal.md)',
-    link: 'animal.md',
-  };
-  const expectedLink = 'animal.md';
-  const testStream = new ResolveStream();
-
-  t.plan(1);
-  testStream
-    .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk.link, expectedLink);
-      }
-    })
-    .on('error', () => t.fail())
-    .on('end', () => t.end());
-
-  testStream.write(input);
-  testStream.end();
-});
-
-
-test.cb('should parse input with overrides', (t) => {
-  const input = {
-    content: ':[](animal animal:wolf.md food:"cheese" remote:http://github.com/example.md null:)',
-    link: 'animal animal:wolf.md food:"cheese" remote:http://github.com/example.md null:',
-  };
-  const expectedReferences = [
-    {
-      placeholder: 'animal',
-      link: 'wolf.md',
-      relativePath: '',
-    },
-    {
-      placeholder: 'food',
-      link: '"cheese"',
-      relativePath: '',
-    },
-    {
-      placeholder: 'remote',
-      link: 'http://github.com/example.md',
-      relativePath: '',
-    },
-    {
-      placeholder: 'null',
-      link: '""',
-      relativePath: '',
-    },
-  ];
-  const testStream = new ResolveStream();
-
-  t.plan(1);
-  testStream
-    .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk.references, expectedReferences);
-      }
-    })
-    .on('error', () => t.fail())
-    .on('end', () => t.end());
-
-  testStream.write(input);
-  testStream.end();
-});
-
-
-test.cb('should parse and resolve link with correct overriding link', (t) => {
-  const input = {
-    content: ':[](animal animal:wolf.md)',
-    link: 'animal animal:wolf.md',
-    references: [
-      {
-        placeholder: 'animal',
-        link: 'fox.md',
-      },
-      {
-        placeholder: 'food',
-        link: 'cheese.md',
-      },
-    ],
-  };
-  const expectedLink = 'fox.md';
-  const testStream = new ResolveStream();
-
-  t.plan(1);
-  testStream
-    .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk.link, expectedLink);
-      }
-    })
-    .on('error', () => t.fail())
-    .on('end', () => t.end());
-
-  testStream.write(input);
-  testStream.end();
-});
-
-
-test.cb('should parse and resolve link using fallback link if no overriding reference available', (t) => {
-  const input = {
-    content: ':[](animal || "fox" feline:cat.md food:cheese.md)',
-    link: 'animal || "fox" feline:cat.md food:cheese.md',
+    content: ':[](fox.md)',
+    link: 'fox.md',
+    relativePath: '/foo',
   };
   const expected = {
-    content: ':[](animal || "fox" feline:cat.md food:cheese.md)',
-    references: [
-      {
-        placeholder: 'feline',
-        link: 'cat.md',
-        relativePath: '',
-      },
-      {
-        placeholder: 'food',
-        link: 'cheese.md',
-        relativePath: '',
-      },
-    ],
-    link: '"fox"',
-    relativePath: '',
-  };
-  const testStream = new ResolveStream();
-
-  t.plan(1);
-  testStream
-    .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk, expected);
-      }
-    })
-    .on('error', () => t.fail())
-    .on('end', () => t.end());
-
-  testStream.write(input);
-  testStream.end();
-});
-
-
-test.cb('should emit error on invalid link', (t) => {
-  const input = {
-    content: ':[](animal.md foo:bar:"exception!")',
-    link: 'animal.md foo:bar:"exception!"',
+    indent: '',
+    content: 'fox',
+    line: 1,
+    column: 0,
+    source: '/foo/fox.md',
   };
   const testStream = new ResolveStream();
 
   t.plan(2);
-  testStream
-    .on('readable', function read() {
-      this.read();
-    })
-    .on('error', (err) => {
-      t.deepEqual(err.message, 'Link could not be parsed');
-      t.deepEqual(err.path, 'animal.md foo:bar:"exception!"');
-    })
-    .on('end', () => t.end());
+  testStream.on('readable', function read() {
+    let chunk = null;
+    while ((chunk = this.read()) !== null) {
+      t.deepEqual(chunk, expected);
+    }
+  });
+  testStream.on('error', () => t.fail());
+  testStream.on('source', (source) => t.deepEqual(source, 'fox.md'));
+  testStream.on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
 });
 
-
-test.cb('should parse link and return references with correct relative path', (t) => {
+test.cb('should emit error if circular dependency detected', (t) => {
   const input = {
-    content: ':[](animal.md)',
-    link: 'animal.md canine:dog.md',
-    relativePath: 'foo',
-  };
-  const expected = {
-    content: ':[](animal.md)',
-    references: [
-      {
-        placeholder: 'canine',
-        link: 'dog.md',
-        relativePath: 'foo',
-      },
-    ],
-    link: 'animal.md',
-    relativePath: 'foo',
+    content: ':[](fox.md)',
+    link: 'fox.md',
+    relativePath: '/foo',
+    parents: ['/foo/fox.md'],
   };
   const testStream = new ResolveStream();
 
   t.plan(1);
-  testStream
-    .on('readable', function read() {
-      let chunk = null;
-      while ((chunk = this.read()) !== null) {
-        t.deepEqual(chunk, expected);
-      }
-    })
-    .on('error', () => t.fail())
-    .on('end', () => t.end());
+  testStream.on('readable', function read() {
+    this.read();
+  });
+  testStream.on('error', () => t.pass());
+  testStream.on('end', () => t.end());
 
   testStream.write(input);
   testStream.end();
 });
+
+// test.cb('should emit error if nested link is invalid', (t) => {
+//   const input = {
+//     content: ':[](animal.md)',
+//     link: 'animal.md',
+//     relativePath: '/foo',
+//   };
+//   const testStream = new ResolveStream();
+//
+//   t.plan(1);
+//   testStream.on('readable', function read() {
+//     this.read();
+//   });
+//   testStream.on('error', () => t.pass());
+//   testStream.on('end', () => t.end());
+//
+//   testStream.write(input);
+//   testStream.end();
+// });

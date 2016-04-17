@@ -3,9 +3,8 @@ import through2 from 'through2';
 import duplexer from 'duplexer2';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
-import { parseTransclude, resolveReferences } from './resolve';
+import { parseTransclude, resolveReferences, resolveLink } from './resolve';
 import TrimStream from './trim-stream';
-import resolveLink from './inflater';
 
 import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
