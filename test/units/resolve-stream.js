@@ -1,6 +1,7 @@
 import test from 'ava';
 import sinon from 'sinon';
 import { Readable } from 'stream';
+global.fs = require('fs');
 
 import ResolveStream from '../../src/resolve-stream';
 
@@ -13,7 +14,6 @@ test.before(() => {
   animalStream.push(':[bad link](vulpes.md)');
   animalStream.push(null);
 
-  global.fs = require('fs');
   const stub = sinon.stub(global.fs, 'createReadStream');
   stub.withArgs('/foo/fox.md', { encoding: 'utf8' }).returns(foxStream);
   stub.withArgs('/foo/animal.md', { encoding: 'utf8' }).returns(animalStream);

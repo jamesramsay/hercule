@@ -10,6 +10,7 @@ import dashdash from 'dashdash';
 import Transcluder from './transclude-stream';
 
 let opts;
+let args;
 
 const parser = dashdash.createParser({
   options: [
@@ -40,6 +41,7 @@ const parser = dashdash.createParser({
 
 try {
   opts = parser.parse(process.argv);
+  args = opts._args; // eslint-disable-line
 } catch (err) {
   process.stdout.write(`hercule: error: ${err.message}\n`);
   process.exit(1);
@@ -61,16 +63,16 @@ function main() {
     parentRefs: [],
   };
 
-  if (opts._args.length === 0) {
+  if (args.length === 0) {
     // Reading input from stdin
     inputStream = process.stdin;
     options.relativePath = opts.relativePath;
   } else {
     // Reading input from file
     // TODO: handle file error!
-    inputStream = fs.createReadStream(opts._args[0], { encoding: 'utf8' });
-    options.source = path.normalize(opts._args[0]);
-    options.relativePath = path.dirname(opts._args[0]);
+    inputStream = fs.createReadStream(args[0], { encoding: 'utf8' });
+    options.source = path.normalize(args[0]);
+    options.relativePath = path.dirname(args[0]);
   }
 
   if (opts.output) {
