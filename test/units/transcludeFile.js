@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeFile } from '../../lib/hercule';
+import { transcludeFile } from '../../src/hercule';
 
 test.cb('should transclude with only required arguments', (t) => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');

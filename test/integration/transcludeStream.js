@@ -3,7 +3,7 @@ import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 
-import { TranscludeStream } from '../../lib/hercule';
+import { TranscludeStream } from '../../src/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 

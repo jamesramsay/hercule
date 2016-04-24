@@ -1,5 +1,5 @@
 import test from 'ava';
-import { parseTransclude } from '../../../lib/resolve';
+import { parseTransclude } from '../../../src/resolve';
 
 test.cb('should parse simple link', (t) => {
   const link = 'animal.md';

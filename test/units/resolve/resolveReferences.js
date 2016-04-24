@@ -1,5 +1,5 @@
 import test from 'ava';
-import { resolveReferences } from '../../../lib/resolve';
+import { resolveReferences } from '../../../src/resolve';
 
 test('should resolve to pimary if none other provided', (t) => {
   const primary = { link: 'animal.md', relativePath: '/foo' };

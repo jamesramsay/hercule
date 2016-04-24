@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeFileSync } from '../../lib/hercule';
+import { transcludeFileSync } from '../../src/hercule';
 
 const [major, minor] = process.versions.node.split('.');
 

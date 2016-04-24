@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeString } from '../../lib/hercule';
+import { transcludeString } from '../../src/hercule';
 
 test.cb('should transclude with only required arguments', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';

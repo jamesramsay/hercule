@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import Transcluder from '../../lib/transclude-stream';
+import Transcluder from '../../src/transclude-stream';
 
 test.cb('should handle no input', (t) => {
   const testStream = new Transcluder();

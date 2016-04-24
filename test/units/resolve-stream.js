@@ -2,7 +2,7 @@ import test from 'ava';
 import sinon from 'sinon';
 import { Readable } from 'stream';
 
-import ResolveStream from '../../lib/resolve-stream';
+import ResolveStream from '../../src/resolve-stream';
 
 test.before(() => {
   const foxStream = new Readable;

@@ -1,7 +1,7 @@
 import test from 'ava';
 import _ from 'lodash';
 
-import { transcludeFileSync } from '../../lib/hercule';
+import { transcludeFileSync } from '../../src/hercule';
 import fixtures from '../fixtures';
 
 const [major, minor] = process.versions.node.split('.');

@@ -2,7 +2,7 @@ import test from 'ava';
 import path from 'path';
 import _ from 'lodash';
 
-import { transcludeString } from '../../lib/hercule';
+import { transcludeString } from '../../src/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 

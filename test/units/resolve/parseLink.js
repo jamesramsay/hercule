@@ -2,7 +2,7 @@ import test from 'ava';
 import sinon from 'sinon';
 import nock from 'nock';
 import concat from 'concat-stream';
-import { resolveLink } from '../../../lib/resolve';
+import { resolveLink } from '../../../src/resolve';
 import { Readable } from 'stream';
 
 test.before(() => {

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { transcludeStringSync } from '../../lib/hercule';
+import { transcludeStringSync } from '../../src/hercule';
 
 const [major, minor] = process.versions.node.split('.');
 
