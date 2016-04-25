@@ -1,93 +1,114 @@
-import through2 from 'through2';
-import path from 'path';
 import _ from 'lodash';
+import through2 from 'through2';
+import duplexer from 'duplexer2';
+import regexpTokenizer from 'regexp-stream-tokenizer';
 
-import grammar from './transclude-parser';
-import { LINK_TYPES } from './config';
+import { parseTransclude, resolveReferences, resolveLink } from './resolve';
+import TrimStream from './trim-stream';
+
+import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
 /**
-* Input stream: (object)
-* - link (object, required)
-*   - href (string, required)
-* - relativePath (string)
+* Input stream: object
+* - link (string, required)
+* - relativePath (string, required)
+* - parents (array, required)
 * - references (array, required)
-*   - (object)
-*     - placeholder (string, required)
-*     - href (string, required)
-*     - hrefType (enum, required)
-*     - source (string)
-*     - original (object)
-*       - line (integer, required)
-*       - column (integer, required)
-* - parents (array, required)
 *
-* Output stream: (object)
-* - link (object, required)
-*   - href (string)
-*   - hrefType (enum)
-* - relativePath (string, optional)
-* - references (array, required) - References extended with any newly parsed references.
-*   - (object) - as above
-* - parents (array, required)
+* Output stream: object
+* - chunk (string, required)
 *
 * Input and output properties can be altered by providing options
 */
 
-function resolve(unresolvedLink, references, relativePath) {
-  const primary = unresolvedLink.primary;
-  const fallback = unresolvedLink.fallback;
-  const override = _.find(references, { placeholder: primary.href });
-  const link = _.pick(override || fallback || primary, ['href', 'hrefType']);
+export default function ResolveStream(opt) {
+  const options = _.merge({}, opt);
 
-  if (!override && link.hrefType === LINK_TYPES.LOCAL) {
-    link.href = path.join(relativePath, link.href);
+  function inflate(link, relativePath, references, parents, indent) {
+    const resolverStream = new ResolveStream();
+    const trimmerStream = new TrimStream();
+
+    function token(match) {
+      return _.merge(
+        defaultToken(match, options, indent),
+        {
+          relativePath,
+          references: [...references],
+          parents: [link, ...parents],
+        }
+      );
+    }
+
+    function separator(match) {
+      return defaultSeparator(match, indent);
+    }
+
+    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, source: link, token, separator };
+    const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
+    const tokenizerStream = regexpTokenizer(tokenizerOptions, linkRegExp);
+
+    trimmerStream.pipe(tokenizerStream).pipe(resolverStream);
+
+    return duplexer({ objectMode: true }, trimmerStream, resolverStream);
   }
 
-  return link;
-}
-
-function parse(rawLink, relativePath) {
-  // Parse link body using peg.js grammar
-  // This allows complex links with placeholders, fallbacks, and overrides
-  const parsedLink = grammar.parse(rawLink);
-
-  // Make references relative
-  const parsedReferences = _.map(parsedLink.references, ({ placeholder, href, hrefType }) => {
-    const relativeHref = (hrefType === LINK_TYPES.LOCAL) ? path.join(relativePath, href) : href;
-    return { placeholder, hrefType, href: relativeHref };
-  });
-
-  return { parsedLink, parsedReferences };
-}
-
-export default function ResolveStream() {
+  /* eslint-disable consistent-return */
   function transform(chunk, encoding, cb) {
-    const rawLink = _.get(chunk, 'link.href');
-    const relativePath = _.get(chunk, 'relativePath') || '';
+    const transclusionLink = _.get(chunk, 'link');
+    const transclusionRelativePath = _.get(chunk, 'relativePath') || '';
     const parentRefs = _.get(chunk, 'references') || [];
-    let parsedLink;
-    let parsedReferences;
+    const parents = _.get(chunk, 'parents') || [];
+    const indent = _.get(chunk, 'indent') || '';
+    const self = this;
 
-    // No link to parse, move along
-    if (!rawLink) {
-      this.push(chunk);
+    function handleError(message, path, error) {
+      self.push(chunk);
+      if (!_.isUndefined(message)) self.emit('error', { message, path, error });
       return cb();
     }
 
-    try {
-      ({ parsedLink, parsedReferences } = parse(rawLink, relativePath));
-    } catch (err) {
-      this.push(chunk);
-      this.emit('error', { msg: 'Link could not be parsed', path: rawLink, error: err });
-      return cb();
-    }
+    if (!transclusionLink) return handleError();
 
-    const references = _.uniq([...parsedReferences, ...parentRefs]);
-    const link = resolve(parsedLink, parentRefs, relativePath);
+    // Parses raw transclusion link: primary.link || fallback.link reference.placeholder:reference.link ...
+    parseTransclude(transclusionLink, transclusionRelativePath, (parseErr, primary, fallback, parsedReferences) => {
+      if (parseErr) return handleError('Link could not be parsed', transclusionLink, parseErr);
 
-    this.emit('source', link.href);
-    this.push(_.assign(chunk, { link, references }));
-    return cb();
+      const references = _.uniq([...parsedReferences, ...parentRefs]);
+
+      // References from parent files override primary links, then to fallback if provided and no matching references
+      const { link, relativePath } = resolveReferences(primary, fallback, parentRefs);
+
+      this.emit('source', link);
+
+      // Resolve link to readable stream
+      resolveLink(link, relativePath, (resolveErr, input, resolvedLink, resolvedRelativePath) => {
+        if (resolveErr) return handleError('Link could not be inflated', link, resolveErr);
+        if (_.includes(parents, resolvedLink)) return handleError('Circular dependency detected', link);
+
+        const inflater = inflate(resolvedLink, resolvedRelativePath, references, parents, indent);
+
+        input.on('error', (inputErr) => {
+          this.emit('error', _.merge({ message: 'Could not read file' }, inputErr));
+          cb();
+        });
+
+        inflater.on('readable', function inputReadable() {
+          let content;
+          while ((content = this.read()) !== null) {
+            self.push(content);
+          }
+        });
+
+        inflater.on('error', (inflateErr) => {
+          this.emit('error', inflateErr);
+          cb();
+        });
+
+        inflater.on('end', () => cb());
+
+        input.pipe(inflater);
+      });
+    });
   }
 
   return through2.obj(transform);

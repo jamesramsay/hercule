@@ -1,4 +1,4 @@
-start = p:primary? " || "? f:fallback? " "? r:reference* {
+start = p:primary " || "? f:fallback? " "? r:reference* {
   return {
     "primary": p,
     "fallback": f,
@@ -9,8 +9,7 @@ start = p:primary? " || "? f:fallback? " "? r:reference* {
 reference = p:placeholder ":" l:primary " "? {
   return {
     "placeholder": p,
-    "href": l.href,
-    "hrefType": l.hrefType
+    "link": l
   };
 }
 
@@ -18,39 +17,21 @@ placeholder = p:[a-zA-Z0-9]+ {
   return p.join("");
 }
 
-primary = httpLink / localLink / stringLink / reset
+primary = unquotedString / quotedString / reset
 
-fallback = httpLink / localLink / stringLink
-
-localLink = f:[^ ()\"]+ {
-  return {
-    "hrefType": "local",
-    "href": f.join("")
-  };
-}
-
-httpLink = left:("http://" / "https://") right:[^ ()]+ {
-  return {
-    "hrefType": "http",
-    "href": left + right.join("")
-  };
-}
-
-stringLink = s:string {
-  return {
-    "hrefType": "string",
-    "href": s
-  };
-}
+fallback = unquotedString / quotedString
 
 reset = "" {
-  return {
-    "hrefType": "string",
-    "href": ""
-  };
+  return "\"\"";
 }
 
-string = QUOTATION_MARK chars:char* QUOTATION_MARK {
+unquotedString = chars:[^ \"]+ {
+  return chars.join("");
+}
+
+quotedString = QUOTATION_MARK chars:char* QUOTATION_MARK {
+  chars.unshift("\"");
+  chars.push("\"");
   return chars.join("");
 }
 

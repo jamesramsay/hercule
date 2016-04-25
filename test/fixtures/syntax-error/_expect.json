@@ -1,6 +1,6 @@
 {
   "error": {
-    "msg": "Link could not be parsed",
+    "message": "Link could not be parsed",
     "path": "animal.md foo:bar:\"exception!\""
   }
 }

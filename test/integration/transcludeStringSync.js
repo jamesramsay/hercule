@@ -2,7 +2,7 @@ import test from 'ava';
 import path from 'path';
 import _ from 'lodash';
 
-import { transcludeStringSync } from '../../lib/hercule';
+import { transcludeStringSync } from '../../src/hercule';
 import fixtures from '../fixtures';
 
 const [major, minor] = process.versions.node.split('.');
@@ -26,7 +26,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
       t.deepEqual(output, fixture.expectedOutput);
     } catch (ex) {
       if (config.error) {
-        t.deepEqual(ex.message, config.error.msg);
+        t.deepEqual(ex.message, 'Could not transclude input');
       } else {
         t.fail();
       }

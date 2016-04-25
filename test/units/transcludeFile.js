@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeFile } from '../../lib/hercule';
+import { transcludeFile } from '../../src/hercule';
 
 test.cb('should transclude with only required arguments', (t) => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
@@ -25,11 +25,9 @@ test.cb('should transclude with optional relativePath argument', (t) => {
 
 test.cb('should return error if file doesn\'t exist', (t) => {
   const input = path.join('i-dont-exist.md');
-  transcludeFile(input, (err, output) => {
-    t.truthy(err);
-    // t.deepEqual(err.msg, 'TODO');
+  transcludeFile(input, (err) => {
+    t.regex(err.message, /ENOENT/);
     t.deepEqual(err.path, 'i-dont-exist.md');
-    t.falsy(output);
     t.end();
   });
 });
@@ -37,11 +35,9 @@ test.cb('should return error if file doesn\'t exist', (t) => {
 test.cb('should return one error if circular dependency found', (t) => {
   const input = path.join(__dirname, '../fixtures/circular-references/index.md');
   const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
-  const expected = 'The quick brown :[fox](fox.md) jumps over the lazy dog.\n';
-  transcludeFile(input, options, (err, output) => {
-    t.deepEqual(err.msg, 'Circular dependency detected');
-    t.regex(err.path, /fixtures\/circular-references\/fox.md/);
-    t.deepEqual(output, expected);
+  transcludeFile(input, options, (err) => {
+    t.deepEqual(err.message, 'Circular dependency detected');
+    t.regex(err.path, /fox.md/);
     t.end();
   });
 });
@@ -49,11 +45,9 @@ test.cb('should return one error if circular dependency found', (t) => {
 test.cb('should return one error if invalid links found', (t) => {
   const input = path.join(__dirname, '../fixtures/invalid-link/index.md');
   const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
-  const expected = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
-  transcludeFile(input, options, (err, output) => {
-    t.deepEqual(err.msg, 'Could not read file');
-    t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
-    t.deepEqual(output, expected);
+  transcludeFile(input, options, (err) => {
+    t.deepEqual(err.message, 'Could not read file');
+    t.regex(err.path, /i-dont-exist.md/);
     t.end();
   });
 });
@@ -66,7 +60,7 @@ test.cb('should return sourceList', (t) => {
   transcludeFile(input, options, (err, output, sourceList) => {
     t.deepEqual(err, null);
     t.deepEqual(output, expected);
-    t.regex(sourceList[0], /fixtures\/local-link\/size\.md/);
+    t.regex(sourceList[0], /size\.md/);
     t.deepEqual(sourceList.length, 1);
     t.end();
   });

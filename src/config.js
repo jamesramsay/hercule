@@ -1,11 +1,5 @@
 import _ from 'lodash';
 
-export const LINK_TYPES = {
-  LOCAL: 'local',
-  HTTP: 'http',
-  STRING: 'string',
-};
-
 // Link detection (including leading whitespace)
 export const defaultTokenRegExp = new RegExp(/(^[\t ]*)?(:\[.*?\]\((.*?)\))/gm);
 export const MATCH_GROUP = 0;
@@ -17,9 +11,7 @@ export function defaultToken(
   match, { linkMatch, relativePath = '', references = [], parents = [] }, whitespace) {
   return {
     content: match[MATCH_GROUP],
-    link: {
-      href: _.isFunction(linkMatch) ? linkMatch(match) : match[LINK_GROUP],
-    },
+    link: _.isFunction(linkMatch) ? linkMatch(match) : match[LINK_GROUP],
     indent: _.filter([whitespace, match[WHITESPACE_GROUP]], _.isString).join(''),
     relativePath,
     references,
@@ -27,8 +19,9 @@ export function defaultToken(
   };
 }
 
-export function defaultSeparator(match) {
+export function defaultSeparator(match, indent = '') {
   return {
+    indent,
     content: match[0],
   };
 }

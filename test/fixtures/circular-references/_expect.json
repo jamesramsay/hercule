@@ -1,7 +1,7 @@
 {
   "plan": 3,
   "error": {
-    "msg": "Circular dependency detected",
-    "path": "fixtures/circular-references/fox.md"
+    "message": "Circular dependency detected",
+    "path": "fox.md"
   }
 }

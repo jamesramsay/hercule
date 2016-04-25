@@ -1,7 +1,7 @@
 import test from 'ava';
 import _ from 'lodash';
 
-import { transcludeFileSync } from '../../lib/hercule';
+import { transcludeFileSync } from '../../src/hercule';
 import fixtures from '../fixtures';
 
 const [major, minor] = process.versions.node.split('.');
@@ -24,7 +24,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
       t.deepEqual(output, fixture.expectedOutput);
     } catch (ex) {
       if (config.error) {
-        t.deepEqual(ex.message, config.error.msg);
+        t.deepEqual(ex.message, 'Could not transclude file');
       } else {
         t.fail();
       }

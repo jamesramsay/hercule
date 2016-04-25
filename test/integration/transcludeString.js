@@ -2,7 +2,7 @@ import test from 'ava';
 import path from 'path';
 import _ from 'lodash';
 
-import { transcludeString } from '../../lib/hercule';
+import { transcludeString } from '../../src/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 
@@ -14,7 +14,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
 
     transcludeString(fixture.input, options, (err, output) => {
       if (err) {
-        t.deepEqual(err.msg, config.error.msg);
+        t.deepEqual(err.message, config.error.message);
         t.regex(err.path, new RegExp(config.error.path));
       } else {
         t.deepEqual(err, null);

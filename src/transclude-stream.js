@@ -4,7 +4,6 @@ import get from 'through2-get';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
-import InflateStream from './inflate-stream';
 import IndentStream from './indent-stream';
 import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
@@ -21,7 +20,6 @@ const DEFAULT_OPTIONS = {
 
 export default function Transcluder(opt) {
   const options = _.merge({}, DEFAULT_OPTIONS, opt);
-  const source = options.source;
   const sourcePaths = [];
 
   function token(match) {
@@ -35,14 +33,12 @@ export default function Transcluder(opt) {
   const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
   const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
   const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
-  const resolver = new ResolveStream(source);
-  const inflater = new InflateStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
+  const resolver = new ResolveStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
   const indenter = new IndentStream();
   const stringify = get('content');
 
   tokenizer
   .pipe(resolver)
-  .pipe(inflater)
   .pipe(indenter)
   .pipe(stringify);
 
@@ -51,11 +47,6 @@ export default function Transcluder(opt) {
   resolver.on('error', (err) => {
     transcluder.emit('error', err);
     resolver.end();
-  });
-
-  inflater.on('error', (err) => {
-    transcluder.emit('error', err);
-    inflater.end();
   });
 
   resolver.on('source', (filepath) => {

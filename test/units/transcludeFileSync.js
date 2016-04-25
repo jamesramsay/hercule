@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeFileSync } from '../../lib/hercule';
+import { transcludeFileSync } from '../../src/hercule';
 
 const [major, minor] = process.versions.node.split('.');
 
@@ -32,6 +32,6 @@ test('should throw error with invalid link', (t) => {
     transcludeFileSync(input);
     t.fail();
   } catch (ex) {
-    t.deepEqual(ex.message, 'Could not read file');
+    t.deepEqual(ex.message, 'Could not transclude file');
   }
 });
