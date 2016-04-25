@@ -4,13 +4,13 @@ import nock from 'nock';
 import concat from 'concat-stream';
 import { resolveLink } from '../../../src/resolve';
 import { Readable } from 'stream';
+global.fs = require('fs');
 
 test.before(() => {
   const localStream = new Readable;
   localStream.push('local!');
   localStream.push(null);
 
-  global.fs = require('fs');
   sinon.stub(global.fs, 'createReadStream')
     .withArgs('/foo/animal.md', { encoding: 'utf8' })
     .returns(localStream);
