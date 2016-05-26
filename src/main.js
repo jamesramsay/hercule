@@ -43,7 +43,7 @@ try {
   opts = parser.parse(process.argv);
   args = opts._args; // eslint-disable-line
 } catch (err) {
-  process.stdout.write(`hercule: error: ${err.message}\n`);
+  process.stderr.write(`hercule: error: ${err.message}\n`);
   process.exit(1);
 }
 
@@ -89,7 +89,7 @@ function main() {
     if (opts.reporter === 'json-err') {
       process.stderr.write(JSON.stringify(err));
     } else {
-      process.stdout.write(`\n\nERROR: ${err.message} (${err.path})\n`);
+      process.stderr.write(`\n\nERROR: ${err.message} (${err.path})\n`);
     }
     process.exit(1);
   });
