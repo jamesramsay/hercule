@@ -1,7 +1,7 @@
 /**
 * Hercule
 * A simple markdown transclusion tool
-* Author: james ramsay
+* Author: James Ramsay
 */
 
 import fs from 'fs';
@@ -57,8 +57,8 @@ if (opts.help) {
 function main() {
   let inputStream;
   let outputStream;
+  let source;
   const options = {
-    relativePath: '',
     parents: [],
     parentRefs: [],
   };
@@ -66,13 +66,12 @@ function main() {
   if (args.length === 0) {
     // Reading input from stdin
     inputStream = process.stdin;
+    source = `${opts.relativePath}/stdin.md`;
     options.relativePath = opts.relativePath;
   } else {
     // Reading input from file
-    // TODO: handle file error!
-    inputStream = fs.createReadStream(args[0], { encoding: 'utf8' });
-    options.source = path.normalize(args[0]);
-    options.relativePath = path.dirname(args[0]);
+    source = path.normalize(args[0]);
+    inputStream = fs.createReadStream(source, { encoding: 'utf8' });
   }
 
   if (opts.output) {
@@ -83,7 +82,7 @@ function main() {
     outputStream = process.stdout;
   }
 
-  const transclude = new Transcluder(options);
+  const transclude = new Transcluder(source, options);
 
   transclude.on('error', (err) => {
     if (opts.reporter === 'json-err') {

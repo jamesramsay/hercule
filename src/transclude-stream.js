@@ -1,3 +1,5 @@
+import path from 'path';
+
 import _ from 'lodash';
 import duplexer from 'duplexer2';
 import get from 'through2-get';
@@ -18,8 +20,8 @@ const DEFAULT_OPTIONS = {
   output: 'content',
 };
 
-export default function Transcluder(opt) {
-  const options = _.merge({}, DEFAULT_OPTIONS, opt);
+export default function Transcluder(source, opt) {
+  const options = _.merge({}, DEFAULT_OPTIONS, { relativePath: path.dirname(source) }, opt);
   const sourcePaths = [];
 
   function token(match) {
@@ -33,7 +35,7 @@ export default function Transcluder(opt) {
   const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
   const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
   const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
-  const resolver = new ResolveStream({ linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
+  const resolver = new ResolveStream(source, { linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
   const indenter = new IndentStream();
   const stringify = get('content');
 

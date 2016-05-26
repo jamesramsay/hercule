@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import childProcess from 'child_process';
 import _ from 'lodash';
 
@@ -12,8 +13,10 @@ export function transcludeString(...args) {
   const input = args.shift();
   const cb = args.pop();
   const [options] = args;
+  const relativePath = _.get(options, 'relativePath');
+  const source = relativePath ? `${options.relativePath}/string` : 'string';
 
-  const transclude = new Transcluder(options);
+  const transclude = new Transcluder(source, options);
   let outputString = '';
   let sourcePaths;
   let cbErr = null;
@@ -39,9 +42,10 @@ export function transcludeString(...args) {
 export function transcludeFile(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options] = args;
+  const [options = {}] = args;
+  if (!_.get(options, 'relativePath')) options.relativePath = path.basename(input);
 
-  const transclude = new Transcluder(options);
+  const transclude = new Transcluder(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
   let sourcePaths;
