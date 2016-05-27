@@ -12,13 +12,13 @@ export const TranscludeStream = Transcluder;
 export function transcludeString(...args) {
   const input = args.shift();
   const cb = args.pop();
-  const [options] = args;
+  const [options = {}] = args;
   const relativePath = _.get(options, 'relativePath');
   const source = relativePath ? `${options.relativePath}/string` : 'string';
 
   const transclude = new Transcluder(source, options);
   let outputString = '';
-  let sourcePaths;
+  let sourceMap;
   let cbErr = null;
 
   transclude
@@ -31,8 +31,8 @@ export function transcludeString(...args) {
     .on('error', (err) => {
       if (!cbErr) cbErr = err;
     })
-    .on('sources', (srcPaths) => (sourcePaths = srcPaths))
-    .on('end', () => cb(cbErr, outputString, sourcePaths));
+    .on('sourcemap', (srcmap) => (sourceMap = srcmap))
+    .on('end', () => cb(cbErr, outputString, sourceMap.sources, sourceMap));
 
   transclude.write(input, 'utf8');
   transclude.end();
@@ -48,7 +48,7 @@ export function transcludeFile(...args) {
   const transclude = new Transcluder(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
-  let sourcePaths;
+  let sourceMap;
   let cbErr = null;
 
   inputStream.on('error', (err) => cb(err));
@@ -63,8 +63,8 @@ export function transcludeFile(...args) {
     .on('error', (err) => {
       if (!cbErr) cbErr = err;
     })
-    .on('sources', (srcPaths) => (sourcePaths = srcPaths))
-    .on('end', () => cb(cbErr, outputString, sourcePaths));
+    .on('sourcemap', (srcmap) => (sourceMap = srcmap))
+    .on('end', () => cb(cbErr, outputString, sourceMap.sources, sourceMap));
 
   inputStream.pipe(transclude);
 }

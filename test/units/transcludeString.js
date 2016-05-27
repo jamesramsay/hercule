@@ -31,7 +31,7 @@ test.cb('should return sourceList', (t) => {
   transcludeString(input, options, (err, output, sourceList) => {
     t.deepEqual(err, null);
     t.deepEqual(output, expected);
-    t.deepEqual(sourceList.length, 1);
+    t.deepEqual(sourceList.length, 2);
     t.end();
   });
 });

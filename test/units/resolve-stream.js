@@ -62,7 +62,7 @@ test.cb('should handle input without link', (t) => {
   testStream.end();
 });
 
-test.cb('should resolve simple link to content and emit source', (t) => {
+test.cb('should resolve simple link to content', (t) => {
   const input = {
     content: ':[](fox.md)',
     link: 'fox.md',
@@ -71,12 +71,13 @@ test.cb('should resolve simple link to content and emit source', (t) => {
   const expected = {
     indent: '',
     content: 'fox',
+    source: '/foo/fox.md',
     line: 1,
     column: 0,
   };
-  const testStream = new ResolveStream();
+  const testStream = new ResolveStream('/foo/bar.md');
 
-  t.plan(2);
+  t.plan(1);
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
@@ -84,7 +85,6 @@ test.cb('should resolve simple link to content and emit source', (t) => {
     }
   });
   testStream.on('error', () => t.fail());
-  testStream.on('source', (source) => t.deepEqual(source, 'fox.md'));
   testStream.on('end', () => t.end());
 
   testStream.write(input);

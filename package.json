@@ -7,8 +7,7 @@
     "test": "npm run test-units && npm run test-integration && npm run test-cli",
     "test-units": "nyc --cache ava --verbose test/units",
     "test-integration": "ava --verbose test/integration",
-    "test-cli": "./test/modules/bin/bats test/bats",
-    "pretest": "npm run compile",
+    "test-cli": "npm run compile && ./test/modules/bin/bats test/bats",
     "posttest": "if check-node-version --node '>= 4'; then npm run lint && npm run check-commit; else echo 'Skipped posttest'; fi",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov | codecov",
@@ -64,6 +63,7 @@
     "lodash": "^4.0.0",
     "regexp-stream-tokenizer": "^0.2.0",
     "request": "^2.65.0",
+    "source-map": "^0.5.3",
     "through2": "^2.0.0",
     "through2-get": "^0.0.2"
   },

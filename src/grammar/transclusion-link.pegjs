@@ -22,17 +22,26 @@ primary = unquotedString / quotedString / reset
 fallback = unquotedString / quotedString
 
 reset = "" {
-  return "\"\"";
+  return {
+    "match": "\"\"",
+    "index": location().start.offset
+  };
 }
 
 unquotedString = chars:[^ \"]+ {
-  return chars.join("");
+  return {
+    "match": chars.join(""),
+    "index": location().start.offset
+  };
 }
 
 quotedString = QUOTATION_MARK chars:char* QUOTATION_MARK {
   chars.unshift("\"");
   chars.push("\"");
-  return chars.join("");
+  return {
+    "match": chars.join(""),
+    "index": location().start.offset
+  };
 }
 
 char = UNESCAPED / ESCAPE sequence:(

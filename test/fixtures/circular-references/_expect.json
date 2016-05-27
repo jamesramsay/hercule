@@ -1,5 +1,4 @@
 {
-  "plan": 3,
   "error": {
     "message": "Circular dependency detected",
     "path": "fox.md"

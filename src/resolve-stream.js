@@ -22,6 +22,8 @@ import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } 
 export default function ResolveStream(source, opt) {
   const options = _.merge({}, opt);
 
+  // Create nested duplex stream
+  // TODO: rename this function for improved clarity
   function inflate(link, relativePath, references, parents, indent) {
     const resolverStream = new ResolveStream(link);
 
@@ -29,6 +31,7 @@ export default function ResolveStream(source, opt) {
       return _.merge(
         defaultToken(match, options, indent),
         {
+          source: link,
           relativePath,
           references: [...references],
           parents: [link, ...parents],
@@ -37,7 +40,7 @@ export default function ResolveStream(source, opt) {
     }
 
     function separator(match) {
-      return defaultSeparator(match, indent);
+      return defaultSeparator(match, { indent, source: link });
     }
 
     const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
@@ -66,8 +69,14 @@ export default function ResolveStream(source, opt) {
 
     if (!transclusionLink) return handleError();
 
+    //  Sourcemap
+    const cursor = {
+      line: _.get(chunk, 'line'),
+      column: _.get(chunk, 'column') + chunk.content.indexOf(transclusionLink),
+    };
+
     // Parses raw transclusion link: primary.link || fallback.link reference.placeholder:reference.link ...
-    parseTransclude(transclusionLink, relativePath, source, (parseErr, primary, fallback, parsedReferences) => {
+    parseTransclude(transclusionLink, relativePath, source, cursor, (parseErr, primary, fallback, parsedReferences) => {
       if (parseErr) return handleError('Link could not be parsed', transclusionLink, parseErr);
 
       const references = _.uniq([...parsedReferences, ...parentRefs]);
@@ -75,12 +84,9 @@ export default function ResolveStream(source, opt) {
       // References from parent files override primary links, then to fallback if provided and no matching references
       const link = resolveReferences(primary, fallback, parentRefs);
 
-      // FIXME: link.link is horrible
-      this.emit('source', link.link);
-
       // Resolve link to readable stream
       resolveLink(link, (resolveErr, input, resolvedLink, resolvedRelativePath) => {
-        if (resolveErr) return handleError('Link could not be inflated', link, resolveErr);
+        if (resolveErr) return handleError('Link could not be inflated', resolvedLink, resolveErr);
         if (_.includes(parents, resolvedLink)) return handleError('Circular dependency detected', resolvedLink);
 
         const inflater = inflate(resolvedLink, resolvedRelativePath, references, parents, indent);

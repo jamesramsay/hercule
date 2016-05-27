@@ -12,43 +12,47 @@ export function resolveReferences(primary, fallback, references) {
   return override || fallback || primary;
 }
 
-export function parseTransclude(transclusionLink, relativePath, source, cb) {
+export function parseTransclude(transclusionLink, relativePath, source, { line, column }, cb) {
   let parsedLink;
-  let primary;
   let fallback;
-  let parsedReferences;
 
   try {
     parsedLink = transcludeGrammar.parse(transclusionLink);
-
-    primary = { link: parsedLink.primary, relativePath, source };
-    fallback = parsedLink.fallback ? { link: parsedLink.fallback, relativePath, source } : null;
-    parsedReferences = _.map(parsedLink.references, ({ placeholder, link }) => (
-      { placeholder, link, relativePath, source }
-    ));
   } catch (ex) {
     return cb(ex);
   }
 
+  const parsedPrimary = parsedLink.primary;
+  const parsedFallback = parsedLink.fallback;
+
+  const primary = { link: parsedPrimary.match, relativePath, source, line, column: column + parsedPrimary.index };
+
+  if (parsedFallback) {
+    fallback = { link: parsedFallback.match, relativePath, source, line, column: column + parsedFallback.index };
+  }
+
+  const parsedReferences = _.map(parsedLink.references, ({ placeholder, link }) => (
+    { placeholder, link: link.match, relativePath, source, line, column: column + link.index }
+  ));
+
   return cb(null, primary, fallback, parsedReferences);
 }
 
+// FIXME: link.link is stupid!
 /**
-* Resolves a link to a readable stream for transclusion.
-*
-* Arguments:
-* - link (string)
-* - relativePath (string)
-*
-* Returns:
-* - error (object): If an error is returned stream will emit error and halt transclusion.
-*   - message (string): A message explaining the error!
-* - input (stream)
-* - resolvedLink (string): Used for determining if a circular link exists.
-* - resolvedRelativePath (string): Will be provided as the relativePath for any nested transclusion
-*
-*/
-export function resolveLink({ link, relativePath, source }, cb) {
+ * resolveLink() Resolves a link to a readable stream for transclusion.
+ *
+ * @param {Object} link - Link will be resolved and contents returned as a readable stream
+ * @param {string} link.link - Path to the target file relative to the from the source of the link
+ * @param {string} link.relativePath - Directory name of the source file where the link originated.
+ *   The relative path is not derived from the source to isolate path handling to this function.
+ * @param {string} link.source - Absolute path of the source file
+ * @param {number} link.line - Location of the of the link in the source file
+ * @param {number} link.column - Location of the of the link in the source file
+ * @param {resolveLinkCallback} cb - callback
+ * @returns {function} cb
+ */
+export function resolveLink({ link, relativePath, source, line, column }, cb) {
   let input = '';
   let linkType;
   let resolvedLink;
@@ -61,8 +65,7 @@ export function resolveLink({ link, relativePath, source }, cb) {
   }
 
   if (linkType === 'string') {
-    // Use native slice which permits removing the first and last character
-    input = stringInflater(link.slice(1, -1), source); // eslint-disable-line lodash/prefer-lodash-method
+    input = stringInflater(link, source, line, column);
   }
 
   if (linkType === 'local') {
@@ -78,3 +81,13 @@ export function resolveLink({ link, relativePath, source }, cb) {
 
   return cb(null, input, resolvedLink, resolvedRelativePath);
 }
+
+/**
+ * Resolved link callback
+ *
+ * @callback resolveLinkCallback
+ * @param {Object} error - Error object
+ * @param {Object} input - Readable stream object which will be processed for transculsion
+ * @param {string} absolutePath - Absolute path of the link permits checking for circular dependencies
+ * @param {string} dirname - Directory name of the path to the file or equivalent permits handling of relative links
+ */
