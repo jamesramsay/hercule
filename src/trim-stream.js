@@ -1,5 +1,4 @@
 import through2 from 'through2';
-import _ from 'lodash';
 
 /**
 * Trims new line at EOF to allow a file to be transcluded inline.
@@ -15,11 +14,6 @@ export default function TrimStream() {
   let inputBuffer = '';
 
   function transform(chunk, encoding, cb) {
-    // Allow objects to be passed through unaltered
-    if (!_.isString(chunk) && !_.isBuffer(chunk)) {
-      return cb(null, chunk);
-    }
-
     const input = chunk.toString('utf8');
 
     // Combine buffer and new input

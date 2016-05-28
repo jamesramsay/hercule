@@ -5,6 +5,7 @@ global.fs = require('fs');
 
 import ResolveStream from '../../src/resolve-stream';
 
+// TODO: directly mock inflate logic
 test.before(() => {
   const foxStream = new Readable;
   foxStream.push('fox');
