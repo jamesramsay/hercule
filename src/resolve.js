@@ -12,7 +12,7 @@ export function resolveReferences(primary, fallback, references) {
   return override || fallback || primary;
 }
 
-export function parseTransclude(transclusionLink, relativePath, cb) {
+export function parseTransclude(transclusionLink, relativePath, source, cb) {
   let parsedLink;
   let primary;
   let fallback;
@@ -21,10 +21,11 @@ export function parseTransclude(transclusionLink, relativePath, cb) {
   try {
     parsedLink = transcludeGrammar.parse(transclusionLink);
 
-    // Links are relative to their source
-    primary = { link: parsedLink.primary, relativePath };
-    fallback = parsedLink.fallback ? { link: parsedLink.fallback, relativePath } : null;
-    parsedReferences = _.map(parsedLink.references, ({ placeholder, link }) => ({ placeholder, link, relativePath }));
+    primary = { link: parsedLink.primary, relativePath, source };
+    fallback = parsedLink.fallback ? { link: parsedLink.fallback, relativePath, source } : null;
+    parsedReferences = _.map(parsedLink.references, ({ placeholder, link }) => (
+      { placeholder, link, relativePath, source }
+    ));
   } catch (ex) {
     return cb(ex);
   }
@@ -47,7 +48,7 @@ export function parseTransclude(transclusionLink, relativePath, cb) {
 * - resolvedRelativePath (string): Will be provided as the relativePath for any nested transclusion
 *
 */
-export function resolveLink(link, relativePath, cb) {
+export function resolveLink({ link, relativePath, source }, cb) {
   let input = '';
   let linkType;
   let resolvedLink;
@@ -60,19 +61,18 @@ export function resolveLink(link, relativePath, cb) {
   }
 
   if (linkType === 'string') {
-    input = stringInflater(link.slice(1, -1)); // eslint-disable-line lodash/prefer-lodash-method
+    // Use native slice which permits removing the first and last character
+    input = stringInflater(link.slice(1, -1), source); // eslint-disable-line lodash/prefer-lodash-method
   }
 
   if (linkType === 'local') {
     resolvedLink = path.join(relativePath, link);
     resolvedRelativePath = path.dirname(resolvedLink);
-
     input = localInflater(resolvedLink);
   }
   if (linkType === 'http') {
     resolvedLink = link;
     resolvedRelativePath = link;
-
     input = httpInflater(resolvedLink);
   }
 

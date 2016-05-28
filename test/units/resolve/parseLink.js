@@ -27,8 +27,9 @@ test.after(() => {
 test.cb('should resolve local file link', (t) => {
   const link = 'animal.md';
   const relativePath = '/foo';
+  const source = '/foo/bar.md';
 
-  resolveLink(link, relativePath, (err, input, resolvedLink, resolvedRelativePath) => {
+  resolveLink({ link, relativePath, source }, (err, input, resolvedLink, resolvedRelativePath) => {
     t.ifError(err);
     t.deepEqual(resolvedLink, '/foo/animal.md');
     t.deepEqual(resolvedRelativePath, relativePath);
@@ -45,8 +46,9 @@ test.cb('should resolve local file link', (t) => {
 test.cb('should resolve http link', (t) => {
   const link = 'http://github.com/a.md';
   const relativePath = '/foo';
+  const source = '/foo/bar.md';
 
-  resolveLink(link, relativePath, (err, input, resolvedLink, resolvedRelativePath) => {
+  resolveLink({ link, relativePath, source }, (err, input, resolvedLink, resolvedRelativePath) => {
     t.ifError(err);
     t.deepEqual(resolvedLink, link);
     t.deepEqual(resolvedRelativePath, link);
@@ -63,8 +65,9 @@ test.cb('should resolve http link', (t) => {
 test.cb('should emit error on invalid http link', (t) => {
   const link = 'http://github.com/i-dont-exist.md';
   const relativePath = '/foo';
+  const source = '/foo/bar.md';
 
-  resolveLink(link, relativePath, (err, input) => {
+  resolveLink({ link, relativePath, source }, (err, input) => {
     input.on('error', (inputErr) => {
       t.deepEqual(inputErr.message, 'Could not read file');
       t.deepEqual(inputErr.path, link);
@@ -82,14 +85,17 @@ test.cb('should emit error on invalid http link', (t) => {
 test.cb('should resolve string link', (t) => {
   const link = '"foo bar"';
   const relativePath = '/foo';
+  const source = '/foo/bar.md';
 
-  resolveLink(link, relativePath, (err, input, resolvedLink, resolvedRelativePath) => {
+  resolveLink({ link, relativePath, source }, (err, input, resolvedLink, resolvedRelativePath) => {
     t.ifError(err);
     t.deepEqual(resolvedLink, null);
     t.deepEqual(resolvedRelativePath, null);
 
+    input.on('error', () => t.fail());
+
     const concatStream = concat((result) => {
-      t.deepEqual(result.toString('utf8'), 'foo bar');
+      t.deepEqual(result, [{ content: 'foo bar', source }]);
       t.end();
     });
 

@@ -71,7 +71,6 @@ test.cb('should resolve simple link to content and emit source', (t) => {
     content: 'fox',
     line: 1,
     column: 0,
-    source: '/foo/fox.md',
   };
   const testStream = new ResolveStream();
 
@@ -109,22 +108,3 @@ test.cb('should emit error if circular dependency detected', (t) => {
   testStream.write(input);
   testStream.end();
 });
-
-// test.cb('should emit error if nested link is invalid', (t) => {
-//   const input = {
-//     content: ':[](animal.md)',
-//     link: 'animal.md',
-//     relativePath: '/foo',
-//   };
-//   const testStream = new ResolveStream();
-//
-//   t.plan(1);
-//   testStream.on('readable', function read() {
-//     this.read();
-//   });
-//   testStream.on('error', () => t.pass());
-//   testStream.on('end', () => t.end());
-//
-//   testStream.write(input);
-//   testStream.end();
-// });
