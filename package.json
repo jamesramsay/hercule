@@ -62,7 +62,7 @@
     "dashdash": "^1.10.1",
     "duplexer2": "^0.1.4",
     "lodash": "^4.0.0",
-    "regexp-stream-tokenizer": "^0.1.1",
+    "regexp-stream-tokenizer": "^0.2.0",
     "request": "^2.65.0",
     "through2": "^2.0.0",
     "through2-get": "^0.0.2"
