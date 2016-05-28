@@ -18,24 +18,6 @@ test.cb('should handle no input', (t) => {
 });
 
 
-test.cb('should not modify object chunks', (t) => {
-  const input = { content: 'The quick brown fox jumps over the lazy dog.' };
-  const testStream = new TrimStream();
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.deepEqual(chunk, input);
-    }
-  });
-
-  testStream.on('end', () => t.end());
-
-  testStream.write(input);
-  testStream.end();
-});
-
-
 test.cb('should not modify input without trailing new line', (t) => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const testStream = new TrimStream();

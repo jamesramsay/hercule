@@ -4,8 +4,6 @@ import duplexer from 'duplexer2';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import { parseTransclude, resolveReferences, resolveLink } from './resolve';
-import TrimStream from './trim-stream';
-
 import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
 /**
@@ -26,7 +24,6 @@ export default function ResolveStream(source, opt) {
 
   function inflate(link, relativePath, references, parents, indent) {
     const resolverStream = new ResolveStream(link);
-    const trimmerStream = new TrimStream();
 
     function token(match) {
       return _.merge(
@@ -47,9 +44,9 @@ export default function ResolveStream(source, opt) {
     const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
     const tokenizerStream = regexpTokenizer(tokenizerOptions, linkRegExp);
 
-    trimmerStream.pipe(tokenizerStream).pipe(resolverStream);
+    tokenizerStream.pipe(resolverStream);
 
-    return duplexer({ objectMode: true }, trimmerStream, resolverStream);
+    return duplexer({ objectMode: true }, tokenizerStream, resolverStream);
   }
 
   /* eslint-disable consistent-return */
