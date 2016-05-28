@@ -89,8 +89,8 @@ test.cb('should resolve string link', (t) => {
 
   resolveLink({ link, relativePath, source }, (err, input, resolvedLink, resolvedRelativePath) => {
     t.ifError(err);
-    t.deepEqual(resolvedLink, null);
-    t.deepEqual(resolvedRelativePath, null);
+    t.falsy(resolvedLink);
+    t.falsy(resolvedRelativePath);
 
     input.on('error', () => t.fail());
 
