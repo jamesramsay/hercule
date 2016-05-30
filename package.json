@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
