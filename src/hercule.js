@@ -43,7 +43,7 @@ export function transcludeFile(...args) {
   const input = args.shift();
   const cb = args.pop();
   const [options = {}] = args;
-  if (!_.get(options, 'relativePath')) options.relativePath = path.basename(input);
+  if (!_.get(options, 'relativePath')) options.relativePath = path.dirname(input);
 
   const transclude = new Transcluder(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });

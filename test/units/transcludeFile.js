@@ -43,9 +43,8 @@ test.cb('should return one error if circular dependency found', (t) => {
 });
 
 test.cb('should return one error if invalid links found', (t) => {
-  const input = path.join(__dirname, '../fixtures/invalid-link/index.md');
-  const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
-  transcludeFile(input, options, (err) => {
+  const input = path.join(__dirname, '../fixtures/local-link-ENOENT/index.md');
+  transcludeFile(input, (err) => {
     t.deepEqual(err.message, 'Could not read file');
     t.regex(err.path, /i-dont-exist.md/);
     t.end();
@@ -54,10 +53,9 @@ test.cb('should return one error if invalid links found', (t) => {
 
 test.cb('should return sourceList', (t) => {
   const input = path.join(__dirname, '../fixtures/local-link/index.md');
-  const options = { relativePath: path.join(__dirname, '../fixtures/local-link') };
   const expected = 'Jackdaws love my big sphinx of quartz.\n';
 
-  transcludeFile(input, options, (err, output, sourceList) => {
+  transcludeFile(input, (err, output, sourceList) => {
     t.deepEqual(err, null);
     t.deepEqual(output, expected);
     t.regex(sourceList[0], /size\.md/);
@@ -70,7 +68,6 @@ test.cb('should support tokenizer options', (t) => {
   const input = path.join(__dirname, '../fixtures/_aglio/index.md');
   const expected = 'Jackdaws love my\n\nbig\n\nsphinx\n\nof quartz.\n';
   const options = {
-    relativePath: path.join(__dirname, '../fixtures/_aglio'),
     linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
     linkMatch: (match) => match[3] || match[5],
   };
