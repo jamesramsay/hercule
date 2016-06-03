@@ -32,6 +32,15 @@ test.cb('should return error if file doesn\'t exist', (t) => {
   });
 });
 
+test.cb('should return error if input is a directory', (t) => {
+  const input = path.join('i-dont-exist.md');
+  transcludeFile(input, (err) => {
+    t.regex(err.message, /ENOENT/);
+    t.deepEqual(err.path, 'i-dont-exist.md');
+    t.end();
+  });
+});
+
 test.cb('should return one error if circular dependency found', (t) => {
   const input = path.join(__dirname, '../fixtures/circular-references/index.md');
   const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
@@ -45,7 +54,7 @@ test.cb('should return one error if circular dependency found', (t) => {
 test.cb('should return one error if invalid links found', (t) => {
   const input = path.join(__dirname, '../fixtures/local-link-ENOENT/index.md');
   transcludeFile(input, (err) => {
-    t.deepEqual(err.message, 'Could not read file');
+    t.regex(err.message, /ENOENT/);
     t.regex(err.path, /i-dont-exist.md/);
     t.end();
   });

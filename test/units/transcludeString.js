@@ -40,7 +40,7 @@ test.cb('should return one error if invalid links found', (t) => {
   const input = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
   const options = { relativePath: path.join(__dirname, '../fixtures/invalid-link') };
   transcludeString(input, options, (err) => {
-    t.deepEqual(err.message, 'Could not read file');
+    t.regex(err.message, /ENOENT/);
     t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
     t.end();
   });
@@ -54,7 +54,7 @@ test.cb('should return errors when custom tokenizer options used', (t) => {
   };
 
   transcludeString(input, options, (err) => {
-    t.deepEqual(err.message, 'Could not read file');
+    t.regex(err.message, /ENOENT/);
     t.deepEqual(err.path, 'test1.apib');
     t.end();
   });
