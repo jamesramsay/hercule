@@ -18,7 +18,7 @@
   [ "$output" == "Jackdaws love my big sphinx of quartz." ]
 }
 
-@test "transcluding bad input" {
-  run ./bin/hercule ./test/fixtures/invalid-link/index.md
+@test "transcluding invalid input" {
+  run ./bin/hercule ./test/fixtures/local-link-ENOENT/index.md
   [ "$status" -eq 1 ]
 }
