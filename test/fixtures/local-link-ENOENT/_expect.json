@@ -1,7 +1,7 @@
 {
   "plan": 5,
   "error": {
-    "message": "Could not read file",
+    "message": "ENOENT",
     "path": "fixtures/local-link-ENOENT/(i-dont-exist.md|mineral.md)"
   }
 }

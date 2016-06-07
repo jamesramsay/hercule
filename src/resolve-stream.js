@@ -86,7 +86,7 @@ export default function ResolveStream(source, opt) {
         const inflater = inflate(resolvedLink, resolvedRelativePath, references, parents, indent);
 
         input.on('error', (inputErr) => {
-          this.emit('error', _.merge({ message: 'Could not read file' }, inputErr));
+          this.emit('error', inputErr);
           cb();
         });
 
