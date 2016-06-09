@@ -8,8 +8,11 @@ test.cb('should return exactly one object', (t) => {
 
   t.plan(1);
 
-  testStream.on('readable', function read() {
-    t.deepEqual(this.read(), { content, source });
+  testStream.on('readable', () => {
+    let chunk;
+    while ((chunk = testStream.read()) !== null) {
+      t.deepEqual(chunk, { content, source });
+    }
   });
 
   testStream.on('end', () => t.end());
