@@ -38,10 +38,20 @@ export default function Transcluder(source = 'input', opt) {
     return defaultSeparator(match, options);
   }
 
-  const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
   const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
+  const tokenizerOptions = {
+    leaveBehind: `${WHITESPACE_GROUP}`,
+    token,
+    separator,
+  };
+  const resolverOptions = {
+    linkRegExp: options.linkRegExp,
+    linkMatch: options.linkMatch,
+    resolveLink: options.resolveLink,
+  };
+
   const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
-  const resolver = new ResolveStream(source, { linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
+  const resolver = new ResolveStream(source, resolverOptions);
   const indenter = new IndentStream();
   const sourcemap = new SourceMapStream(outputFile);
   const stringify = get('content');
