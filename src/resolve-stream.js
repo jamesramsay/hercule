@@ -84,8 +84,11 @@ export default function ResolveStream(source, opt) {
       // References from parent files override primary links, then to fallback if provided and no matching references
       const link = resolveReferences(primary, fallback, parentRefs);
 
+      // NEW: support for custom resolve link function
+      const linkResolver = _.isFunction(options.resolveLink) ? options.resolveLink : resolveLink;
+
       // Resolve link to readable stream
-      resolveLink(link, (resolveErr, input, resolvedLink, resolvedRelativePath) => {
+      linkResolver(link, (resolveErr, input, resolvedLink, resolvedRelativePath) => {
         if (resolveErr) return handleError('Link could not be inflated', resolvedLink, resolveErr);
         if (_.includes(parents, resolvedLink)) return handleError('Circular dependency detected', resolvedLink);
 

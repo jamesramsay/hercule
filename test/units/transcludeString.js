@@ -1,5 +1,6 @@
 import test from 'ava';
 import path from 'path';
+import { Readable } from 'stream';
 
 import { transcludeString } from '../../src/hercule';
 
@@ -56,6 +57,29 @@ test.cb('should return errors when custom tokenizer options used', (t) => {
   transcludeString(input, options, (err) => {
     t.regex(err.message, /ENOENT/);
     t.deepEqual(err.path, 'test1.apib');
+    t.end();
+  });
+});
+
+test.cb('should support custom linkResolver function', (t) => {
+  const input = ':[](foo.md):[](bar.md)';
+  function resolveLink({ link, relativePath, source, line, column }, cb) {
+    const documents = {
+      'foo.md': 'foo',
+      'bar.md': 'bar',
+    };
+    const fooStream = new Readable();
+    fooStream.push(documents[link]);
+    fooStream.push(null);
+
+    return cb(null, fooStream, link, relativePath);
+  }
+  const options = { resolveLink };
+  const expected = 'foobar';
+
+  transcludeString(input, options, (err, output) => {
+    t.deepEqual(err, null);
+    t.deepEqual(output, expected);
     t.end();
   });
 });
