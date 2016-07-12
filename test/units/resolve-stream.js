@@ -1,9 +1,10 @@
 import test from 'ava';
 import sinon from 'sinon';
 import { Readable } from 'stream';
-global.fs = require('fs');
 
 import ResolveStream from '../../src/resolve-stream';
+
+global.fs = require('fs');
 
 // TODO: directly mock inflate logic
 test.before(() => {

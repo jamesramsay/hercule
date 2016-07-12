@@ -3,7 +3,7 @@
     "node": true
   },
   "extends": [
-    "airbnb/base",
+    "airbnb-base",
     "plugin:lodash/recommended"
   ],
   "plugins": [

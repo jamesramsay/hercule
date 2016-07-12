@@ -2,8 +2,10 @@ import test from 'ava';
 import sinon from 'sinon';
 import nock from 'nock';
 import concat from 'concat-stream';
-import { resolveLink } from '../../../src/resolve';
 import { Readable } from 'stream';
+
+import { resolveLink } from '../../../src/resolve';
+
 global.fs = require('fs');
 
 test.before(() => {

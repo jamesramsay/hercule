@@ -1,8 +1,9 @@
 import ava from 'ava'; // eslint-disable-line ava/use-test
 import sinon from 'sinon';
-global.childProcess = require('child_process');
 
 import { transcludeFileSync } from '../../src/hercule';
+
+global.childProcess = require('child_process');
 
 const [major, minor] = process.versions.node.split('.');
 const test = (major < 1 && minor < 12) ? ava.skip : ava;

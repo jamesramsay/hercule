@@ -2,11 +2,12 @@
   "env": {
     "node": true
   },
-  "extends": "airbnb/base",
+  "extends": "airbnb-base",
   "rules": {
     "id-length": [2, {"min": 2, "max": 25, "properties": "never", "exceptions": ["_", "t"]}],
     "max-len": [1, 120, 2],
     "no-cond-assign": [2, "except-parens"],
-    "no-param-reassign": [2, {"props": false}]
+    "no-param-reassign": [2, {"props": false}],
+    "import/no-extraneous-dependencies": [2, {"devDependencies": true}]
   }
 }
