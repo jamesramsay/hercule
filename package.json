@@ -31,6 +31,9 @@
       "test"
     ]
   },
+  "lambci": {
+    "cmd": "npm set progress=false && npm install && npm run compile-grammars && npm run test-units && npm run test-integration"
+  },
   "bin": {
     "hercule": "./bin/hercule"
   },
@@ -82,6 +85,7 @@
     "eslint-plugin-import": "^1.5.0",
     "eslint-plugin-lodash": "^1.6.5",
     "nock": "^8.0.0",
+    "npm-run-all": "*",
     "nyc": "^7.0.0",
     "pegjs": "^0.9.0",
     "semver": "^5.1.0",
