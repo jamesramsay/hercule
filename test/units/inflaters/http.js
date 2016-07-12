@@ -1,9 +1,10 @@
 import test from 'ava';
 import nock from 'nock';
 import concat from 'concat-stream';
-global.fs = require('fs');
 
 import httpInflater from '../../../src/inflaters/http';
+
+global.fs = require('fs');
 
 test.before(() => {
   nock('http://github.com').get('/foo.md').reply(200, 'foo\nbar\n');

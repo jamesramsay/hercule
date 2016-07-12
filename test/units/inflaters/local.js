@@ -2,9 +2,10 @@ import test from 'ava';
 import sinon from 'sinon';
 import { Readable } from 'stream';
 import concat from 'concat-stream';
-global.fs = require('fs');
 
 import localInflater from '../../../src/inflaters/local';
+
+global.fs = require('fs');
 
 test.before(() => {
   const fooStream = new Readable;
