@@ -8,7 +8,7 @@ export const PLACEHOLDER_GROUP = 2;
 export const LINK_GROUP = 3;
 
 export function defaultToken(
-  match, { linkMatch, relativePath = '', references = [], parents = [] }, whitespace) {
+  match, { linkMatch, relativePath = '', references = [], parents = [], source = '' }, whitespace) {
   return {
     content: match[MATCH_GROUP],
     link: _.isFunction(linkMatch) ? linkMatch(match) : match[LINK_GROUP],
@@ -16,12 +16,14 @@ export function defaultToken(
     relativePath,
     references,
     parents,
+    source,
   };
 }
 
-export function defaultSeparator(match, indent = '') {
+export function defaultSeparator(match, { indent = '', source = '' }) {
   return {
     indent,
-    content: match[0],
+    content: match[MATCH_GROUP],
+    source,
   };
 }

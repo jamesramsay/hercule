@@ -25,10 +25,16 @@ const parser = dashdash.createParser({
       help: 'File to output.',
       helpArg: 'FILE',
     },
+    // TODO: unit test transcludeStringSync with relativePath
     {
       names: ['relativePath', 'r'],
       type: 'string',
       help: 'Relative path. stdin will be parsed relative to this path.',
+    },
+    {
+      names: ['sourcemap', 's'],
+      type: 'bool',
+      help: 'Generate sourcemap for output file.',
     },
     {
       name: 'reporter',
@@ -49,7 +55,8 @@ try {
 
 
 if (opts.help) {
-  process.stdout.write(`usage: hercule [OPTIONS]\noptions:\n${parser.help({ includeEnv: true }).trimRight()}\n`);
+  process.stdout.write('usage: hercule [OPTIONS] path/to/input.md\n\n');
+  process.stdout.write(`options:\n${parser.help({ includeEnv: true }).trimRight()}\n\n`);
   process.exit();
 }
 
@@ -77,9 +84,11 @@ function main() {
   if (opts.output) {
     // Writing output to file
     outputStream = fs.createWriteStream(opts.output, { encoding: 'utf8' });
+    options.outputFile = opts.output;
   } else {
     // Writing output to stdout
     outputStream = process.stdout;
+    options.outputFile = 'stdout';
   }
 
   const transclude = new Transcluder(source, options);
@@ -91,6 +100,10 @@ function main() {
       process.stderr.write(`\n\nERROR: ${err.message} (${err.path})\n`);
     }
     process.exit(1);
+  });
+
+  transclude.on('sourcemap', (srcMap) => {
+    if (opts.output) fs.writeFileSync(`${opts.output}.map`, `${JSON.stringify(srcMap)}\n`);
   });
 
   inputStream.pipe(transclude).pipe(outputStream);

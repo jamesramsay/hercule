@@ -7,6 +7,7 @@ import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
 import IndentStream from './indent-stream';
+import SourceMapStream from './source-map-stream';
 import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
 
 /**
@@ -18,18 +19,23 @@ import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } 
 const DEFAULT_OPTIONS = {
   input: 'link',
   output: 'content',
+  source: 'string',
 };
 
-export default function Transcluder(source, opt) {
+// The sourceFile should be relative to the sourcePath
+export default function Transcluder(source = 'input', opt) {
   const options = _.merge({}, DEFAULT_OPTIONS, { relativePath: path.dirname(source) }, opt);
-  const sourcePaths = [];
+
+  // Sourcemap
+  const outputFile = _.get(options, 'outputFile');
+  let sourceMap;
 
   function token(match) {
     return defaultToken(match, options);
   }
 
   function separator(match) {
-    return defaultSeparator(match);
+    return defaultSeparator(match, options);
   }
 
   const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
@@ -37,11 +43,13 @@ export default function Transcluder(source, opt) {
   const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
   const resolver = new ResolveStream(source, { linkRegExp: options.linkRegExp, linkMatch: options.linkMatch });
   const indenter = new IndentStream();
+  const sourcemap = new SourceMapStream(outputFile);
   const stringify = get('content');
 
   tokenizer
   .pipe(resolver)
   .pipe(indenter)
+  .pipe(sourcemap)
   .pipe(stringify);
 
   const transcluder = duplexer(tokenizer, stringify);
@@ -51,12 +59,13 @@ export default function Transcluder(source, opt) {
     resolver.end();
   });
 
-  resolver.on('source', (filepath) => {
-    sourcePaths.push(filepath);
+  sourcemap.on('sourcemap', (generatedSourceMap) => {
+    sourceMap = generatedSourceMap;
   });
 
   transcluder.on('end', () => {
-    transcluder.emit('sources', sourcePaths);
+    transcluder.emit('sources', sourceMap.sources);
+    transcluder.emit('sourcemap', sourceMap);
   });
 
   return transcluder;

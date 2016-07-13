@@ -230,8 +230,7 @@ __Arguments__
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the transclusion links within input `str` are relative.
 - `callback(err, [output], [sourcePaths])` - A callback which is called after the input `str` has been processed.
-  `callback` will be passed an error, processed output and array of source document file paths.
-
+  `callback` will be passed an error, processed output and array of source document file paths and sourcemap object.
 
 Omit the `callback` if using `transcludeStringSync`. Only `output` will be returned.
 
@@ -275,8 +274,9 @@ __Arguments__
 - `filepath` - A path to a file to process.
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the input `filepath` is relative.
-- `callback(err, [output], [sourcePaths])` - A callback which is called after the file at the provided `filepath`
-  has been processed. `callback` will be passed an error, processed output and array of source document file paths.
+- `callback(err, [output], [sourcePaths], [sourcemap])` - A callback which is called after the file at the provided
+ `filepath` has been processed. `callback` will be passed an error, processed output, list of transcluded file paths
+  and sourcemap object.
 
 Omit the `callback` if using `transcludeFileSync`. Only `output` will be returned.
 

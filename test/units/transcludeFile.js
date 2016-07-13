@@ -67,8 +67,8 @@ test.cb('should return sourceList', (t) => {
   transcludeFile(input, (err, output, sourceList) => {
     t.deepEqual(err, null);
     t.deepEqual(output, expected);
-    t.regex(sourceList[0], /size\.md/);
-    t.deepEqual(sourceList.length, 1);
+    t.regex(sourceList[1], /size\.md/);
+    t.deepEqual(sourceList.length, 2);
     t.end();
   });
 });
