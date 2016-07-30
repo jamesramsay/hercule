@@ -77,7 +77,7 @@
     "codecov.io": "^0.1.6",
     "concat-stream": "^1.5.1",
     "eslint": "^3.0.0",
-    "eslint-config-airbnb-base": "^4.0.0",
+    "eslint-config-airbnb-base": "^5.0.1",
     "eslint-plugin-ava": "^2.0.1",
     "eslint-plugin-import": "^1.5.0",
     "eslint-plugin-lodash": "^1.6.5",
