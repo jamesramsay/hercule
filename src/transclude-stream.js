@@ -47,10 +47,10 @@ export default function Transcluder(source = 'input', opt) {
   const stringify = get('content');
 
   tokenizer
-  .pipe(resolver)
-  .pipe(indenter)
-  .pipe(sourcemap)
-  .pipe(stringify);
+    .pipe(resolver)
+    .pipe(indenter)
+    .pipe(sourcemap)
+    .pipe(stringify);
 
   const transcluder = duplexer(tokenizer, stringify);
 

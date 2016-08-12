@@ -9,7 +9,7 @@ import { resolveLink } from '../../../src/resolve';
 global.fs = require('fs');
 
 test.before(() => {
-  const localStream = new Readable;
+  const localStream = new Readable();
   localStream.push('local!');
   localStream.push(null);
 

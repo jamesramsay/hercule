@@ -8,7 +8,7 @@ import localInflater from '../../../src/inflaters/local';
 global.fs = require('fs');
 
 test.before(() => {
-  const fooStream = new Readable;
+  const fooStream = new Readable();
   fooStream.push('foo\n');
   fooStream.push('bar\n');
   fooStream.push(null);
