@@ -8,11 +8,11 @@ global.fs = require('fs');
 
 // TODO: directly mock inflate logic
 test.before(() => {
-  const foxStream = new Readable;
+  const foxStream = new Readable();
   foxStream.push('fox');
   foxStream.push(null);
 
-  const animalStream = new Readable;
+  const animalStream = new Readable();
   animalStream.push(':[bad link](vulpes.md)');
   animalStream.push(null);
 
