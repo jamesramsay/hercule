@@ -12,7 +12,7 @@
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov | codecov",
     "compile": "babel src --out-dir lib --source-maps && npm run compile-grammars",
-    "compile-grammars": "mkdir -p ./lib/grammar && pegjs src/grammar/transclusion-link.pegjs lib/grammar/transclusion-link.js && pegjs src/grammar/inflate-link.pegjs lib/grammar/inflate-link.js",
+    "compile-grammars": "mkdir -p ./lib/grammar && pegjs -o lib/grammar/transclusion-link.js src/grammar/transclusion-link.pegjs && pegjs -o lib/grammar/inflate-link.js src/grammar/inflate-link.pegjs",
     "lint": "eslint ./src ./test",
     "install-bats": "./scripts/install-bats",
     "check-commit": "./scripts/commit-msg",
@@ -83,7 +83,7 @@
     "eslint-plugin-lodash": "^1.6.5",
     "nock": "^8.0.0",
     "nyc": "^7.0.0",
-    "pegjs": "^0.9.0",
+    "pegjs": "^0.10.0",
     "semver": "^5.1.0",
     "shelljs": "^0.6.0",
     "sinon": "^1.17.3"
