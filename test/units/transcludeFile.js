@@ -78,7 +78,7 @@ test.cb('should support tokenizer options', (t) => {
   const expected = 'Jackdaws love my\n\nbig\n\nsphinx\n\nof quartz.\n';
   const options = {
     linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?\]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
-    linkMatch: (match) => match[3] || match[5],
+    linkMatch: match => match[3] || match[5],
   };
 
   transcludeFile(input, options, (err, output) => {
