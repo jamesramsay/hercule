@@ -10,8 +10,8 @@ try {
 } catch (ex) {
   // Permits using compiling grammar when using ES2015 source
   const peg = require('pegjs'); // eslint-disable-line
-  linkGrammar = peg.buildParser(fs.readFileSync(path.join(__dirname, 'inflate-link.pegjs'), 'utf8'));
-  transcludeGrammar = peg.buildParser(fs.readFileSync(path.join(__dirname, 'transclusion-link.pegjs'), 'utf8'));
+  linkGrammar = peg.generate(fs.readFileSync(path.join(__dirname, 'inflate-link.pegjs'), 'utf8'));
+  transcludeGrammar = peg.generate(fs.readFileSync(path.join(__dirname, 'transclusion-link.pegjs'), 'utf8'));
 }
 
 module.exports = {
