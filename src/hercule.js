@@ -31,7 +31,7 @@ export function transcludeString(...args) {
     .on('error', (err) => {
       if (!cbErr) cbErr = err;
     })
-    .on('sourcemap', (srcmap) => (sourceMap = srcmap))
+    .on('sourcemap', srcmap => (sourceMap = srcmap))
     .on('end', () => cb(cbErr, outputString, sourceMap.sources, sourceMap));
 
   transclude.write(input, 'utf8');
@@ -51,7 +51,7 @@ export function transcludeFile(...args) {
   let sourceMap;
   let cbErr = null;
 
-  inputStream.on('error', (err) => cb(err));
+  inputStream.on('error', err => cb(err));
 
   transclude
     .on('readable', function read() {
@@ -63,7 +63,7 @@ export function transcludeFile(...args) {
     .on('error', (err) => {
       if (!cbErr) cbErr = err;
     })
-    .on('sourcemap', (srcmap) => (sourceMap = srcmap))
+    .on('sourcemap', srcmap => (sourceMap = srcmap))
     .on('end', () => cb(cbErr, outputString, sourceMap.sources, sourceMap));
 
   inputStream.pipe(transclude);
