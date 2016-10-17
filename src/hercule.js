@@ -74,7 +74,7 @@ export function transcludeFileSync(input, options) {
   const syncOptions = { cwd: __dirname, timeout: SYNC_TIMEOUT };
   const syncArgs = [input, '--reporter', 'json-err'];
 
-  _.forEach(options, (optionValue, optionName) => {
+  _.forEach(options, (optionValue, optionName) => { // eslint-disable-line
     syncArgs.push(`--${optionName}`, `${optionValue}`);
   });
 
@@ -92,7 +92,7 @@ export function transcludeStringSync(input, options) {
   const syncOptions = { input, cwd: __dirname, timeout: SYNC_TIMEOUT };
   const syncArgs = ['--reporter', 'json-err'];
 
-  _.forEach(options, (optionValue, optionName) => {
+  _.forEach(options, (optionValue, optionName) => { // eslint-disable-line
     syncArgs.push(`--${optionName}`, `${optionValue}`);
   });
 
