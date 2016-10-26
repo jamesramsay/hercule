@@ -1,12 +1,9 @@
-import ava from 'ava'; // eslint-disable-line ava/use-test
+import test from 'ava';
 import path from 'path';
 import _ from 'lodash';
 
 import { transcludeStringSync } from '../../src/hercule';
 import fixtures from '../fixtures';
-
-const [major, minor] = process.versions.node.split('.');
-const test = (major < 1 && minor < 12) ? ava.skip : ava;
 
 _.forEach((fixtures.fixtures), (fixture) => {
   // Exclude http tests because mocking won't cover sub-process
