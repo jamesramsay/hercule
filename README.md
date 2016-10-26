@@ -19,9 +19,6 @@ Hercule is a command-line tool and library for transcluding markdown, [API Bluep
 - Transclude remote (HTTP) files
 - Transclude strings
 - Smart indentation
-- Stream, Async, Sync APIs
-
-Note: synchronous API is only available in node 0.12 and above.
 
 -----
 
@@ -50,28 +47,28 @@ cat src/blueprint.md | hercule | less
 Or you can use Hercule as a library:
 
 ```javascript
-var hercule = require('hercule');
+import { trancludeString } from 'hercule';
 
-var output = hercule.transcludeStringSync("# Title\n\n:[abstract](abstract.md)");
-console.log(output);
+trancludeString('# Title\n\n:[abstract](abstract.md)', (err, output) => {
+  if (err) console.log(err)
+  console.log(output);
+});
 ```
 
 ## Transclusion Syntax
-
-The following examples use ES2015 syntax.
 
 ### Basic transclusion (local files and remote HTTP files)
 
 Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
 
 ```javascript
-import { transcludeStringSync } from 'hercule';
+import { trancludeString } from 'hercule';
 
-const input = 'This is an :[example link](foo.md).';
-
-const output = transcludeStringSync(input);
-console.log(output);
-// This is an example transclusion.
+trancludeString('This is an :[example link](foo.md).', (err, output) => {
+  if (err) console.log(err)
+  console.log(output);
+  // This is an example transclusion.
+});
 ```
 
 Extending the standard Markdown link syntax means most markdown parsers will treat Hercule's transclusion links as standard Markdown links.
@@ -80,13 +77,15 @@ For example, Github handles transclusion links in this manner.
 Hercule is also able to transclude HTTP links.
 
 ```javascript
-import { transcludeStringSync } from 'hercule';
+import { trancludeString } from 'hercule';
 
-const input = 'Jackdaws love my :[size](https://raw.githubusercontent.com/jamesramsay/hercule/master/test/fixtures/basic/size.md) sphinx of quartz.';
+input = 'Jackdaws love my :[size](https://raw.githubusercontent.com/jamesramsay/hercule/master/test/fixtures/basic/size.md) sphinx of quartz.';
 
-const output = hercule.transcludeStringSync(input);
-console.log(output);
-// Jackdaws love my big sphinx of quartz.
+trancludeString(input, (err, output) => {
+  if (err) console.log(err)
+  console.log(output);
+  // Jackdaws love my big sphinx of quartz.
+});
 ```
 
 ### Placeholders and overriding references
@@ -98,7 +97,7 @@ Placeholders and references can be helpful for increasing the _'dryness'_ of you
 or allowing environmental variables to be passed into the document during processing.
 
 ```javascript
-import { transcludeStringSync } from 'hercule';
+import { transcludeString } from 'hercule';
 
 const input = ':[foo](bar)';
 const options = {
@@ -109,9 +108,11 @@ const options = {
   }]
 };
 
-const output = transcludeStringSync(input, options);
-console.log(output);
-// fizz buzz
+trancludeString(input, (err, output) => {
+  if (err) console.log(err)
+  console.log(output);
+  // fizz buzz
+});
 ```
 
 References are passed down to any nested transclusion links.
@@ -132,26 +133,31 @@ The following example uses Apiary's [Markdown Syntax for Object Notation (MSON)]
 ```
 
 ```javascript
-import { transcludeStringSync } from 'hercule';
+import { transcludeString } from 'hercule';
 
 const inputRequired = ':[Required Ingredient](cucmber.mson required:"required")';
 const inputDefault = ':[Optional Ingredient](cucmber.mson)';
 
-const outputRequired = transcludeStringSync(inputRequired);
-console.log(outputRequired);
-// ## Recipe (object)
-//
-// - id: 1 (number, required)
-// - name: Cucumber (string, required)
-// - description: Essential for tzatziki (string, required)
+trancludeString(inputRequired, (err, output) => {
+  if (err) console.log(err)
+  console.log(output);
+  // ## Recipe (object)
+  //
+  // - id: 1 (number, required)
+  // - name: Cucumber (string, required)
+  // - description: Essential for tzatziki (string, required)
+});
 
-const outputDefault = transcludeStringSync(inputDefault);
-console.log(outputDefault);
-// ## Recipe (object)
-//
-// - id: 1 (number, required)
-// - name: Cucumber (string, required)
-// - description: Essential for tzatziki (string, optional)
+
+trancludeString(inputDefault, (err, output) => {
+  if (err) console.log(err)
+  console.log(output);
+  // ## Recipe (object)
+  //
+  // - id: 1 (number, required)
+  // - name: Cucumber (string, required)
+  // - description: Essential for tzatziki (string, optional)
+});
 ```
 
 ### Whitespace sensitivity
@@ -170,14 +176,9 @@ Each line of `snippet.c` will be indented with the whitespace preceding it.
 
 ## Documentation
 
-Some functions are available in both sync and async varieties.
-
 - [`TranscludeStream`](#transclude)
-- [`transcludeString`](#transcludeString), `transcludeStringSync`
-- [`transcludeFile`](#transcludeFile), `transcludeFileSync`
-
-Note synchronous interfaces rely on [`execFileSync`](https://nodejs.org/api/child_process.html#child_process_child_process_execfilesync_file_args_options) which is only available with node 0.12 and above.
-Async interfaces should work with node 0.10 and above.
+- [`transcludeString`](#transcludeString)
+- [`transcludeFile`](#transcludeFile)
 
 ---------------------------------------
 
@@ -232,12 +233,9 @@ __Arguments__
 - `callback(err, [output], [sourcePaths])` - A callback which is called after the input `str` has been processed.
   `callback` will be passed an error, processed output and array of source document file paths and sourcemap object.
 
-Omit the `callback` if using `transcludeStringSync`. Only `output` will be returned.
-
 __Examples__
 
 ```javascript
-// async
 import { trancludeString } from 'hercule';
 
 trancludeString(':[foo](bar.md)', (err, output) => {
@@ -245,20 +243,6 @@ trancludeString(':[foo](bar.md)', (err, output) => {
   if (err) console.log(err)
   console.log(output);
 });
-
-```
-
-```javascript
-// sync
-import { trancludeStringSync } from 'hercule';
-
-try {
-  var output = trancludeFileSync('bar.md');
-  console.log(output);
-} catch (ex) {
-  // Handle exceptions like dead links
-  console.log(ex);
-}
 ```
 
 ---------------------------------------
@@ -278,31 +262,14 @@ __Arguments__
  `filepath` has been processed. `callback` will be passed an error, processed output, list of transcluded file paths
   and sourcemap object.
 
-Omit the `callback` if using `transcludeFileSync`. Only `output` will be returned.
-
 __Examples__
 
 ```javascript
-// async
 import { trancludeFile } from 'hercule';
 
-trancludeFileSync('foo.md', (err, output) => {
+trancludeFile('foo.md', (err, output) => {
   // Handle exceptions like dead links
   if (err) console.log(err)
   console.log(output);
 });
-
-```
-
-```javascript
-// sync
-import { trancludeFileSync } from 'hercule';
-
-try {
-  var output = trancludeFileSync('foo.md');
-  console.log(output);
-} catch (ex) {
-  // Handle exceptions like dead links
-  console.log(ex);
-}
 ```
