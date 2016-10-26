@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "3.0.5",
+  "version": "4.0.0",
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
@@ -8,7 +8,7 @@
     "test-units": "nyc --cache ava --verbose test/units",
     "test-integration": "ava --verbose test/integration",
     "test-cli": "npm run compile && ./test/modules/bin/bats test/bats",
-    "posttest": "if check-node-version --node '>= 4'; then npm run lint && npm run check-commit; else echo 'Skipped posttest'; fi",
+    "posttest": "npm run lint && npm run check-commit",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov | codecov",
     "compile": "babel src --out-dir lib --source-maps && npm run compile-grammars",
@@ -19,6 +19,12 @@
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
     "release:patch": "npm version patch && git push --follow-tags"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "publishConfig": {
+    "tag": "next"
   },
   "ava": {
     "require": "babel-register",

@@ -1,12 +1,9 @@
-import ava from 'ava'; // eslint-disable-line ava/use-test
+import test from 'ava';
 import sinon from 'sinon';
 
 import { transcludeStringSync } from '../../src/hercule';
 
 global.childProcess = require('child_process');
-
-const [major, minor] = process.versions.node.split('.');
-const test = (major < 1 && minor < 12) ? ava.skip : ava;
 
 test.before(() => {
   const stub = sinon.stub(global.childProcess, 'spawnSync');
