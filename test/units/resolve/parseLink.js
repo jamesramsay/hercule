@@ -71,13 +71,13 @@ test.cb('should emit error on invalid http link', (t) => {
 
   resolveLink({ link, relativePath, source }, (err, input) => {
     input.on('error', (inputErr) => {
-      t.deepEqual(inputErr.message, 'Could not read file');
-      t.deepEqual(inputErr.path, link);
+      t.truthy(inputErr.message);
+      t.truthy(inputErr.path);
       t.end();
     });
 
     const concatStream = concat((result) => {
-      t.truthy(result.toString('utf8'));
+      t.is(result.toString('utf8'), '');
     });
 
     input.pipe(concatStream);

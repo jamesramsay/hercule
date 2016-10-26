@@ -1,4 +1,4 @@
-import request from 'request';
+import got from 'got';
 import duplexer from 'duplexer2';
 import TrimStream from '../trim-stream';
 
@@ -11,7 +11,7 @@ import TrimStream from '../trim-stream';
  */
 export default function inflate(link) {
   const trimStream = new TrimStream();
-  const remoteStream = request.get(link);
+  const remoteStream = got.stream(link);
 
   // Manually trigger error since 2XX respsonse doesn't trigger error despite not having expected content
   remoteStream.on('response', function error(res) {
