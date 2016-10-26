@@ -7,10 +7,9 @@ node_js:
 cache:
   directories:
   - $HOME/.yarn-cache
+  - $HOME/.bats
 
-before_install:
-  # Install bats
-  - npm run install-bats
+before_install: git clone https://github.com/sstephenson/bats.git .bats
 
 before_script: npm run compile
 
