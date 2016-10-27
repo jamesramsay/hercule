@@ -1,5 +1,4 @@
 import test from 'ava';
-import path from 'path';
 import _ from 'lodash';
 
 import { transcludeString } from '../../src/hercule';
@@ -8,7 +7,7 @@ import './_mock';
 
 _.forEach((fixtures.fixtures), (fixture) => {
   test.cb(`should transclude ${fixture.name}`, (t) => {
-    const options = { relativePath: path.resolve(__dirname, '../fixtures', fixture.name) };
+    const options = { source: fixture.inputFile };
     const config = fixture.expectedConfig;
 
     transcludeString(fixture.input, options, (err, output) => {

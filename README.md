@@ -179,26 +179,25 @@ Each line of `snippet.c` will be indented with the whitespace preceding it.
 - [`TranscludeStream`](#transclude)
 - [`transcludeString`](#transcludeString)
 - [`transcludeFile`](#transcludeFile)
+- [Resolvers](#resolvers)
+  - [`defaultResolvers`](#defaultResolvers)
+  - [`resolveHttpUrl`](#resolveHttpUrl)
+  - [`resolveLocalUrl`](#resolveLocalUrl)
+  - [`resolveString`](#resolveString)
 
 ---------------------------------------
 
 <a name="transclude" />
 
-### TranscludeStream([source], [options])
+### TranscludeStream(source, [options])
 
 Returns a duplex stream.
 
 __Arguments__
 
-- `source` - Source file for the purpose of the sourcemap
-- `options` - An object of options to be applied when processing input.
-  - `relativePath` - A path to which the transclusion links within input stream are relative.
-  - `references` - A collection of references which be considered when resolving each transclusion link.
-    Each reference must contain `placeholder`, `href`, and `hrefType`.
-    - `placeholder` - A string used to locate the target(s) for transclusion.
-    - `href` - A link which will be trancluded according to its `hrefType`.
-    - `hrefType` - `file`, `http`, or `string`
-  - `parents` - A collection of fully qualified file paths of the input used to detect and prevent circular transclusion.
+1. `source` (_String_): A string used for resolving relative links and generating sourcemap.
+2. `options` (_Object_): An object of options to be applied when processing input.
+  - `resolvers` - An array of functions which are applied to resolve the URLs to content.
 
 __Examples__
 
@@ -226,11 +225,11 @@ Transcludes the input `str`, and `callback` is called when finished.
 
 __Arguments__
 
-- `str` - A string to process.
-- `options` - An object of options to be applied when processing input.
-  - `relativePath` - A path to which the transclusion links within input `str` are relative.
-- `callback(err, [output], [sourcePaths])` - A callback which is called after the input `str` has been processed.
-  `callback` will be passed an error, processed output and array of source document file paths and sourcemap object.
+1. `str` (_String_): A string to process.
+2. `options` (_Object_): An object of options to be applied when processing input.
+  - `source` (_String_): source file required for resolving relative links and generating sourcemap.
+  - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
+3. `callback(err, [output], [sourcePaths])` (_Function_): A function that will be called after the input `str` has been processed.
 
 __Examples__
 
@@ -248,18 +247,16 @@ trancludeString(':[foo](bar.md)', (err, output) => {
 
 <a name="transcludeFile" />
 
-### transcludeFile(filepath, [options], callback)
+### transcludeFile(source, [options], callback)
 
-Transcludes the file at the provided `filepath`, and `callback` is called when finished.
+Transcludes the `source` file.
 
 __Arguments__
 
-- `filepath` - A path to a file to process.
-- `options` - An object of options to be applied when processing input.
-  - `relativePath` - A path to which the input `filepath` is relative.
-- `callback(err, [output], [sourcePaths], [sourcemap])` - A callback which is called after the file at the provided
- `filepath` has been processed. `callback` will be passed an error, processed output, list of transcluded file paths
-  and sourcemap object.
+1. `source` (_String_): A path to a file to process.
+2. `options` (_Object_): An object of options to be applied when processing input.
+  - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
+3. `callback(err, [output], [sourcePaths], [sourcemap])` (_Function_): A function that will be called after the `source` file has been processed.
 
 __Examples__
 
@@ -272,3 +269,50 @@ trancludeFile('foo.md', (err, output) => {
   console.log(output);
 });
 ```
+
+---------------------------------------
+
+<a name="resolvers" />
+
+### Resolvers
+
+Resolver functions transform urls into the input to be transcluded.
+
+Hercule includes resolvers for http urls, local files, and strings. You can replace these with your own resolvers to customise the behaviour.
+
+__Arguments__
+
+1. `url` - A relative url from the input being processed.
+2. `source` - The absolute source url of the url being resolved.
+
+__Returns__
+
+- (_Object_)
+  - `content` (_Stream | String_): The content to be transcluded. Streams are processed for further transclusion links. Strings are assumed fully processed.
+  - `url` (_String_): The absolute url of the input, allowing circular reference detection and nested transclusion.
+
+<a name="defaultResolvers" />
+
+#### defaultResolvers
+
+Ordered array of functions applied until a result is returned.
+
+TODO: write the rest of this
+
+<a name="resolveHttpUrl" />
+
+#### resolveHttpUrl
+
+TODO: write this
+
+<a name="resolveLocalUrl" />
+
+#### resolveLocalUrl
+
+TODO: write this
+
+<a name="resolveString" />
+
+#### resolveString
+
+TODO: write this

@@ -1,7 +1,6 @@
 import test from 'ava';
 import _ from 'lodash';
 import fs from 'fs';
-import path from 'path';
 
 import { TranscludeStream } from '../../src/hercule';
 import fixtures from '../fixtures';
@@ -10,15 +9,12 @@ import './_mock';
 _.forEach((fixtures.fixtures), (fixture) => {
   test.cb(`should transclude ${fixture.name}`, (t) => {
     const config = fixture.expectedConfig;
-    const options = {
-      relativePath: path.dirname(fixture.inputFile),
-      source: fixture.inputFile,
-      outputFile: `${fixture.inputPath}/_expect.md`,
-    };
+    const options = { outputFile: `${fixture.inputPath}/_expect.md` };
     let outputString = '';
+    let sourcemap;
 
-    const transclude = new TranscludeStream(fixture.inputFile, options);
     const input = fs.createReadStream(fixture.inputFile, { encoding: 'utf8' });
+    const transclude = new TranscludeStream(input.path, options);
 
     transclude
       .on('readable', function read() {
@@ -32,13 +28,14 @@ _.forEach((fixtures.fixtures), (fixture) => {
         t.regex(err.path, new RegExp(config.error.path));
       })
       .on('sourcemap', (outputSourcemap) => {
-        if (fixture.expectedSourcemap) {
-          t.deepEqual(outputSourcemap.mappings, fixture.expectedSourcemap.mappings);
-          t.deepEqual(outputSourcemap.sources, fixture.expectedSourcemap.sources);
-        }
+        sourcemap = outputSourcemap;
       })
       .on('end', () => {
         t.deepEqual(outputString, fixture.expectedOutput);
+        if (fixture.expectedSourcemap) {
+          t.deepEqual(sourcemap.mappings, fixture.expectedSourcemap.mappings);
+          t.deepEqual(sourcemap.sources, fixture.expectedSourcemap.sources);
+        }
         t.end();
       });
 

@@ -1,7 +1,5 @@
-import path from 'path';
-
 import _ from 'lodash';
-import duplexer from 'duplexer2';
+import duplexer from 'duplexer3';
 import get from 'through2-get';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
@@ -17,25 +15,20 @@ import { defaultTokenRegExp, defaultToken, defaultSeparator } from './config';
 * Output stream: string
 */
 
-const DEFAULT_OPTIONS = {
-  input: 'link',
-  output: 'content',
-};
-
 // The sourceFile should be relative to the sourcePath
 export default function Transcluder(source = 'input', opt) {
-  const options = _.merge({}, DEFAULT_OPTIONS, { relativePath: path.dirname(source), source }, opt);
+  const options = _.merge({}, { source }, opt);
 
   // Sourcemap
   const outputFile = _.get(options, 'outputFile');
   let sourceMap;
 
   function token(match) {
-    return defaultToken(match, options);
+    return defaultToken(match, { source, parents: [source] });
   }
 
   function separator(match) {
-    return defaultSeparator(match, options);
+    return defaultSeparator(match, { source, parents: [source] });
   }
 
   const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
