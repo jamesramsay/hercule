@@ -25,7 +25,7 @@ export default function ResolveStream(source, opt) {
   // Create nested duplex stream
   // TODO: rename this function for improved clarity
   function inflate(link, relativePath, references, parents, indent) {
-    const resolverStream = new ResolveStream(link);
+    const resolverStream = new ResolveStream(link, options);
 
     function token(match) {
       return _.merge(

@@ -128,7 +128,11 @@ test.cb('should support custom linkResolver function', (t) => {
     const resolvedRelativePath = path.dirname(resolvedLink);
 
     const fooStream = new Readable();
-    fooStream.push('foo');
+    if (link === 'fox.md') {
+      fooStream.push(':[](animal.md)');
+    } else {
+      fooStream.push('foo');
+    }
     fooStream.push(null);
 
     return cb(null, fooStream, resolvedLink, resolvedRelativePath);
@@ -136,7 +140,7 @@ test.cb('should support custom linkResolver function', (t) => {
   const expected = {
     indent: '',
     content: 'foo',
-    source: '/foo/fox.md',
+    source: '/foo/animal.md',
     line: 1,
     column: 0,
   };
