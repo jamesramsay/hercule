@@ -35,7 +35,7 @@ export default function ResolveStream(source, opt) {
           relativePath,
           references: [...references],
           parents: [link, ...parents],
-        }
+        },
       );
     }
 
