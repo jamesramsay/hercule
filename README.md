@@ -184,12 +184,13 @@ Each line of `snippet.c` will be indented with the whitespace preceding it.
 
 <a name="transclude" />
 
-### TranscludeStream([options], [pathList])
+### TranscludeStream([source], [options])
 
 Returns a duplex stream.
 
 __Arguments__
 
+- `source` - Source file for the purpose of the sourcemap
 - `options` - An object of options to be applied when processing input.
   - `relativePath` - A path to which the transclusion links within input stream are relative.
   - `references` - A collection of references which be considered when resolving each transclusion link.
@@ -198,8 +199,6 @@ __Arguments__
     - `href` - A link which will be trancluded according to its `hrefType`.
     - `hrefType` - `file`, `http`, or `string`
   - `parents` - A collection of fully qualified file paths of the input used to detect and prevent circular transclusion.
-- `pathList` - An array (typically empty) which the path of every transclusion will be appended to.
-  This is helpful for generating a watch list for live reloading.
 
 __Examples__
 

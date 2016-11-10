@@ -17,7 +17,7 @@ gulp.task('hercule', function() {
       }
 
       if (file.isStream()) {
-        var transcluder = new hercule.TranscludeStream(options);
+        var transcluder = new hercule.TranscludeStream(null, options);
         file.contents = file.contents.pipe(transcluder);
         return callback(null, file);
       }
