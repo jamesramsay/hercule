@@ -52,7 +52,7 @@ export function parseTransclude(transclusionLink, relativePath, source, { line, 
  * @param {resolveLinkCallback} cb - callback
  * @returns {function} cb
  */
-export function resolveLink({ link, relativePath, source, line, column }, cb) {
+export function resolveLink({ link, relativePath, source, parents, line, column }, cb) {
   let input = '';
   let linkType;
   let resolvedLink;
@@ -65,7 +65,7 @@ export function resolveLink({ link, relativePath, source, line, column }, cb) {
   }
 
   if (linkType === 'string') {
-    input = stringInflater(link, source, line, column);
+    input = stringInflater(link, source, line, column, parents);
   }
 
   if (linkType === 'local') {

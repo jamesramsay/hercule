@@ -20,10 +20,11 @@ export function defaultToken(
   };
 }
 
-export function defaultSeparator(match, { indent = '', source = '' }) {
+export function defaultSeparator(match, { indent = '', source = '', parents = [] }) {
   return {
     indent,
     content: match[MATCH_GROUP],
     source,
+    parents,
   };
 }

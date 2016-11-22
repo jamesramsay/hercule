@@ -73,8 +73,8 @@ function main() {
   if (args.length === 0) {
     // Reading input from stdin
     inputStream = process.stdin;
-    source = `${opts.relativePath}/stdin.md`;
-    options.relativePath = opts.relativePath;
+    source = path.join(opts.relativePath, 'stdin');
+    // options.relativePath = opts.relativePath;
   } else {
     // Reading input from file
     source = path.normalize(args[0]);

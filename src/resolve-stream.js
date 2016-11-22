@@ -40,7 +40,7 @@ export default function ResolveStream(source, opt) {
     }
 
     function separator(match) {
-      return defaultSeparator(match, { indent, source: link });
+      return defaultSeparator(match, { indent, source: link, parents: [...parents] });
     }
 
     const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
@@ -80,6 +80,7 @@ export default function ResolveStream(source, opt) {
       if (parseErr) return handleError('Link could not be parsed', transclusionLink, parseErr);
 
       const references = _.uniq([...parsedReferences, ...parentRefs]);
+      const linkParents = [...parents, source];
 
       // References from parent files override primary links, then to fallback if provided and no matching references
       const link = resolveReferences(primary, fallback, parentRefs);
@@ -90,9 +91,9 @@ export default function ResolveStream(source, opt) {
       // Resolve link to readable stream
       linkResolver(link, (resolveErr, input, resolvedLink, resolvedRelativePath) => {
         if (resolveErr) return handleError('Link could not be inflated', resolvedLink, resolveErr);
-        if (_.includes(parents, resolvedLink)) return handleError('Circular dependency detected', resolvedLink);
+        if (_.includes(linkParents, resolvedLink)) return handleError('Circular dependency detected', resolvedLink);
 
-        const inflater = inflate(resolvedLink, resolvedRelativePath, references, parents, indent);
+        const inflater = inflate(resolvedLink, resolvedRelativePath, references, linkParents, indent);
 
         input.on('error', (inputErr) => {
           this.emit('error', inputErr);

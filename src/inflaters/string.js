@@ -12,16 +12,17 @@ import { Readable } from 'stream';
  * @param {string} source - Source document containing the input string
  * @param {number} line - Location of the of input in the source file
  * @param {number} column - Location of the of input in the source file
+ * @param {array} parents - Array of ancestors
  * @return {Object} stringStream - Readable stream object
  */
-export default function inflate(input, source, line, column) {
+export default function inflate(input, source, line, column, parents) {
   const stringStream = new Readable({ objectMode: true });
 
   // Strings provided by fallback or reference are quoted
   const content = input.slice(1, -1);
   const adjustedColumn = column + 1; // compensate for removed leading quote
 
-  stringStream.push({ content, source, line, column: adjustedColumn });
+  stringStream.push({ content, source, line, column: adjustedColumn, parents });
   stringStream.push(null);
   return stringStream;
 }
