@@ -31,6 +31,7 @@ export default function SourceMapStream(generatedFile = 'string') {
       column: chunk.column,
     };
 
+    if (content === '') return cb();
     if (!generatedFile) return cb();
 
     mappings.push({

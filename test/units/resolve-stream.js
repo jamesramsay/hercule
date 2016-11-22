@@ -80,6 +80,7 @@ test.cb('should resolve simple link to content', (t) => {
     source: '/foo/fox.md',
     line: 1,
     column: 0,
+    parents: ['/foo/bar.md'],
   };
   const testStream = new ResolveStream('/foo/bar.md');
 
@@ -143,6 +144,7 @@ test.cb('should support custom linkResolver function', (t) => {
     source: '/foo/animal.md',
     line: 1,
     column: 0,
+    parents: ['/foo/bar.md', '/foo/fox.md'],
   };
 
   const testStream = new ResolveStream('/foo/bar.md', { resolveLink });
@@ -174,6 +176,7 @@ test.cb('should ignore linkResolver that isn\'t a function', (t) => {
     source: '/bar.md',
     line: 1,
     column: 0,
+    parents: ['/foo.md'],
   };
   const testStream = new ResolveStream('/foo.md', { resolveLink });
 
