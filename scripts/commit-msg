@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-require('shelljs/make');
 
-var semver = require('semver');
 'use strict';
 
-var TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade|chore\(package\)):/;
+/* global cat, cd, cp, echo, exec, exit, find, ls, mkdir, pwd, rm, target, test*/
+require('shelljs/make');
+const semver = require('semver');
+
+const TAG_REGEX = /^(?:Fix|Update|Breaking|Docs|Build|New|Upgrade|chore\(package\)):/;
 
 /**
  * Executes a command and returns the output instead of printing it to stdout.
@@ -15,24 +17,15 @@ function execSilent(cmd) {
   return exec(cmd, { silent: true }).output;
 }
 
-/**
- * Splits a command result to separate lines.
- * @param {string} result The command result string.
- * @returns {array} The separated lines.
- */
-function splitCommandResultToLines(result) {
-  return result.trim().split('\n');
-}
-
 function checkGitCommit() {
-  var commitMsgs, failed;
+  let failed;
 
   echo('Validating commit message...');
 
-  commitMsgs = [execSilent('git log -1 --format=format:%s --no-merges')];
+  const commitMsgs = [execSilent('git log -1 --format=format:%s --no-merges')];
 
   // No commit since master should not cause test to fail
-  if (commitMsgs[0] === '') {
+  if (commitMsgs[0] === undefined || commitMsgs[0] === '') {
     return;
   }
 
@@ -44,7 +37,7 @@ function checkGitCommit() {
 
   // Only check non-release messages
   if (!semver.valid(commitMsgs[0]) && !/^Revert /.test(commitMsgs[0])) {
-    if (commitMsgs[0].slice(0, commitMsgs[0].indexOf('\n')).length > 72) {
+    if (commitMsgs[0].split(/\r?\n/)[0].length > 72) {
       echo(' - First line of commit message must not exceed 72 characters');
       failed = true;
     }
@@ -62,7 +55,6 @@ function checkGitCommit() {
         '   Please refer to the contribution guidelines for more details.'].join('\n'));
       failed = true;
     }
-
   }
 
   if (failed) {
