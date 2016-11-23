@@ -64,7 +64,7 @@ test.cb('should emit a sourcemap', (t) => {
       sources: ['foo.md'],
       names: [],
       mappings: 'AAAA',
-      file: '../test/units/output.md',
+      file: '../output.md',
     });
     t.end();
   });
