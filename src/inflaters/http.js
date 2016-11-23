@@ -15,5 +15,4 @@ export default function inflate(link) {
     if (res.statusCode !== 200) this.emit('error', { message: 'Could not read file', path: link });
   });
   return remoteStream;
-
 }

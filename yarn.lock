@@ -3255,6 +3255,15 @@ readable-stream@~1.0.26:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
+readable-stream@~1.1.0:
+  version "1.1.14"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.1.14.tgz#7cf4c54ef648e3813084c636dd2079e166c081d9"
+  dependencies:
+    core-util-is "~1.0.0"
+    inherits "~2.0.1"
+    isarray "0.0.1"
+    string_decoder "~0.10.x"
+
 readable-stream@~2.0.0:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.0.6.tgz#8f90341e68a53ccc928788dacfcd11b36eb9b78e"
@@ -3663,6 +3672,13 @@ stream-combiner@~0.0.2:
   resolved "https://registry.yarnpkg.com/stream-combiner/-/stream-combiner-0.0.4.tgz#4d5e433c185261dde623ca3f44c586bcf5c4ad14"
   dependencies:
     duplexer "~0.1.1"
+
+stream-spigot@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/stream-spigot/-/stream-spigot-3.0.5.tgz#6186a2b4e0a01dc7c8dbc9745fc667cae6c33b41"
+  dependencies:
+    readable-stream "~1.1.0"
+    xtend "~4.0.0"
 
 string_decoder@~0.10.x:
   version "0.10.31"

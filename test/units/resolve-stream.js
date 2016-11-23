@@ -123,8 +123,9 @@ test.cb('should support custom linkResolver function', (t) => {
     content: ':[](fox.md)',
     link: 'fox.md',
     relativePath: '/foo',
+    parents: [],
   };
-  function resolveLink({ link, relativePath, source, line, column }, cb) {
+  function resolveLink({ link, relativePath, parents, source, line, column }, cb) {
     const resolvedLink = path.join(relativePath, link);
     const resolvedRelativePath = path.dirname(resolvedLink);
 
@@ -144,7 +145,7 @@ test.cb('should support custom linkResolver function', (t) => {
     source: '/foo/animal.md',
     line: 1,
     column: 0,
-    parents: ['/foo/bar.md', '/foo/fox.md'],
+    parents: ['/foo/fox.md', '/foo/bar.md', '/foo/fox.md'],
   };
 
   const testStream = new ResolveStream('/foo/bar.md', { resolveLink });
