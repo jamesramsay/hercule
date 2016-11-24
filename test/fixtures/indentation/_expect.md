@@ -5,5 +5,3 @@ BY LEWIS CARROLL
           Did gyre and gimble in the wabe:
     All mimsy were the borogoves,
           And the mome raths outgrabe.
-    
-The End.
