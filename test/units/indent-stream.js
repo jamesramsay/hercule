@@ -1,4 +1,5 @@
 import test from 'ava';
+import spigot from 'stream-spigot';
 import IndentStream from '../../src/indent-stream';
 
 
@@ -17,75 +18,81 @@ test.cb('should handle no input', (t) => {
   testStream.end();
 });
 
-
-test.cb('should not modify input without whitespace', (t) => {
-  const input = {
-    content: 'The quick brown fox jumps over the lazy dog.',
-    whitespace: null,
-  };
+test.cb('should not modify input without whitespace or newline', (t) => {
+  const input = [
+    {
+      content: 'The quick brown fox ',
+    },
+    {
+      content: 'jumps over ',
+      indent: null,
+    },
+    {
+      content: 'the lazy dog.',
+      indent: '    ',
+    },
+  ];
   const testStream = new IndentStream();
+  const output = [];
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.deepEqual(chunk, input);
+      output.push(chunk);
     }
   });
 
   testStream.on('end', () => {
+    t.deepEqual(output, input);
     t.end();
   });
 
-  testStream.write(input);
-  testStream.end();
+  spigot({ objectMode: true }, input).pipe(testStream);
 });
 
-
-test.cb('should not modify input without new lines', (t) => {
-  const input = {
-    content: 'The quick brown fox jumps over the lazy dog.',
-    whitespace: '  ',
-  };
+test.cb('should indent text after each new line', (t) => {
+  const input = [
+    {
+      content: 'The quick\n\nbrown\n',
+      indent: '  ',
+    },
+    {
+      content: '\nfox jumps\nover the lazy dog.',
+      indent: '  ',
+    },
+    {
+      content: '\n',
+      indent: '  ',
+    },
+  ];
+  const expect = [
+    {
+      content: 'The quick\n\n  brown\n',
+      indent: '  ',
+    },
+    {
+      content: '\n  fox jumps\n  over the lazy dog.',
+      indent: '  ',
+    },
+    {
+      content: '\n',
+      indent: '  ',
+    },
+  ];
   const testStream = new IndentStream();
+  const output = [];
 
   testStream.on('readable', function read() {
     let chunk = null;
     while ((chunk = this.read()) !== null) {
-      t.deepEqual(chunk, input);
+      output.push(chunk);
     }
   });
 
   testStream.on('end', () => {
+    t.deepEqual(output, expect);
     t.end();
   });
 
-  testStream.write(input);
-  testStream.end();
-});
-
-
-test.cb('should only indent text after each new line', (t) => {
-  const input = {
-    content: 'The quick brown\nfox jumps\nover the lazy dog.\n',
-    indent: '  ',
-  };
-  const expect = {
-    content: 'The quick brown\n  fox jumps\n  over the lazy dog.\n  ',
-    indent: '  ',
-  };
-  const testStream = new IndentStream();
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      t.deepEqual(chunk, expect);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.end();
-  });
-
-  testStream.write(input);
-  testStream.end();
+  spigot({ objectMode: true }, input).pipe(testStream);
 });
