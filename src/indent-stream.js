@@ -1,41 +1,51 @@
 import through2 from 'through2';
-import _ from 'lodash';
 
 /**
 * Indents each line of a chunk by the provided indent amount
-*
-* Input stream: (object)
-* - content (string, required)
-* - indent (string, optional) - String to be appended to the start of each line.
-*
-* Output stream: (object)
-* - content (string)
 */
 
-const DEFAULT_OPTIONS = {
-  input: 'content',
-  output: 'content',
-  indent: 'indent',
-};
-
-export default function IndentStream(opt) {
-  const options = _.merge({}, DEFAULT_OPTIONS, opt);
+export default function IndentStream() {
+  const NEWLINE = '\n';
+  const inputBuffer = [];
 
   function transform(chunk, encoding, cb) {
-    const indent = _.get(chunk, options.indent);
-    let content = _.get(chunk, options.input);
+    inputBuffer.push(chunk);
 
-    if (!indent) {
-      this.push(chunk);
-      return cb();
+    // The input buffer shouldn't have more than two items in it at a time
+    while (inputBuffer.length > 1) {
+      const indent = inputBuffer[0].indent;
+      let content = inputBuffer[0].content;
+      const endsWithNewLine = inputBuffer[0].content.slice(-1) === NEWLINE;
+      const followedByNewLine = inputBuffer[1].content.slice(0, 1) === NEWLINE;
+
+      if (indent) {
+        content = content.replace(/\n(?!\s)/g, `\n${indent}`);
+
+        if (endsWithNewLine && followedByNewLine) {
+          content = content.replace(/\n\s+$/g, NEWLINE);
+        }
+
+        inputBuffer[0].content = content;
+      }
+
+      const out = inputBuffer.shift();
+      this.push(out);
     }
 
-    content = content.replace(/\n/g, `\n${indent}`);
-    const output = _.assign(chunk, { [options.output]: content });
-
-    this.push(output);
     return cb();
   }
 
-  return through2.obj(transform);
+  function flush(cb) {
+    // Empty internal buffer and signal the end of the output stream.
+    if (inputBuffer.length > 0) {
+      const indent = inputBuffer[0].indent;
+      const content = inputBuffer[0].content;
+      if (indent) inputBuffer[0].content = content.replace(/\n(?!\s|$)/g, `\n${indent}`);
+      this.push(inputBuffer.shift());
+    }
+    this.push(null);
+    return cb();
+  }
+
+  return through2.obj(transform, flush);
 }
