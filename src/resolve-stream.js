@@ -4,7 +4,7 @@ import duplexer from 'duplexer2';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import { parseTransclude, resolveReferences, resolveLink } from './resolve';
-import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
+import { defaultTokenRegExp, defaultToken, defaultSeparator } from './config';
 
 /**
 * Input stream: object
@@ -43,9 +43,8 @@ export default function ResolveStream(source, opt) {
       return defaultSeparator(match, { indent, source: link, parents: [...parents] });
     }
 
-    const tokenizerOptions = { leaveBehind: `${WHITESPACE_GROUP}`, token, separator };
     const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
-    const tokenizerStream = regexpTokenizer(tokenizerOptions, linkRegExp);
+    const tokenizerStream = regexpTokenizer({ token, separator }, linkRegExp);
 
     tokenizerStream.pipe(resolverStream);
 
