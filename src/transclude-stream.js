@@ -9,7 +9,7 @@ import ResolveStream from './resolve-stream';
 import IndentStream from './indent-stream';
 import TrimStream from './trim-stream';
 import SourceMapStream from './source-map-stream';
-import { defaultTokenRegExp, defaultToken, defaultSeparator, WHITESPACE_GROUP } from './config';
+import { defaultTokenRegExp, defaultToken, defaultSeparator } from './config';
 
 /**
 * Input stream: string
@@ -39,18 +39,13 @@ export default function Transcluder(source = 'input', opt) {
   }
 
   const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
-  const tokenizerOptions = {
-    leaveBehind: `${WHITESPACE_GROUP}`,
-    token,
-    separator,
-  };
   const resolverOptions = {
     linkRegExp: options.linkRegExp,
     linkMatch: options.linkMatch,
     resolveLink: options.resolveLink,
   };
 
-  const tokenizer = regexpTokenizer(tokenizerOptions, linkRegExp);
+  const tokenizer = regexpTokenizer({ token, separator }, linkRegExp);
   const resolver = new ResolveStream(source, resolverOptions);
   const indenter = new IndentStream();
   const trim = new TrimStream();
