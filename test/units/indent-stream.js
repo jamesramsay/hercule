@@ -53,30 +53,54 @@ test.cb('should not modify input without whitespace or newline', (t) => {
 test.cb('should indent text after each new line', (t) => {
   const input = [
     {
-      content: 'The quick\n\nbrown\n',
-      indent: '  ',
-    },
-    {
-      content: '\nfox jumps\nover the lazy dog.',
-      indent: '  ',
-    },
-    {
+      indent: '',
       content: '\n',
-      indent: '  ',
+    },
+    {
+      indent: '    ',
+      content: '’Twas brillig, and the slithy toves\n',
+    },
+    {
+      indent: '    ',
+      content: '  Did gyre and gimble ',
+    },
+    {
+      indent: '    ',
+      content: 'in the wabe:\n',
+    },
+    {
+      indent: '    ',
+      content: 'All mimsy were the borogoves,\n',
+    },
+    {
+      indent: '      ',
+      content: 'And the mome raths outgrabe.\n',
     },
   ];
   const expect = [
     {
-      content: 'The quick\n\n  brown\n',
-      indent: '  ',
-    },
-    {
-      content: '\n  fox jumps\n  over the lazy dog.',
-      indent: '  ',
-    },
-    {
+      indent: '',
       content: '\n',
-      indent: '  ',
+    },
+    {
+      indent: '    ',
+      content: '    ’Twas brillig, and the slithy toves\n',
+    },
+    {
+      indent: '    ',
+      content: '      Did gyre and gimble ',
+    },
+    {
+      indent: '    ',
+      content: 'in the wabe:\n',
+    },
+    {
+      indent: '    ',
+      content: '    All mimsy were the borogoves,\n',
+    },
+    {
+      indent: '      ',
+      content: '      And the mome raths outgrabe.\n',
     },
   ];
   const testStream = new IndentStream();
