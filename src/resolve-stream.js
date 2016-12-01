@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import through2 from 'through2';
-import duplexer from 'duplexer2';
+import duplexer from 'duplexer3';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
-import { parseTransclude, resolveReferences, resolveLink } from './resolve';
+import { parseContent, resolveToReadableStream } from './resolver';
 import { defaultTokenRegExp, defaultToken, defaultSeparator } from './config';
 
 /**
@@ -24,23 +24,22 @@ export default function ResolveStream(source, opt) {
 
   // Create nested duplex stream
   // TODO: rename this function for improved clarity
-  function inflate(link, relativePath, references, parents, indent) {
-    const resolverStream = new ResolveStream(link, options);
+  function inflate(url, references, parents, indent) {
+    const resolverStream = new ResolveStream(url);
 
     function token(match) {
       return _.merge(
         defaultToken(match, options, indent),
         {
-          source: link,
-          relativePath,
+          source: url,
           references: [...references],
-          parents: [link, ...parents],
+          parents: [...parents, url],
         },
       );
     }
 
     function separator(match) {
-      return defaultSeparator(match, { indent, source: link, parents: [...parents] });
+      return defaultSeparator(match, { indent, source: url, parents: [...parents] });
     }
 
     const linkRegExp = _.get(options, 'linkRegExp') || defaultTokenRegExp;
@@ -54,68 +53,81 @@ export default function ResolveStream(source, opt) {
   /* eslint-disable consistent-return */
   function transform(chunk, encoding, cb) {
     const transclusionLink = _.get(chunk, 'link');
-    const relativePath = _.get(chunk, 'relativePath') || '';
-    const parentRefs = _.get(chunk, 'references') || [];
+    const inheritedReferences = _.get(chunk, 'references') || [];
     const parents = _.get(chunk, 'parents') || [];
     const indent = _.get(chunk, 'indent') || '';
     const self = this;
 
-    function handleError(message, path, error) {
-      self.push(chunk);
-      if (!_.isUndefined(message)) self.emit('error', { message, path, error });
-      return cb();
-    }
-
-    if (!transclusionLink) return handleError();
+    if (!transclusionLink) return cb(null, chunk);
 
     //  Sourcemap
-    const cursor = {
+    const contentSource = {
+      source,
       line: _.get(chunk, 'line'),
       column: _.get(chunk, 'column') + chunk.content.indexOf(transclusionLink),
     };
 
-    // Parses raw transclusion link: primary.link || fallback.link reference.placeholder:reference.link ...
-    parseTransclude(transclusionLink, relativePath, source, cursor, (parseErr, primary, fallback, parsedReferences) => {
-      if (parseErr) return handleError('Link could not be parsed', transclusionLink, parseErr);
+    let parsedContent;
 
-      const references = _.uniq([...parsedReferences, ...parentRefs]);
-      const linkParents = [...parents, source];
-
-      // References from parent files override primary links, then to fallback if provided and no matching references
-      const link = resolveReferences(primary, fallback, parentRefs);
-
-      // NEW: support for custom resolve link function
-      const linkResolver = _.isFunction(options.resolveLink) ? options.resolveLink : resolveLink;
-
-      // Resolve link to readable stream
-      linkResolver(link, (resolveErr, input, resolvedLink, resolvedRelativePath) => {
-        if (resolveErr) return handleError('Link could not be inflated', resolvedLink, resolveErr);
-        if (_.includes(linkParents, resolvedLink)) return handleError('Circular dependency detected', resolvedLink);
-
-        const inflater = inflate(resolvedLink, resolvedRelativePath, references, linkParents, indent);
-
-        input.on('error', (inputErr) => {
-          this.emit('error', inputErr);
-          cb();
-        });
-
-        inflater.on('readable', function inputReadable() {
-          let content;
-          while ((content = this.read()) !== null) {
-            self.push(content);
-          }
-        });
-
-        inflater.on('error', (inflateErr) => {
-          this.emit('error', inflateErr);
-          cb();
-        });
-
-        inflater.on('end', () => cb());
-
-        input.pipe(inflater);
+    try {
+      parsedContent = parseContent(transclusionLink, contentSource);
+    } catch (ex) {
+      self.push(chunk);
+      self.emit('error', {
+        message: 'Link could not be parsed',
+        path: source,
+        error: ex,
+        line: contentSource.line,
+        column: contentSource.column,
       });
+      return cb();
+    }
+    const { contentLink, scopeReferences, descendantReferences } = parsedContent;
+
+    // Inherited reference take precendence over fallback reference
+    const references = [...inheritedReferences, ...scopeReferences];
+    const link = _.find(references, { placeholder: contentLink.url }) || contentLink;
+
+    // Prefer nearest inherited reference
+    const nextReferences = _.uniqBy([...descendantReferences, ...inheritedReferences], 'placeholder');
+
+    const { contentStream, resolvedUrl } = resolveToReadableStream(link, options.resolvers);
+    if (_.includes(parents, resolvedUrl)) {
+      self.push(chunk);
+      self.emit('error', {
+        message: 'Circular dependency detected',
+        path: resolvedUrl,
+        line: link.line,
+        column: link.column,
+      });
+      return cb();
+    }
+
+    // Resolved URL will be undefined for quoted strings: :[exmple](link || "fallback" reference:"string")
+    const resolvedSource = resolvedUrl || link.source;
+    const resolvedParents = resolvedSource ? parents : undefined;
+
+    const inflater = inflate(resolvedSource, nextReferences, resolvedParents, indent);
+
+    contentStream.on('error', (inputErr) => {
+      this.emit('error', inputErr);
+      cb();
     });
+
+    inflater.on('readable', function inputReadable() {
+      let content;
+      while ((content = this.read()) !== null) {
+        self.push(content);
+      }
+    });
+
+    inflater.on('error', (inflateErr) => {
+      this.emit('error', inflateErr);
+      cb();
+    });
+
+    inflater.on('end', () => cb());
+    contentStream.pipe(inflater);
   }
 
   return through2.obj(transform);

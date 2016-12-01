@@ -1,6 +1,6 @@
 {
   "error": {
     "message": "Link could not be parsed",
-    "path": "animal.md foo:bar:\"exception!\""
+    "path": "syntax-error/index.md"
   }
 }

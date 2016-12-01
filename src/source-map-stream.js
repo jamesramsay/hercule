@@ -25,6 +25,8 @@ export default function SourceMapStream(generatedFile = 'string') {
   };
 
   function transform(chunk, encoding, cb) {
+    // console.log(chunk);
+
     const content = chunk.content;
     const originalLocation = {
       line: chunk.line,

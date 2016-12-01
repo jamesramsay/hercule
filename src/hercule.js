@@ -10,8 +10,7 @@ export function transcludeString(...args) {
   const input = args.shift();
   const cb = args.pop();
   const [options = {}] = args;
-  const relativePath = _.get(options, 'relativePath');
-  const source = relativePath ? `${options.relativePath}/string` : 'string';
+  const source = _.get(options, 'source') || 'string';
 
   const transclude = new Transcluder(source, options);
   let outputString = '';

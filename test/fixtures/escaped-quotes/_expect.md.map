@@ -1,1 +1,1 @@
-{"version":3,"sources":["index.md","foo.json"],"names":[],"mappings":"AAAA;ACAA;AACA,SAA8B,IAAM;AACpC,CDDoB;ACDpB;AACA,SDC8B,OCDM;AACpC;ADCA","file":"../test/fixtures/escaped-quotes/_expect.md"}
+{"version":3,"sources":["index.md","foo.json"],"names":[],"mappings":"AAAA;ACAA;AACA,SAA6B,IAAO;AACpC,CDDoB;ACDpB;AACA,SDC6B,OCDO;AACpC;ADCA","file":"../test/fixtures/escaped-quotes/_expect.md"}
