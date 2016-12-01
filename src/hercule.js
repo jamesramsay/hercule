@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import _ from 'lodash';
 
 import Transcluder from './transclude-stream';
@@ -28,7 +27,7 @@ export function transcludeString(...args) {
       if (!cbErr) cbErr = err;
     })
     .on('sourcemap', srcmap => (sourceMap = srcmap))
-    .on('end', () => cb(cbErr, outputString, sourceMap.sources, sourceMap));
+    .on('end', () => cb(cbErr, outputString, sourceMap));
 
   transclude.write(input, 'utf8');
   transclude.end();
@@ -39,7 +38,6 @@ export function transcludeFile(...args) {
   const input = args.shift();
   const cb = args.pop();
   const [options = {}] = args;
-  if (!_.get(options, 'relativePath')) options.relativePath = path.dirname(input);
 
   const transclude = new Transcluder(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
@@ -60,7 +58,7 @@ export function transcludeFile(...args) {
       if (!cbErr) cbErr = err;
     })
     .on('sourcemap', srcmap => (sourceMap = srcmap))
-    .on('end', () => cb(cbErr, outputString, sourceMap.sources, sourceMap));
+    .on('end', () => cb(cbErr, outputString, sourceMap));
 
   inputStream.pipe(transclude);
 }

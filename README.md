@@ -199,6 +199,10 @@ __Arguments__
 2. `options` (_Object_): An object of options to be applied when processing input.
   - `resolvers` - An array of functions which are applied to resolve the URLs to content.
 
+__Customer Emitters__
+
+- `sourcemap` (_Object_): A sourcemap object will be emitted exactly once.
+
 __Examples__
 
 ```javascript
@@ -229,7 +233,10 @@ __Arguments__
 2. `options` (_Object_): An object of options to be applied when processing input.
   - `source` (_String_): source file required for resolving relative links and generating sourcemap.
   - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
-3. `callback(err, [output], [sourcePaths])` (_Function_): A function that will be called after the input `str` has been processed.
+3. `callback(err, [output], [sourcemap])` (_Function_): A function that will be called after the input `str` has been processed.
+  - `err` (_Error_): An error object.
+  - `output` (_String_): A string containing processed input.
+  - `sourcemap` (_Object_): A sourcemap object.
 
 __Examples__
 
@@ -256,7 +263,10 @@ __Arguments__
 1. `source` (_String_): A path to a file to process.
 2. `options` (_Object_): An object of options to be applied when processing input.
   - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
-3. `callback(err, [output], [sourcePaths], [sourcemap])` (_Function_): A function that will be called after the `source` file has been processed.
+3. `callback(err, [output], [sourcemap])` (_Function_): A function that will be called after the `source` file has been processed.
+  - `err` (_Error_): An error object.
+  - `output` (_String_): A string containing processed input.
+  - `sourcemap` (_Object_): A sourcemap object.
 
 __Examples__
 
