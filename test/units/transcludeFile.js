@@ -64,11 +64,11 @@ test.cb('should return sourceList', (t) => {
   const input = path.join(__dirname, '../fixtures/local-link/index.md');
   const expected = 'Jackdaws love my big sphinx of quartz.\n';
 
-  transcludeFile(input, (err, output, sourceList) => {
+  transcludeFile(input, (err, output, sourcemap) => {
     t.deepEqual(err, null);
     t.deepEqual(output, expected);
-    t.regex(sourceList[1], /size\.md/);
-    t.deepEqual(sourceList.length, 2);
+    t.regex(sourcemap.sources[1], /size\.md/);
+    t.deepEqual(sourcemap.sources.length, 2);
     t.end();
   });
 });

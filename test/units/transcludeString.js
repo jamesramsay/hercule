@@ -28,10 +28,10 @@ test.cb('should return sourceList', (t) => {
   const options = { source: path.join(__dirname, '../fixtures/local-link/index.md') };
   const expected = 'Jackdaws love my big sphinx of quartz.';
 
-  transcludeString(input, options, (err, output, sourceList) => {
+  transcludeString(input, options, (err, output, sourcemap) => {
     t.deepEqual(err, null);
     t.deepEqual(output, expected);
-    t.deepEqual(sourceList.length, 2);
+    t.deepEqual(sourcemap.sources.length, 2);
     t.end();
   });
 });
