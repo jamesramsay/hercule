@@ -4,7 +4,7 @@ import get from 'through2-get';
 import regexpTokenizer from 'regexp-stream-tokenizer';
 
 import ResolveStream from './resolve-stream';
-import IndentStream from './indent-stream';
+import Indent from './indent';
 import Trim from './trim';
 import SourceMapStream from './source-map-stream';
 import { defaultTokenRegExp, defaultToken, defaultSeparator } from './config';
@@ -40,7 +40,7 @@ export default function Transcluder(source = 'input', opt) {
 
   const tokenizer = regexpTokenizer({ token, separator }, linkRegExp);
   const resolver = new ResolveStream(source, resolverOptions);
-  const indenter = new IndentStream();
+  const indenter = new Indent();
   const trim = new Trim();
   const sourcemap = new SourceMapStream(outputFile);
   const stringify = get('content');
