@@ -23,7 +23,7 @@ test.cb('should transclude with optional source argument', (t) => {
   });
 });
 
-test.cb('should return sourceList', (t) => {
+test.cb('returns sourcemap', (t) => {
   const input = 'Jackdaws love my :[size link](size.md) sphinx of quartz.';
   const options = { source: path.join(__dirname, '../fixtures/local-link/index.md') };
   const expected = 'Jackdaws love my big sphinx of quartz.';
@@ -36,9 +36,10 @@ test.cb('should return sourceList', (t) => {
   });
 });
 
-test.cb('should return one error if invalid links found', (t) => {
+test.cb('returns error for invalid links', (t) => {
   const input = 'Jackdaws love my :[missing](i-dont-exist.md) sphinx of :[missing](mineral.md)';
   const options = { source: path.join(__dirname, '../fixtures/invalid-link/index.md') };
+
   transcludeString(input, options, (err) => {
     t.regex(err.message, /ENOENT/);
     t.regex(err.path, /fixtures\/invalid-link\/i-dont-exist.md/);
@@ -56,29 +57,6 @@ test.cb('should return one error if invalid links found', (t) => {
 //   transcludeString(input, options, (err) => {
 //     t.regex(err.message, /ENOENT/);
 //     t.deepEqual(err.path, 'test1.apib');
-//     t.end();
-//   });
-// });
-
-// test.cb('should support custom linkResolver function', (t) => {
-//   const input = ':[](foo.md):[](bar.md)';
-//   function resolveLink({ link, relativePath, source, line, column }, cb) {
-//     const documents = {
-//       'foo.md': 'foo',
-//       'bar.md': 'bar',
-//     };
-//     const fooStream = new Readable();
-//     fooStream.push(documents[link]);
-//     fooStream.push(null);
-//
-//     return cb(null, fooStream, link, relativePath);
-//   }
-//   const options = { resolveLink };
-//   const expected = 'foobar';
-//
-//   transcludeString(input, options, (err, output) => {
-//     t.deepEqual(err, null);
-//     t.deepEqual(output, expected);
 //     t.end();
 //   });
 // });

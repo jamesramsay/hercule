@@ -1,9 +1,44 @@
 import fs from 'fs';
 import _ from 'lodash';
+import duplexer from 'duplexer3';
+import get from 'through2-get';
 
-import Transcluder from './transclude-stream';
+import Transclude from './transclude';
+import Indent from './indent';
+import Trim from './trim';
+import Sourcemap from './sourcemap';
 
-export const TranscludeStream = Transcluder;
+export function TranscludeStream(source = 'input', options) {
+  const outputFile = _.get(options, 'outputFile');
+  let sourceMap;
+
+  const transclude = new Transclude(source);
+  const indenter = new Indent();
+  const trim = new Trim();
+  const sourcemap = new Sourcemap(outputFile);
+  const stringify = get('content');
+
+  transclude
+    .pipe(trim)
+    .pipe(indenter)
+    .pipe(sourcemap)
+    .pipe(stringify);
+
+  const transcluder = duplexer(transclude, stringify);
+
+  transclude.on('error', (err) => {
+    transcluder.emit('error', err);
+    transclude.end();
+  });
+
+  sourcemap.on('sourcemap', (generatedSourceMap) => {
+    sourceMap = generatedSourceMap;
+  });
+
+  transcluder.on('end', () => transcluder.emit('sourcemap', sourceMap));
+
+  return transcluder;
+}
 
 export function transcludeString(...args) {
   const input = args.shift();
@@ -11,7 +46,7 @@ export function transcludeString(...args) {
   const [options = {}] = args;
   const source = _.get(options, 'source') || 'string';
 
-  const transclude = new Transcluder(source, options);
+  const transclude = new TranscludeStream(source, options);
   let outputString = '';
   let sourceMap;
   let cbErr = null;
@@ -39,7 +74,7 @@ export function transcludeFile(...args) {
   const cb = args.pop();
   const [options = {}] = args;
 
-  const transclude = new Transcluder(input, options);
+  const transclude = new TranscludeStream(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let outputString = '';
   let sourceMap;

@@ -1,9 +1,9 @@
 import test from 'ava';
-import SourceMapStream from '../../src/source-map-stream';
+import Sourcemap from '../../src/sourcemap';
 
 
 test.cb('should handle no input', (t) => {
-  const testStream = new SourceMapStream();
+  const testStream = new Sourcemap();
 
   testStream.on('readable', function read() {
     if (this.read() !== null) t.fail();
@@ -24,7 +24,7 @@ test.cb('should not modify input', (t) => {
     line: 1,
     column: 0,
   };
-  const testStream = new SourceMapStream();
+  const testStream = new Sourcemap();
   let output;
 
   testStream.on('readable', function read() {
@@ -50,7 +50,7 @@ test.cb('should emit a sourcemap', (t) => {
     line: 1,
     column: 0,
   };
-  const testStream = new SourceMapStream('output.md');
+  const testStream = new Sourcemap('output.md');
 
   testStream.on('readable', function read() {
     while (this.read() !== null) {

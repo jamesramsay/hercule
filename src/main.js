@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import dashdash from 'dashdash';
-import Transcluder from './transclude-stream';
+import { TranscludeStream } from './hercule';
 
 let opts;
 let args;
@@ -91,7 +91,7 @@ function main() {
     options.outputFile = 'stdout';
   }
 
-  const transclude = new Transcluder(source, options);
+  const transclude = new TranscludeStream(source, options);
 
   transclude.on('error', (err) => {
     if (opts.reporter === 'json-err') {
