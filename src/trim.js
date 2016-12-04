@@ -6,7 +6,7 @@ import through2 from 'through2';
 *
 */
 
-export default function TrimStream() {
+export default function Trim() {
   const NEWLINE = '\n';
   const inputBuffer = [];
   let memoContent = null;

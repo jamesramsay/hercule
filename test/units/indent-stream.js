@@ -1,10 +1,10 @@
 import test from 'ava';
 import spigot from 'stream-spigot';
-import IndentStream from '../../src/indent-stream';
+import Indent from '../../src/indent';
 
 
 test.cb('should handle no input', (t) => {
-  const testStream = new IndentStream();
+  const testStream = new Indent();
 
   testStream.on('readable', function read() {
     if (this.read() !== null) t.fail();
@@ -32,7 +32,7 @@ test.cb('should not modify input without whitespace or newline', (t) => {
       indent: '    ',
     },
   ];
-  const testStream = new IndentStream();
+  const testStream = new Indent();
   const output = [];
 
   testStream.on('readable', function read() {
@@ -103,7 +103,7 @@ test.cb('should indent text after each new line', (t) => {
       content: '      And the mome raths outgrabe.\n',
     },
   ];
-  const testStream = new IndentStream();
+  const testStream = new Indent();
   const output = [];
 
   testStream.on('readable', function read() {

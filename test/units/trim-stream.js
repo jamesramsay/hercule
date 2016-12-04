@@ -1,10 +1,10 @@
 import test from 'ava';
 import spigot from 'stream-spigot';
-import TrimStream from '../../src/trim-stream';
+import Trim from '../../src/trim';
 
 
 test.cb('should handle no input', (t) => {
-  const testStream = new TrimStream();
+  const testStream = new Trim();
 
   testStream.on('readable', function read() {
     if (this.read() !== null) t.fail();
@@ -38,7 +38,7 @@ test.cb('should not modify input stream from a single source', (t) => {
     },
   ];
 
-  const testStream = new TrimStream();
+  const testStream = new Trim();
   const output = [];
 
   testStream.on('readable', function read() {
@@ -95,7 +95,7 @@ test.cb('should handle advanced scenario', (t) => {
       source: 'index.md',
     },
   ];
-  const testStream = new TrimStream();
+  const testStream = new Trim();
   const output = [];
   const expect = [
     {
@@ -178,7 +178,7 @@ test.cb('should handle multiple new line scenarios', (t) => {
       source: 'index.md',
     },
   ];
-  const testStream = new TrimStream();
+  const testStream = new Trim();
   const output = [];
   const expect = [
     {

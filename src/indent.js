@@ -4,7 +4,7 @@ import through2 from 'through2';
 * Indents each line of a chunk by the provided indent amount
 */
 
-export default function IndentStream() {
+export default function Indent() {
   const NEWLINE = '\n';
   const inputBuffer = [];
 
