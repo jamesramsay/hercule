@@ -9,7 +9,7 @@ export default function Indent() {
   const inputBuffer = [];
 
   function transform(chunk, encoding, cb) {
-    inputBuffer.push(chunk);
+    if (chunk.content) inputBuffer.push(chunk);
 
     // The input buffer shouldn't have more than two items in it at a time
     while (inputBuffer.length > 1) {

@@ -64,12 +64,14 @@
   },
   "homepage": "https://github.com/jamesramsay/hercule",
   "dependencies": {
+    "async": "^2.1.4",
+    "clone-regexp": "^1.0.0",
     "dashdash": "^1.10.1",
     "duplexer3": "^0.1.4",
     "got": "^6.5.0",
     "isstream": "^0.1.2",
+    "left-split": "^1.0.0",
     "lodash": "^4.0.0",
-    "regexp-stream-tokenizer": "^0.2.0",
     "source-map": "^0.5.3",
     "through2": "^2.0.0",
     "through2-get": "^0.0.2"

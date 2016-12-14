@@ -31,7 +31,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
         sourcemap = outputSourcemap;
       })
       .on('end', () => {
-        t.deepEqual(outputString, fixture.expectedOutput);
+        if (!config.error) t.deepEqual(outputString, fixture.expectedOutput);
         if (fixture.expectedSourcemap) {
           t.deepEqual(sourcemap.mappings, fixture.expectedSourcemap.mappings);
           t.deepEqual(sourcemap.sources, fixture.expectedSourcemap.sources);
