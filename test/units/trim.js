@@ -1,23 +1,8 @@
 import test from 'ava';
 import spigot from 'stream-spigot';
+import getStream from 'get-stream';
+
 import Trim from '../../src/trim';
-
-
-test.cb('should handle no input', (t) => {
-  const testStream = new Trim();
-
-  testStream.on('readable', function read() {
-    if (this.read() !== null) t.fail();
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
-
-  testStream.end();
-});
-
 
 test.cb('should not modify input stream from a single source', (t) => {
   const input = [
@@ -39,21 +24,15 @@ test.cb('should not modify input stream from a single source', (t) => {
   ];
 
   const testStream = new Trim();
-  const output = [];
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.deepEqual(output, input);
-    t.end();
-  });
 
   spigot({ objectMode: true }, input).pipe(testStream);
+
+  getStream.array(testStream)
+    .then((output) => {
+      t.deepEqual(output, input);
+      t.end();
+    })
+    .catch(err => t.fail(err));
 });
 
 
@@ -95,8 +74,6 @@ test.cb('should handle advanced scenario', (t) => {
       source: 'index.md',
     },
   ];
-  const testStream = new Trim();
-  const output = [];
   const expect = [
     {
       content: 'The quick brown fox ',
@@ -129,20 +106,16 @@ test.cb('should handle advanced scenario', (t) => {
       source: 'activity.md',
     },
   ];
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.deepEqual(output, expect);
-    t.end();
-  });
+  const testStream = new Trim();
 
   spigot({ objectMode: true }, input).pipe(testStream);
+
+  getStream.array(testStream)
+    .then((output) => {
+      t.deepEqual(output, expect);
+      t.end();
+    })
+    .catch(err => t.fail(err));
 });
 
 test.cb('should handle multiple new line scenarios', (t) => {
@@ -178,8 +151,6 @@ test.cb('should handle multiple new line scenarios', (t) => {
       source: 'index.md',
     },
   ];
-  const testStream = new Trim();
-  const output = [];
   const expect = [
     {
       content: 'The quick brown fox\n',
@@ -202,18 +173,14 @@ test.cb('should handle multiple new line scenarios', (t) => {
       source: 'index.md',
     },
   ];
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.deepEqual(output, expect);
-    t.end();
-  });
+  const testStream = new Trim();
 
   spigot({ objectMode: true }, input).pipe(testStream);
+
+  getStream.array(testStream)
+    .then((output) => {
+      t.deepEqual(output, expect);
+      t.end();
+    })
+    .catch(err => t.fail(err));
 });

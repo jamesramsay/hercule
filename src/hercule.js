@@ -2,6 +2,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import duplexer from 'duplexer3';
 import get from 'through2-get';
+import getStream from 'get-stream';
 
 import Transclude from './transclude';
 import Indent from './indent';
@@ -47,25 +48,21 @@ export function transcludeString(...args) {
   const source = _.get(options, 'source') || 'string';
 
   const transclude = new TranscludeStream(source, options);
-  let outputString = '';
   let sourceMap;
   let cbErr = null;
 
   transclude
-    .on('readable', function read() {
-      let content = null;
-      while ((content = this.read()) !== null) {
-        outputString += content.toString('utf8');
-      }
-    })
-    .on('error', (err) => {
-      if (!cbErr) cbErr = err;
-    })
     .on('sourcemap', srcmap => (sourceMap = srcmap))
-    .on('end', () => cb(cbErr, outputString, sourceMap));
+    .on('error', (err) => {
+      if (!cbErr) cbErr = err; // TODO: fix stream emitting multiple errors
+    });
 
   transclude.write(input, 'utf8');
   transclude.end();
+
+  getStream(transclude)
+    .then(output => cb(null, output, sourceMap))
+    .catch(err => cb(err, err.bufferedData, sourceMap));
 }
 
 
@@ -76,24 +73,19 @@ export function transcludeFile(...args) {
 
   const transclude = new TranscludeStream(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
-  let outputString = '';
   let sourceMap;
   let cbErr = null;
 
   inputStream.on('error', err => cb(err));
-
   transclude
-    .on('readable', function read() {
-      let content = null;
-      while ((content = this.read()) !== null) {
-        outputString += content;
-      }
-    })
-    .on('error', (err) => {
-      if (!cbErr) cbErr = err;
-    })
     .on('sourcemap', srcmap => (sourceMap = srcmap))
-    .on('end', () => cb(cbErr, outputString, sourceMap));
+    .on('error', (err) => {
+      if (!cbErr) cbErr = err; // TODO: fix stream emitting multiple errors
+    });
 
   inputStream.pipe(transclude);
+
+  getStream(transclude)
+    .then(output => cb(null, output, sourceMap))
+    .catch(err => cb(err, err.bufferedData, sourceMap));
 }

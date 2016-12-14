@@ -2,6 +2,8 @@ import test from 'ava';
 import sinon from 'sinon';
 import { Readable } from 'stream';
 import spigot from 'stream-spigot';
+import get from 'through2-get';
+import getStream from 'get-stream';
 
 import transclude from '../../src/transclude';
 import * as resolver from '../../src/resolver';
@@ -17,42 +19,31 @@ test.afterEach((t) => {
 test.cb('should pass through objects unmodified', (t) => {
   const input = [{ content: 'Hello world!' }];
   const testStream = transclude();
-  const output = [];
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk);
-    }
-  });
-
-  testStream.on('end', () => {
-    t.deepEqual(output, input);
-    t.end();
-  });
 
   spigot({ objectMode: true }, input).pipe(testStream);
+
+  getStream.array(testStream)
+    .then((output) => {
+      t.deepEqual(output, input);
+      t.end();
+    })
+    .catch(err => t.fail(err));
 });
 
 test.cb('should split strings after new lines', (t) => {
   const input = ['The quick ', 'brown fox\r\njumps over', ' the lazy dog.\n'];
   const expected = ['The quick brown fox\r\n', 'jumps over the lazy dog.\n'];
   const testStream = transclude();
-  const output = [];
+  const stringify = get('content');
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk.content);
-    }
-  });
+  spigot({ objectMode: true }, input).pipe(testStream).pipe(stringify);
 
-  testStream.on('end', () => {
-    t.deepEqual(output, expected);
-    t.end();
-  });
-
-  spigot({ objectMode: true }, input).pipe(testStream);
+  getStream.array(stringify)
+    .then((output) => {
+      t.deepEqual(output, expected);
+      t.end();
+    })
+    .catch(err => t.fail(err));
 });
 
 test.serial.cb('should locate link within content', (t) => {
@@ -61,59 +52,46 @@ test.serial.cb('should locate link within content', (t) => {
   const input = ['Fizz :[foo]', '(foo.md) bar\nbuzz :[bar](bar.md)\n'];
   const expected = ['Fizz ', 'zing', ' bar\n', 'buzz ', 'zing', '\n'];
   const testStream = transclude('string', { resolvers: [() => ({ content: 'zing', url: 'baz.md' })] });
-  const output = [];
+  const stringify = get('content');
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk.content);
-    }
-  });
+  spigot({ objectMode: true }, input).pipe(testStream).pipe(stringify);
 
-  testStream.on('end', () => {
-    t.is(resolver.parseContent.firstCall.args[0], 'foo.md');
-    t.is(resolver.parseContent.secondCall.args[0], 'bar.md');
-    t.deepEqual(output, expected);
-    t.end();
-  });
-
-  spigot({ objectMode: true }, input).pipe(testStream);
+  getStream.array(stringify)
+    .then((output) => {
+      t.is(resolver.parseContent.firstCall.args[0], 'foo.md');
+      t.is(resolver.parseContent.secondCall.args[0], 'bar.md');
+      t.deepEqual(output, expected);
+      t.end();
+    })
+    .catch(err => t.fail(err));
 });
 
 test.cb('throws on invalid link', (t) => {
   const input = [':[foo](foo .md)'];
   const testStream = transclude();
-  const output = [];
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk.content);
-    }
-  });
-  t.plan(1);
-  testStream.on('error', err => t.is(err.message, 'Link could not be parsed'));
-  testStream.on('end', () => t.end());
 
   spigot({ objectMode: true }, input).pipe(testStream);
+
+  getStream.array(testStream)
+    .then(() => t.fail('expected error'))
+    .catch((err) => {
+      t.is(err.message, 'Link could not be parsed');
+      t.end();
+    });
 });
 
 test.cb('throws on circular reference', (t) => {
   const input = [':[foo](foo.md)'];
   const testStream = transclude('foo.md', { resolvers: [() => ({ content: new Readable(), url: 'foo.md' })] });
-  const output = [];
-
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk.content);
-    }
-  });
-  t.plan(1);
-  testStream.on('error', err => t.is(err.message, 'Circular dependency detected'));
-  testStream.on('end', () => t.end());
 
   spigot({ objectMode: true }, input).pipe(testStream);
+
+  getStream.array(testStream)
+    .then(() => t.fail('expected error'))
+    .catch((err) => {
+      t.is(err.message, 'Circular dependency detected');
+      t.end();
+    });
 });
 
 // test.cb('should extend with source, parents, references, and cursor information', (t) => {

@@ -68,6 +68,7 @@
     "clone-regexp": "^1.0.0",
     "dashdash": "^1.10.1",
     "duplexer3": "^0.1.4",
+    "get-stream": "^3.0.0",
     "got": "^6.5.0",
     "isstream": "^0.1.2",
     "left-split": "^1.0.0",
