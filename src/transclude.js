@@ -54,12 +54,13 @@ export default function Transclude(source = 'string', options = {}) {
 
   // eslint-disable-next-line consistent-return
   function transclude(chunk, cb) {
+    const self = this;
+
     if (!chunk.link) {
-      this.push(chunk);
+      self.push(chunk);
       return cb();
     }
 
-    const self = this;
     const { parents, indent } = chunk;
     const sourceLine = chunk.line;
     const sourceColumn = chunk.column;

@@ -25,17 +25,12 @@ export function TranscludeStream(source = 'input', options) {
     .pipe(sourcemap)
     .pipe(stringify);
 
-  const transcluder = duplexer(transclude, stringify);
-
-  transclude.on('error', (err) => {
-    transcluder.emit('error', err);
-    transclude.end();
-  });
-
+  transclude.on('error', () => transclude.end());
   sourcemap.on('sourcemap', (generatedSourceMap) => {
     sourceMap = generatedSourceMap;
   });
 
+  const transcluder = duplexer({ bubbleErrors: false }, transclude, stringify);
   transcluder.on('end', () => transcluder.emit('sourcemap', sourceMap));
 
   return transcluder;
@@ -49,14 +44,8 @@ export function transcludeString(...args) {
 
   const transclude = new TranscludeStream(source, options);
   let sourceMap;
-  let cbErr = null;
 
-  transclude
-    .on('sourcemap', srcmap => (sourceMap = srcmap))
-    .on('error', (err) => {
-      if (!cbErr) cbErr = err; // TODO: fix stream emitting multiple errors
-    });
-
+  transclude.on('sourcemap', srcmap => (sourceMap = srcmap));
   transclude.write(input, 'utf8');
   transclude.end();
 
@@ -74,15 +63,9 @@ export function transcludeFile(...args) {
   const transclude = new TranscludeStream(input, options);
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let sourceMap;
-  let cbErr = null;
 
+  transclude.on('sourcemap', srcmap => (sourceMap = srcmap));
   inputStream.on('error', err => cb(err));
-  transclude
-    .on('sourcemap', srcmap => (sourceMap = srcmap))
-    .on('error', (err) => {
-      if (!cbErr) cbErr = err; // TODO: fix stream emitting multiple errors
-    });
-
   inputStream.pipe(transclude);
 
   getStream(transclude)
