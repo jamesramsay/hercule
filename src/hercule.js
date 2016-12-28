@@ -19,16 +19,10 @@ export function TranscludeStream(source = 'input', options) {
   const sourcemap = new Sourcemap(outputFile);
   const stringify = get('content');
 
-  transclude
-    .pipe(trim)
-    .pipe(indenter)
-    .pipe(sourcemap)
-    .pipe(stringify);
-
   transclude.on('error', () => transclude.end());
-  sourcemap.on('sourcemap', (generatedSourceMap) => {
-    sourceMap = generatedSourceMap;
-  });
+  sourcemap.on('sourcemap', generatedSourceMap => (sourceMap = generatedSourceMap));
+
+  transclude.pipe(trim).pipe(indenter).pipe(sourcemap).pipe(stringify);
 
   const transcluder = duplexer({ bubbleErrors: false }, transclude, stringify);
   transcluder.on('end', () => transcluder.emit('sourcemap', sourceMap));

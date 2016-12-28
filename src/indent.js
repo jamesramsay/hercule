@@ -1,9 +1,5 @@
 import through2 from 'through2';
 
-/**
-* Indents each line of a chunk by the provided indent amount
-*/
-
 export default function Indent() {
   const NEWLINE = '\n';
   const inputBuffer = [];
@@ -19,11 +15,9 @@ export default function Indent() {
       const beginsNewLine = inputBuffer[1].content.slice(0, 1) === NEWLINE;
 
       if (indent) {
-        if (preceededNewLine && !beginsNewLine) {
-          content = indent + content;
-        }
-        content = content.replace(/\n(?!\s|$)/g, `\n${indent}`);
+        if (preceededNewLine && !beginsNewLine) content = indent + content;
 
+        content = content.replace(/\n(?!\s|$)/g, `\n${indent}`);
         inputBuffer[1].content = content;
       }
 

@@ -301,14 +301,6 @@ __Returns__
   - `content` (_Stream | String_): The content to be transcluded. Streams are processed for further transclusion links. Strings are assumed fully processed.
   - `url` (_String_): The absolute url of the input, allowing circular reference detection and nested transclusion.
 
-<a name="defaultResolvers" />
-
-#### defaultResolvers
-
-Ordered array of functions applied until a result is returned.
-
-TODO: write the rest of this
-
 <a name="resolveHttpUrl" />
 
 #### resolveHttpUrl
