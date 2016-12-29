@@ -1,18 +1,19 @@
-# Hercule – Transclusion Tool
-
-[![Version](https://img.shields.io/npm/v/hercule.svg)](https://npmjs.com/package/hercule)
-[![License](https://img.shields.io/npm/l/hercule.svg)](https://npmjs.com/package/hercule)
-[![Build Status](https://img.shields.io/travis/jamesramsay/hercule/master.svg)](https://travis-ci.org/jamesramsay/hercule)
-[![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule/master.svg)](https://codecov.io/github/jamesramsay/hercule)
-[![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
+# Hercule
 
 <a href="https://www.npmjs.com/package/hercule">
-  <img src="https://cdn.rawgit.com/jamesramsay/hercule/16c858e8048830bd058ed632e59a988d67845029/hercule.svg" alt="Hercule" width="128px">
+  <img src="https://cdn.rawgit.com/jamesramsay/hercule/16c858e8048830bd058ed632e59a988d67845029/hercule.svg" alt="Hercule" width="256px">
 </a>
 
-Write large markdown documents, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
+> :recycle: Simple document transclusion, ideal for Markdown
 
-Hercule is a command-line tool and library for transcluding markdown, [API Blueprint](http://apiblueprint.org), and plaintext. This allows complex and repetitive documents to be written as smaller logical documents, for improved consistency, reuse, and separation of concerns.
+[![Build Status](https://img.shields.io/travis/jamesramsay/hercule/master.svg)](https://travis-ci.org/jamesramsay/hercule)
+[![Coverage Status](https://img.shields.io/codecov/c/github/jamesramsay/hercule/master.svg)](https://codecov.io/github/jamesramsay/hercule)
+[![Monthly Downloads](https://img.shields.io/npm/dm/hercule.svg)](https://npmjs.com/hercule)
+[![Dependency Status](https://img.shields.io/david/jamesramsay/hercule.svg)](https://david-dm.org/jamesramsay/hercule)
+
+Write large markdown, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
+
+Hercule is a command-line tool and library for transcluding text including Markdown and [API Blueprint](http://apiblueprint.org). This allows complex and repetitive documents to be written as smaller documents.
 
 - Simple extension of markdown link syntax `:[Title](link.md)` (preceding colon `:`)
 - Transclude local files
@@ -22,12 +23,12 @@ Hercule is a command-line tool and library for transcluding markdown, [API Bluep
 
 -----
 
-## Installation
+## Install
 
-Install Hercule using [npm](http://npmjs.org):
+**WARNING: Node.js 4 or higher required for hercule@4 and above.** For older Node.js versions use [hercule@3](https://github.com/jamesramsay/hercule/tree/master-3.x)
 
 ```bash
-npm install -g hercule
+$ npm install -g hercule
 ```
 
 ## Usage
@@ -41,7 +42,7 @@ hercule src/blueprint.md -o output.md
 Hercule supports processing input from stdin, and writing to stdout:
 
 ```
-cat src/blueprint.md | hercule | less
+cat src/blueprint.md | hercule - | less
 ```
 
 Or you can use Hercule as a library:
