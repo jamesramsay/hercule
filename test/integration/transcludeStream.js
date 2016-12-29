@@ -16,6 +16,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
 
     let outputString = '';
     let sourcemap;
+    let errored = 0;
 
     const input = fs.createReadStream(fixture.inputFile, { encoding: 'utf8' });
     const transclude = new TranscludeStream(input.path, options);
@@ -28,7 +29,10 @@ _.forEach((fixtures.fixtures), (fixture) => {
         }
       })
       .on('error', (err) => {
-        // TODO: should only once!
+        // Error should be emitted no more than once
+        t.falsy(errored);
+        errored += 1;
+
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
       })
