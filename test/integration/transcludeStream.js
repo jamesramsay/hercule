@@ -9,7 +9,11 @@ import './_mock';
 _.forEach((fixtures.fixtures), (fixture) => {
   test.cb(`should transclude ${fixture.name}`, (t) => {
     const config = fixture.expectedConfig;
-    const options = { outputFile: `${fixture.inputPath}/_expect.md` };
+    const options = config.options || {};
+
+    // Set output file for sourcemap
+    options.outputFile = `${fixture.inputPath}/_expect.md`;
+
     let outputString = '';
     let sourcemap;
 
@@ -24,6 +28,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
         }
       })
       .on('error', (err) => {
+        // TODO: should only once!
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
       })

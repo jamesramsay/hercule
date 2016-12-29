@@ -318,3 +318,65 @@ TODO: write this
 #### resolveString
 
 TODO: write this
+
+---------------------------------------
+
+<a name="customSyntax" />
+
+### Custom Transclusion Syntax
+
+Tokenization is the first stage of how input is processed and uses a regular expression. You can also use your own regular expression.
+
+- `tokenizerRegExp` (_RegExp_): A regular expression that will be cloned to tokenize input for transclusion.
+- `tokenMatch` (_Integer_): Index of the entire transclusion link match group including indentation.
+- `tokenIndent` (_Integer_): Index of the indentation match group.
+- `tokenLink` (_Integer_): Index of the link match group.
+
+Recipes are provided below for common transclusion syntax's.
+
+#### Aglio
+
+`<!-- include(foo.md) -->``
+
+Suggested configuration for [aglio](https://github.com/danielgtaylor/aglio/) syntax:
+
+```
+const options = {
+  tokenizerRegExp: /( *)?(<!-- include\((.*?)\) -->)/gmi,
+  tokenMatch = 0,
+  tokenIndent = 1,
+  tokenLink = 3
+}
+```
+
+#### Marked
+
+`<<[sections/section1.md]`
+
+Suggested configuration for [Marked](http://marked2app.com/help/Multi-File_Documents.html) app syntax:
+
+```
+const options = {
+  tokenizerRegExp: /( *)?(<<\[(.*)])/gm,
+  tokenMatch = 0,
+  tokenIndent = 1,
+  tokenLink = 3
+}
+```
+
+Hercule does not support the `Transclude Base` metadata header.
+
+#### MultiMarkdown
+
+`{{bar.md}}`
+
+Suggested configuration for [Marked](http://marked2app.com/help/Multi-File_Documents.html) app syntax:
+
+```
+const options = {
+  tokenizerRegExp: /( *)?({{(.*)}})/gm,
+  tokenMatch = 0,
+  tokenIndent = 1,
+  tokenLink = 3
+}
+```

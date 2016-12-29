@@ -1,7 +1,7 @@
 node_modules
 lib
+.bats
 .coveralls.yml
 coverage
 .nyc_output
 *.log
-test/modules*

@@ -13,7 +13,7 @@ export function TranscludeStream(source = 'input', options) {
   const outputFile = _.get(options, 'outputFile');
   let sourceMap;
 
-  const transclude = new Transclude(source);
+  const transclude = new Transclude(source, options);
   const indenter = new Indent();
   const trim = new Trim();
   const sourcemap = new Sourcemap(outputFile);

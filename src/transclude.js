@@ -6,10 +6,32 @@ import leftsplit from 'left-split';
 
 import { parseContent, resolveToReadableStream } from './resolver';
 
-const defaultRegExp = new RegExp(/((^[\t ]*)?:\[.*?]\((.*?)\))/gm);
-const MATCH_GROUP = 0;
-const WHITESPACE_GROUP = 2;
-const LINK_GROUP = 3;
+const SYNTAX = {
+  hercule: {
+    REGEXP: /(^[\t ]*)?:\[.*?]\((.*?)\)/gm,
+    MATCH_GROUP: 0,
+    INDENT_GROUP: 1,
+    LINK_GROUP: 2,
+  },
+  aglio: {
+    REGEXP: /( *)?(<!-- include\((.*?)\) -->)/gmi,
+    MATCH_GROUP: 0,
+    INDENT_GROUP: 1,
+    LINK_GROUP: 3,
+  },
+  marked: {
+    REGEXP: /( *)?<<\[(.*)]/gm,
+    MATCH_GROUP: 0,
+    INDENT_GROUP: 1,
+    LINK_GROUP: 2,
+  },
+  multimarkdown: {
+    REGEXP: /( *)?{{(.*)}}/gm,
+    MATCH_GROUP: 0,
+    INDENT_GROUP: 1,
+    LINK_GROUP: 2,
+  },
+};
 
 function shiftCursor(content, { line, column }) {
   const newLines = (content.match(/\n/g) || []).length;
@@ -41,13 +63,14 @@ function applyReferences(chunk) {
 
 export default function Transclude(source = 'string', options = {}) {
   const {
-      tokenizerRegExp = defaultRegExp,
-      inheritedParents = [],
-      inheritedReferences = [],
-      inheritedIndent = '',
-      resolvers,
-    } = options;
-  const pattern = cloneRegExp(tokenizerRegExp);
+    transclusionSyntax = 'hercule',
+    inheritedParents = [],
+    inheritedReferences = [],
+    inheritedIndent = '',
+    resolvers,
+  } = options;
+  const { REGEXP, MATCH_GROUP, INDENT_GROUP, LINK_GROUP } = SYNTAX[transclusionSyntax];
+  const pattern = cloneRegExp(REGEXP);
   let inputBuffer = '';
   let line = 1;
   let column = 0;
@@ -88,7 +111,7 @@ export default function Transclude(source = 'string', options = {}) {
     const resolvedParents = resolvedSource ? parents : undefined;
 
     const nestedTransclude = new Transclude(resolvedSource, {
-      tokenizerRegExp,
+      transclusionSyntax,
       inheritedParents: resolvedParents,
       inheritedReferences: nextReferences,
       inheritedIndent: indent,
@@ -111,7 +134,7 @@ export default function Transclude(source = 'string', options = {}) {
   function toToken(chunk) {
     const content = chunk[MATCH_GROUP];
     const link = chunk[LINK_GROUP];
-    const indent = chunk[WHITESPACE_GROUP] || '';
+    const indent = chunk[INDENT_GROUP] || '';
 
     const output = { content, line, column };
     output.link = link;
