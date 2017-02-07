@@ -60,5 +60,5 @@ The common JSON body is stored in `gist.json`.
 }
 ```
 
-See `examples/api-bluprint` for a full example.
+See `examples/api-blueprint` for a full example.
 Use `hercule gist-fox.apib | snowcrash` to validate.
