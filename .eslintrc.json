@@ -15,6 +15,7 @@
     "id-length": [2, {"min": 2, "max": 25, "properties": "never", "exceptions": ["_"]}],
     "max-len": [1, 120, 2],
     "no-cond-assign": [2, "except-parens"],
-    "valid-jsdoc": [2]
+    "valid-jsdoc": [2],
+    "lodash/import-scope": [2, "full"]
   }
 }
