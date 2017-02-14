@@ -7,7 +7,7 @@ import through2 from 'through2';
 
 export function resolveHttpUrl(url) {
   // TODO: handle relative link in
-  const isHttpUrl = /https?:\/\//;
+  const isHttpUrl = /^https?:\/\//;
   if (!isHttpUrl.test(url)) return null;
 
   const content = got.stream(url);

@@ -304,7 +304,7 @@ __Returns__
 
 __Examples__
 
-```
+```javascript
 import { trancludeFile, resolveHttpUrl, resolveLocalUrl, resolveString } from 'hercule';
 
 function myResolver(url, source) {
