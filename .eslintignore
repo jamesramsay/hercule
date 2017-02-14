@@ -1,2 +1,3 @@
 test/fixtures/index.js
 test/integration/_mock.js
+test/benchmark.js

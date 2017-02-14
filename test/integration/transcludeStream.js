@@ -9,9 +9,14 @@ import './_mock';
 _.forEach((fixtures.fixtures), (fixture) => {
   test.cb(`should transclude ${fixture.name}`, (t) => {
     const config = fixture.expectedConfig;
-    const options = { outputFile: `${fixture.inputPath}/_expect.md` };
+    const options = config.options || {};
+
+    // Set output file for sourcemap
+    options.outputFile = `${fixture.inputPath}/_expect.md`;
+
     let outputString = '';
     let sourcemap;
+    let errored = 0;
 
     const input = fs.createReadStream(fixture.inputFile, { encoding: 'utf8' });
     const transclude = new TranscludeStream(input.path, options);
@@ -24,6 +29,10 @@ _.forEach((fixtures.fixtures), (fixture) => {
         }
       })
       .on('error', (err) => {
+        // Error should be emitted no more than once
+        t.falsy(errored);
+        errored += 1;
+
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
       })

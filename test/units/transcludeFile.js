@@ -32,15 +32,6 @@ test.cb('should return error if file doesn\'t exist', (t) => {
   });
 });
 
-test.cb('should return error if input is a directory', (t) => {
-  const input = path.join('i-dont-exist.md');
-  transcludeFile(input, (err) => {
-    t.regex(err.message, /ENOENT/);
-    t.deepEqual(err.path, 'i-dont-exist.md');
-    t.end();
-  });
-});
-
 test.cb('should return one error if circular dependency found', (t) => {
   const input = path.join(__dirname, '../fixtures/circular-references/index.md');
   const options = { relativePath: path.join(__dirname, '../fixtures/circular-references') };
@@ -72,18 +63,3 @@ test.cb('should return sourceList', (t) => {
     t.end();
   });
 });
-
-// test.cb('should support tokenizer options', (t) => {
-//   const input = path.join(__dirname, '../fixtures/_aglio/index.md');
-//   const expected = 'Jackdaws love my\n\nbig\n\nsphinx\n\nof quartz.\n';
-//   const options = {
-//     linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
-//     linkMatch: match => match[3] || match[5],
-//   };
-//
-//   transcludeFile(input, options, (err, output) => {
-//     t.deepEqual(err, null);
-//     t.deepEqual(output, expected);
-//     t.end();
-//   });
-// });

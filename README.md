@@ -27,7 +27,7 @@ Hercule is a command-line tool and library for transcluding markdown, [API Bluep
 Install Hercule using [npm](http://npmjs.org):
 
 ```bash
-npm install -g hercule
+$ npm install -g hercule
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ hercule src/blueprint.md -o output.md
 Hercule supports processing input from stdin, and writing to stdout:
 
 ```
-cat src/blueprint.md | hercule | less
+cat src/blueprint.md | hercule - | less
 ```
 
 Or you can use Hercule as a library:
@@ -180,10 +180,7 @@ Each line of `snippet.c` will be indented with the whitespace preceding it.
 - [`transcludeString`](#transcludeString)
 - [`transcludeFile`](#transcludeFile)
 - [Resolvers](#resolvers)
-  - [`defaultResolvers`](#defaultResolvers)
-  - [`resolveHttpUrl`](#resolveHttpUrl)
-  - [`resolveLocalUrl`](#resolveLocalUrl)
-  - [`resolveString`](#resolveString)
+- [Custom Transclusion Syntax](#customSyntax)
 
 ---------------------------------------
 
@@ -197,7 +194,8 @@ __Arguments__
 
 1. `source` (_String_): A string used for resolving relative links and generating sourcemap.
 2. `options` (_Object_): An object of options to be applied when processing input.
-  - `resolvers` - An array of functions which are applied to resolve the URLs to content.
+  - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
+  - `transclusionSyntax` (_String_): Choose transclusion link syntax. Supports 'hercule', 'aglio', 'marked', 'multimarkdown'.
 
 __Customer Emitters__
 
@@ -233,6 +231,7 @@ __Arguments__
 2. `options` (_Object_): An object of options to be applied when processing input.
   - `source` (_String_): source file required for resolving relative links and generating sourcemap.
   - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
+  - `transclusionSyntax` (_String_): Choose transclusion link syntax. Supports 'hercule', 'aglio', 'marked', 'multimarkdown'.
 3. `callback(err, [output], [sourcemap])` (_Function_): A function that will be called after the input `str` has been processed.
   - `err` (_Error_): An error object.
   - `output` (_String_): A string containing processed input.
@@ -263,6 +262,7 @@ __Arguments__
 1. `source` (_String_): A path to a file to process.
 2. `options` (_Object_): An object of options to be applied when processing input.
   - `resolvers` (_Array[Function]_): An array of functions which are applied to resolve the URLs to content.
+  - `transclusionSyntax` (_String_): Choose transclusion link syntax. Supports 'hercule', 'aglio', 'marked', 'multimarkdown'.
 3. `callback(err, [output], [sourcemap])` (_Function_): A function that will be called after the `source` file has been processed.
   - `err` (_Error_): An error object.
   - `output` (_String_): A string containing processed input.
@@ -297,32 +297,40 @@ __Arguments__
 
 __Returns__
 
+- (_null_): Returns null if the url cannot be resolved.
 - (_Object_)
   - `content` (_Stream | String_): The content to be transcluded. Streams are processed for further transclusion links. Strings are assumed fully processed.
   - `url` (_String_): The absolute url of the input, allowing circular reference detection and nested transclusion.
 
-<a name="defaultResolvers" />
+__Examples__
 
-#### defaultResolvers
+```
+import { trancludeFile, resolveHttpUrl, resolveLocalUrl, resolveString } from 'hercule';
 
-Ordered array of functions applied until a result is returned.
+function myResolver(url, source) {
+  // Add your implementation here
+  // Return null to try next resolver
+  return null;
+}
 
-TODO: write the rest of this
+// Resolvers are tried in order
+const resolvers = [myResolver, resolveHttpUrl, resolveLocalUrl, resolveString];
 
-<a name="resolveHttpUrl" />
+trancludeFile('foo.md', { resolvers }, (err, output) => {
+  // Handle exceptions like dead links
+  if (err) console.log(err)
+  console.log(output);
+});
+```
 
-#### resolveHttpUrl
+---------------------------------------
 
-TODO: write this
+<a name="customSyntax" />
 
-<a name="resolveLocalUrl" />
+### Custom Transclusion Syntax
 
-#### resolveLocalUrl
+Hercule also has basic support for alternative transclusion link syntax, including:
 
-TODO: write this
-
-<a name="resolveString" />
-
-#### resolveString
-
-TODO: write this
+- [aglio](https://github.com/danielgtaylor/aglio/): `<!-- include(foo.md) -->`
+- [Marked](http://marked2app.com/help/Multi-File_Documents.html): `<<[sections/section1.md]`
+- [MultiMarkdown](http://fletcher.github.io/MultiMarkdown-5/transclusion.html): `{{bar.md}}`

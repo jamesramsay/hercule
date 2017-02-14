@@ -6,107 +6,88 @@
 
 import fs from 'fs';
 import path from 'path';
-import dashdash from 'dashdash';
+import meow from 'meow';
 import { TranscludeStream } from './hercule';
 
-let opts;
-let args;
-
-const parser = dashdash.createParser({
-  options: [
-    {
-      names: ['help', 'h'],
-      type: 'bool',
-      help: 'Print this help and exit.',
-    },
-    {
-      names: ['output', 'o'],
-      type: 'string',
-      help: 'File to output.',
-      helpArg: 'FILE',
-    },
-    // TODO: unit test transcludeStringSync with relativePath
-    {
-      names: ['relativePath', 'r'],
-      type: 'string',
-      help: 'Relative path. stdin will be parsed relative to this path.',
-    },
-    {
-      names: ['sourcemap', 's'],
-      type: 'bool',
-      help: 'Generate sourcemap for output file.',
-    },
-    {
-      name: 'reporter',
-      type: 'string',
-      help: 'Supported reporters include json, json-stderr, tree',
-    },
+const cli = meow([
+  'Usage:',
+  '  $ hercule [<input> ...]',
+  '',
+  'Options:',
+  '  --stdin, -                 Specifies input to be read from stdin.',
+  '  --output, -o path          Specifies the name and location of the output file.  If not specified, stdout is used.',
+  '  --syntax, -s syntax_name   Specifies which transclusion link syntax (e.g. hercule, aglio, marked, multimarkdown).',
+  '                             If not specifed, hercule is used.',
+  '  --relative, -r path        Specifies the path to which links in input are relative',
+  '  --sourcemap, -m            Specifies a sourcemap should be gnerated. Only used if output is specified.',
+  '',
+  'Examples:',
+  '  $ hercule foo.md',
+  '    Processes the file foo.md and prints to stdout',
+  '  $ cat foo.md | hercule - --output bar.md',
+  '    Processes the input from stdin and writes output to bar.md',
+], {
+  string: [
+    '_',
+    'output',
+    'syntax',
+    'relative',
   ],
+  boolean: [
+    'sourcemap',
+    'stdin',
+  ],
+  default: {
+    syntax: 'hercule',
+    relative: '',
+  },
+  alias: {
+    o: 'output',
+    s: 'syntax',
+    r: 'relative',
+    m: 'sourcemap',
+    h: 'help',
+  },
 });
 
+if (cli.input.length === 0 && !cli.flags.stdin) {
+  process.stderr.write('\nNo input specified.\n');
+  cli.showHelp();
+}
 
-try {
-  opts = parser.parse(process.argv);
-  args = opts._args; // eslint-disable-line
-} catch (err) {
-  process.stderr.write(`hercule: error: ${err.message}\n`);
+let inputStream;
+let source;
+const options = { transclusionSyntax: cli.flags.syntax };
+const input = cli.input[0];
+
+if (input) {
+  // Reading input from file
+  source = path.normalize(input);
+  inputStream = fs.createReadStream(source, { encoding: 'utf8' });
+} else {
+  // Reading from stdin
+  source = path.join(cli.flags.relative, 'stdin');
+  inputStream = process.stdin;
+}
+
+const outputStream = cli.flags.output ? fs.createWriteStream(cli.flags.output, { encoding: 'utf8' }) : process.stdout;
+options.outputFile = cli.flags.output || 'stdout';
+
+const transclude = new TranscludeStream(source, options);
+
+inputStream.on('error', (err) => {
+  process.stderr.write(`\n\n${err.message} (${err.path})\n`);
   process.exit(1);
-}
+});
 
+transclude.on('error', (err) => {
+  process.stderr.write(`\n\nERROR: ${err.message} (${err.path})\n`);
+  process.exit(1);
+});
 
-if (opts.help) {
-  process.stdout.write('usage: hercule [OPTIONS] path/to/input.md\n\n');
-  process.stdout.write(`options:\n${parser.help({ includeEnv: true }).trimRight()}\n\n`);
-  process.exit();
-}
+transclude.on('sourcemap', (sourcemap) => {
+  const sourcemapFilepath = `${cli.flags.output}.map`;
+  if (cli.flags.sourcemap && cli.flags.output) fs.writeFileSync(sourcemapFilepath, `${JSON.stringify(sourcemap)}\n`);
+});
 
-
-function main() {
-  let inputStream;
-  let outputStream;
-  let source;
-  const options = {
-    parents: [],
-    parentRefs: [],
-  };
-
-  if (args.length === 0) {
-    // Reading input from stdin
-    inputStream = process.stdin;
-    source = path.join(opts.relativePath, 'stdin');
-    // options.relativePath = opts.relativePath;
-  } else {
-    // Reading input from file
-    source = path.normalize(args[0]);
-    inputStream = fs.createReadStream(source, { encoding: 'utf8' });
-  }
-
-  if (opts.output) {
-    // Writing output to file
-    outputStream = fs.createWriteStream(opts.output, { encoding: 'utf8' });
-    options.outputFile = opts.output;
-  } else {
-    // Writing output to stdout
-    outputStream = process.stdout;
-    options.outputFile = 'stdout';
-  }
-
-  const transclude = new TranscludeStream(source, options);
-
-  transclude.on('error', (err) => {
-    if (opts.reporter === 'json-err') {
-      process.stderr.write(JSON.stringify(err));
-    } else {
-      process.stderr.write(`\n\nERROR: ${err.message} (${err.path})\n`);
-    }
-    process.exit(1);
-  });
-
-  transclude.on('sourcemap', (srcMap) => {
-    if (opts.output) fs.writeFileSync(`${opts.output}.map`, `${JSON.stringify(srcMap)}\n`);
-  });
-
-  inputStream.pipe(transclude).pipe(outputStream);
-}
-
-main();
+inputStream.pipe(transclude).pipe(outputStream);

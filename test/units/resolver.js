@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { Readable } from 'stream';
 import isStream from 'isstream';
 
-import * as pegjs from '../../src/grammar';
 import * as resolver from '../../src/resolver';
 
 global.fs = require('fs');
@@ -40,85 +39,6 @@ test('throws if not resolved', (t) => {
   const resolvers = [() => _.constant(null)];
   const error = t.throws(() => resolver.resolveToReadableStream({ url: 'foo' }, resolvers));
   t.is(error.message, 'no readable stream or string, resolve \'foo\'');
-});
-
-test.serial('should parse a simple link', (t) => {
-  // link: 'animal.md'
-  const source = '/foo/bar.md';
-
-  t.context.sandbox.stub(pegjs.grammar, 'parse');
-  pegjs.grammar.parse.returns({
-    link: {
-      url: 'animal.md',
-      placeholder: 'animal.md',
-      index: 0,
-    },
-    scopeReferences: [],
-    descendantReferences: [],
-  });
-  const expectedLink = {
-    source,
-    url: 'animal.md',
-    placeholder: 'animal.md',
-    line: 1,
-    column: 0,
-  };
-
-  // We're really testing ability to extend parse output with source information
-  const parsedContent = resolver.parseContent('', { source, line: 1, column: 0 });
-  const { contentLink, scopeReferences, descendantReferences } = parsedContent;
-  t.deepEqual(contentLink, expectedLink);
-  t.deepEqual(scopeReferences, []);
-  t.deepEqual(descendantReferences, []);
-});
-
-test.serial('should parse a complex link', (t) => {
-  // link: 'animal || dog.md wolf:canis-lupus.md'
-  const source = '/foo/bar.md';
-
-  t.context.sandbox.stub(pegjs.grammar, 'parse');
-  pegjs.grammar.parse.returns({
-    link: {
-      url: 'animal',
-      placeholder: 'animal',
-      index: 0,
-    },
-    scopeReferences: [{
-      url: 'dog.md',
-      placeholder: 'animal',
-      index: 10,
-    }],
-    descendantReferences: [{
-      url: 'canis-lupus.md',
-      placeholder: 'wolf',
-      index: 22,
-    }],
-  });
-
-  const parsedContent = resolver.parseContent('', { source, line: 1, column: 0 });
-  const { contentLink, scopeReferences, descendantReferences } = parsedContent;
-
-  t.deepEqual(contentLink, {
-    source,
-    url: 'animal',
-    placeholder: 'animal',
-    line: 1,
-    column: 0,
-  });
-  t.deepEqual(scopeReferences, [{
-    source,
-    url: 'dog.md',
-    placeholder: 'animal',
-    line: 1,
-    column: 10,
-  }]);
-  t.deepEqual(descendantReferences, [{
-    source,
-    url: 'canis-lupus.md',
-    placeholder: 'wolf',
-    line: 1,
-    column: 22,
-  }]);
 });
 
 test('returns stream if http url', (t) => {

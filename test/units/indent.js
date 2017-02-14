@@ -1,22 +1,8 @@
 import test from 'ava';
 import spigot from 'stream-spigot';
+import getStream from 'get-stream';
+
 import Indent from '../../src/indent';
-
-
-test.cb('should handle no input', (t) => {
-  const testStream = new Indent();
-
-  testStream.on('readable', function read() {
-    if (this.read() !== null) t.fail();
-  });
-
-  testStream.on('end', () => {
-    t.pass();
-    t.end();
-  });
-
-  testStream.end();
-});
 
 test.cb('should not modify input without whitespace or newline', (t) => {
   const input = [
@@ -33,21 +19,13 @@ test.cb('should not modify input without whitespace or newline', (t) => {
     },
   ];
   const testStream = new Indent();
-  const output = [];
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk);
-    }
-  });
+  spigot({ objectMode: true }, input).pipe(testStream);
 
-  testStream.on('end', () => {
+  getStream.array(testStream).then((output) => {
     t.deepEqual(output, input);
     t.end();
   });
-
-  spigot({ objectMode: true }, input).pipe(testStream);
 });
 
 test.cb('should indent text after each new line', (t) => {
@@ -104,19 +82,11 @@ test.cb('should indent text after each new line', (t) => {
     },
   ];
   const testStream = new Indent();
-  const output = [];
 
-  testStream.on('readable', function read() {
-    let chunk = null;
-    while ((chunk = this.read()) !== null) {
-      output.push(chunk);
-    }
-  });
+  spigot({ objectMode: true }, input).pipe(testStream);
 
-  testStream.on('end', () => {
+  getStream.array(testStream).then((output) => {
     t.deepEqual(output, expect);
     t.end();
   });
-
-  spigot({ objectMode: true }, input).pipe(testStream);
 });

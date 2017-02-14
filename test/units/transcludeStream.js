@@ -44,7 +44,7 @@ test.cb('should emit error and end on syntax error', (t) => {
   const input = 'The quick brown :[](animal.md foo:bar:"exception!") jumps over the lazy dog.';
   const testStream = new TranscludeStream();
 
-  // t.plan(1);
+  t.plan(1);
   testStream
     .on('readable', function read() {
       this.read();
