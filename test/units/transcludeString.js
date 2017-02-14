@@ -46,17 +46,3 @@ test.cb('returns error for invalid links', (t) => {
     t.end();
   });
 });
-
-// test.cb('should return errors when custom tokenizer options used', (t) => {
-//   const input = '# Title\n<!-- include(test1.apib) -->\nSome content...\n';
-//   const options = {
-//     linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
-//     linkMatch: match => match[3] || match[5],
-//   };
-//
-//   transcludeString(input, options, (err) => {
-//     t.regex(err.message, /ENOENT/);
-//     t.deepEqual(err.path, 'test1.apib');
-//     t.end();
-//   });
-// });

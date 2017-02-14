@@ -63,18 +63,3 @@ test.cb('should return sourceList', (t) => {
     t.end();
   });
 });
-
-// test.cb('should support tokenizer options', (t) => {
-//   const input = path.join(__dirname, '../fixtures/_aglio/index.md');
-//   const expected = 'Jackdaws love my\n\nbig\n\nsphinx\n\nof quartz.\n';
-//   const options = {
-//     linkRegExp: new RegExp(/(^[\t ]*)?(?:(:\[.*?]\((.*?)\))|(<!-- include\((.*?)\) -->))/gm),
-//     linkMatch: match => match[3] || match[5],
-//   };
-//
-//   transcludeFile(input, options, (err, output) => {
-//     t.deepEqual(err, null);
-//     t.deepEqual(output, expected);
-//     t.end();
-//   });
-// });

@@ -5,8 +5,6 @@ import got from 'got';
 import { isReadable } from 'isstream';
 import through2 from 'through2';
 
-import { grammar } from './grammar';
-
 export function resolveHttpUrl(url) {
   // TODO: handle relative link in
   const isHttpUrl = /https?:\/\//;
@@ -71,22 +69,4 @@ export function resolveToReadableStream(link, resolvers = defaultResolvers) {
   }
 
   return { contentStream: outputStream, resolvedUrl: url };
-}
-
-
-function extendWithSource(link, source, line, column) {
-  const url = link.url;
-  const placeholder = link.placeholder;
-  return { url, placeholder, source, line, column: column + link.index };
-}
-
-export function parseContent(content, { source, line, column }) {
-  const args = grammar.parse(content);
-
-  // Attach source information to all the url to be resolved
-  const contentLink = extendWithSource(args.link, source, line, column);
-  const scopeReferences = _.map(args.scopeReferences, ref => extendWithSource(ref, source, line, column));
-  const descendantReferences = _.map(args.descendantReferences, ref => extendWithSource(ref, source, line, column));
-
-  return { contentLink, scopeReferences, descendantReferences };
 }

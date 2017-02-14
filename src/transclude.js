@@ -4,7 +4,8 @@ import async from 'async';
 import cloneRegExp from 'clone-regexp';
 import leftsplit from 'left-split';
 
-import { parseContent, resolveToReadableStream } from './resolver';
+import { resolveToReadableStream } from './resolver';
+import { parseContent } from './parse';
 
 const SYNTAX = {
   hercule: {

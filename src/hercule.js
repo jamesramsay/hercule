@@ -9,6 +9,8 @@ import Indent from './indent';
 import Trim from './trim';
 import Sourcemap from './sourcemap';
 
+export { resolveHttpUrl, resolveLocalUrl, resolveString } from './resolver';
+
 export function TranscludeStream(source = 'input', options) {
   const outputFile = _.get(options, 'outputFile');
   let sourceMap;
