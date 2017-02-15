@@ -1,31 +1,39 @@
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
+import { resolve as resolveUrl } from 'url';
 import got from 'got';
 import { isReadable } from 'isstream';
 import through2 from 'through2';
 
-export function resolveHttpUrl(url) {
-  // TODO: handle relative link in
+export function resolveHttpUrl(linkUrl, sourcePath) {
   const isHttpUrl = /^https?:\/\//;
-  if (!isHttpUrl.test(url)) return null;
+  let resolvedUrl;
 
-  const content = got.stream(url);
+  if (isHttpUrl.test(linkUrl)) {
+    resolvedUrl = linkUrl;
+  } else if (isHttpUrl.test(sourcePath)) {
+    resolvedUrl = resolveUrl(sourcePath, linkUrl);
+  } else {
+    return null;
+  }
+
+  const content = got.stream(resolvedUrl);
 
   // Manually trigger error since 2XX respsonse doesn't trigger error despite not having expected content
   content.on('response', function error(res) {
-    if (res.statusCode !== 200) this.emit('error', { message: 'Could not read file', path: url });
+    if (res.statusCode !== 200) this.emit('error', { message: 'Could not read file', path: linkUrl });
   });
 
-  return { content, url };
+  return { content, url: resolvedUrl };
 }
 
-export function resolveLocalUrl(url, sourcePath) {
+export function resolveLocalUrl(linkUrl, sourcePath) {
   const isLocalUrl = /^[^ ()"']+/;
-  if (!isLocalUrl.test(url)) return null;
+  if (!isLocalUrl.test(linkUrl)) return null;
 
   const relativePath = path.dirname(sourcePath);
-  const localUrl = path.join(relativePath, url);
+  const localUrl = path.join(relativePath, linkUrl);
 
   const content = fs.createReadStream(localUrl, { encoding: 'utf8' });
 

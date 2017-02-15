@@ -46,6 +46,11 @@ test('returns stream if http url', (t) => {
   t.truthy(isStream(content));
 });
 
+test('returns stream for link relative to http url', (t) => {
+  const { content } = resolver.resolveHttpUrl('foo.md', 'https://127.0.0.1');
+  t.truthy(isStream(content));
+});
+
 test('returns falsy if not http url', (t) => {
   t.falsy(resolver.resolveHttpUrl('foo.md'));
 });
