@@ -1,5 +1,7 @@
 # Hercule – Transclusion Tool
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jamesramsay/hercule.svg)](https://greenkeeper.io/)
+
 [![Version](https://img.shields.io/npm/v/hercule.svg)](https://npmjs.com/package/hercule)
 [![License](https://img.shields.io/npm/l/hercule.svg)](https://npmjs.com/package/hercule)
 [![Build Status](https://img.shields.io/travis/jamesramsay/hercule/master.svg)](https://travis-ci.org/jamesramsay/hercule)
