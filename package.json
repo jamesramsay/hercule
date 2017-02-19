@@ -1,6 +1,6 @@
 {
   "name": "hercule",
-  "version": "4.0.0-beta.2",
+  "version": "4.0.0",
   "description": "Markdown, API Blueprint and string transclusion",
   "main": "./lib/hercule",
   "scripts": {
@@ -23,9 +23,6 @@
   "engines": {
     "node": ">=4.0.0"
   },
-  "publishConfig": {
-    "tag": "next"
-  },
   "ava": {
     "require": "babel-register",
     "babel": "inherit"
@@ -33,8 +30,7 @@
   "nyc": {
     "exclude": [
       "node_modules",
-      "lib/grammar/transclusion-link.js",
-      "lib/grammar/inflate-link.js",
+      "lib/grammar/link.js",
       "test"
     ]
   },
