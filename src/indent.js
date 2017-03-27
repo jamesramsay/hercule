@@ -1,4 +1,5 @@
 import through2 from 'through2';
+import _ from 'lodash';
 
 export default function Indent() {
   const NEWLINE = '\n';
@@ -17,7 +18,7 @@ export default function Indent() {
       if (indent) {
         if (preceededNewLine && !beginsNewLine) content = indent + content;
 
-        content = content.replace(/\n(?!\s|$)/g, `\n${indent}`);
+        content = _.replace(content, /\n(?!\s|$)/g, `\n${indent}`);
         inputBuffer[1].content = content;
       }
 
