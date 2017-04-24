@@ -10,14 +10,17 @@ gulp.task('hercule', function() {
       }
 
       if (file.isBuffer()) {
-        hercule.transcludeString(file.contents.toString(encoding), options, function(output) {
+        hercule.transcludeString(file.contents.toString(encoding), options, function(err, output) {
+          if (err) {
+            return callback(err, null)
+          }
           file.contents = new Buffer(output);
           return callback(null, file);
         })
       }
 
       if (file.isStream()) {
-        var transcluder = new hercule.TranscludeStream(null, options);
+        var transcluder = new hercule.TranscludeStream(options);
         file.contents = file.contents.pipe(transcluder);
         return callback(null, file);
       }
