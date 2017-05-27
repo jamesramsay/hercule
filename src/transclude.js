@@ -76,60 +76,62 @@ export default function Transclude(source = 'string', options = {}) {
   let line = 1;
   let column = 0;
 
-  // eslint-disable-next-line consistent-return
   function transclude(chunk, cb) {
     const self = this;
 
-    if (!chunk.link) {
-      self.push(chunk);
-      return cb();
-    }
+    // eslint-disable-next-line consistent-return
+    process.nextTick(() => {
+      if (!chunk.link) {
+        self.push(chunk);
+        return cb();
+      }
 
-    const { parents, indent } = chunk;
-    const sourceLine = chunk.line;
-    const sourceColumn = chunk.column;
-    const content = chunk.content;
+      const { parents, indent } = chunk;
+      const sourceLine = chunk.line;
+      const sourceColumn = chunk.column;
+      const content = chunk.content;
 
-    let out;
-    try {
-      out = applyReferences(chunk);
-    } catch (error) {
-      self.push(chunk.link);
-      return cb({ message: 'Link could not be parsed', path: source, error, line: sourceLine, column: sourceColumn });
-    }
+      let out;
+      try {
+        out = applyReferences(chunk);
+      } catch (error) {
+        self.push(chunk.link);
+        return cb({ message: 'Link could not be parsed', path: source, error, line: sourceLine, column: sourceColumn });
+      }
 
-    const { link, nextReferences } = out;
-    link.content = content;
+      const { link, nextReferences } = out;
+      link.content = content;
 
-    const { contentStream, resolvedUrl } = resolveToReadableStream(link, resolvers);
-    if (_.includes(parents, resolvedUrl)) {
-      self.push(link);
-      return cb({ message: 'Circular dependency detected', path: resolvedUrl, line: link.line, column: link.column });
-    }
+      const { contentStream, resolvedUrl } = resolveToReadableStream(link, resolvers);
+      if (_.includes(parents, resolvedUrl)) {
+        self.push(link);
+        return cb({ message: 'Circular dependency detected', path: resolvedUrl, line: link.line, column: link.column });
+      }
 
-    // Resolved URL will be undefined for quoted strings: :[exmple](link || "fallback" reference:"string")
-    const resolvedSource = resolvedUrl || link.source;
-    const resolvedParents = resolvedSource ? parents : undefined;
+      // Resolved URL will be undefined for quoted strings: :[exmple](link || "fallback" reference:"string")
+      const resolvedSource = resolvedUrl || link.source;
+      const resolvedParents = resolvedSource ? parents : undefined;
 
-    const nestedTransclude = new Transclude(resolvedSource, {
-      transclusionSyntax,
-      inheritedParents: resolvedParents,
-      inheritedReferences: nextReferences,
-      inheritedIndent: indent,
-      resolvers,
+      const nestedTransclude = new Transclude(resolvedSource, {
+        transclusionSyntax,
+        inheritedParents: resolvedParents,
+        inheritedReferences: nextReferences,
+        inheritedIndent: indent,
+        resolvers,
+      });
+
+      nestedTransclude
+        .on('readable', function inputReadable() {
+          let streamContent;
+          while ((streamContent = this.read()) !== null) {
+            self.push(streamContent);
+          }
+        })
+        .on('error', err => cb(err))
+        .on('end', () => cb(null, true));
+      contentStream.on('error', err => cb(err));
+      contentStream.pipe(nestedTransclude);
     });
-
-    nestedTransclude
-      .on('readable', function inputReadable() {
-        let streamContent;
-        while ((streamContent = this.read()) !== null) {
-          self.push(streamContent);
-        }
-      })
-      .on('error', err => cb(err))
-      .on('end', () => cb(null, true));
-    contentStream.on('error', err => cb(err));
-    contentStream.pipe(nestedTransclude);
   }
 
   function toToken(chunk) {
