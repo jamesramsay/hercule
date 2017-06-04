@@ -88,7 +88,7 @@
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-lodash": "^2.4.0",
     "nock": "^9.0.0",
-    "nyc": "^10.0.0",
+    "nyc": "^11.0.2",
     "pegjs": "^0.10.0",
     "semver": "^5.1.0",
     "shelljs": "^0.7.0",
