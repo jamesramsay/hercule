@@ -41,7 +41,7 @@ test('should parse link with fallback', (t) => {
 });
 
 test('should parse link with references', (t) => {
-  const link = 'animal vulpis:fox.md reset: singlestring:\'A\' doublestring:"B"';
+  const link = 'animal vulpis:fox.md reset: singlestring:\'foobar\' doublestring:"fizz-buzz"';
   const expect = {
     link: {
       url: 'animal',
@@ -61,14 +61,14 @@ test('should parse link with references', (t) => {
         index: 27,
       },
       {
-        url: '\'A\'',
+        url: '\'foobar\'',
         placeholder: 'singlestring',
         index: 41,
       },
       {
-        url: '"B"',
+        url: '"fizz-buzz"',
         placeholder: 'doublestring',
-        index: 58,
+        index: 63,
       },
     ],
   };
