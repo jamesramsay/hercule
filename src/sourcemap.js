@@ -45,7 +45,9 @@ export default function SourceMapStream(generatedFile = 'string') {
   function flush(cb) {
     if (!generatedFile) return cb();
 
-    const generator = new sourceMap.SourceMapGenerator({ file: path.relative(__dirname, generatedFile) });
+    const generator = new sourceMap.SourceMapGenerator({
+      file: path.relative(__dirname, generatedFile),
+    });
     _.forEach(mappings, map => generator.addMapping(map));
     this.emit('sourcemap', JSON.parse(generator.toString()));
     return cb();

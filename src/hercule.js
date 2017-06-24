@@ -22,7 +22,10 @@ export function TranscludeStream(source = 'input', options) {
   const stringify = get('content');
 
   transclude.on('error', () => transclude.end());
-  sourcemap.on('sourcemap', generatedSourceMap => (sourceMap = generatedSourceMap));
+  sourcemap.on(
+    'sourcemap',
+    generatedSourceMap => (sourceMap = generatedSourceMap)
+  );
 
   transclude.pipe(trim).pipe(indenter).pipe(sourcemap).pipe(stringify);
 
@@ -49,7 +52,6 @@ export function transcludeString(...args) {
     .then(output => cb(null, output, sourceMap))
     .catch(err => cb(err, err.bufferedData, sourceMap));
 }
-
 
 export function transcludeFile(...args) {
   const input = args.shift();

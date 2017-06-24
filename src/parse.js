@@ -13,8 +13,12 @@ export function parseContent(content, { source, line, column }) {
 
   // Attach source information to all the url to be resolved
   const contentLink = extendWithSource(args.link, source, line, column);
-  const scopeReferences = _.map(args.scopeReferences, ref => extendWithSource(ref, source, line, column));
-  const descendantReferences = _.map(args.descendantReferences, ref => extendWithSource(ref, source, line, column));
+  const scopeReferences = _.map(args.scopeReferences, ref =>
+    extendWithSource(ref, source, line, column)
+  );
+  const descendantReferences = _.map(args.descendantReferences, ref =>
+    extendWithSource(ref, source, line, column)
+  );
 
   return { contentLink, scopeReferences, descendantReferences };
 }

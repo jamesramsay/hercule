@@ -14,7 +14,8 @@ export function resolveHttpUrl(url) {
 
   // Manually trigger error since 2XX respsonse doesn't trigger error despite not having expected content
   content.on('response', function error(res) {
-    if (res.statusCode !== 200) this.emit('error', { message: 'Could not read file', path: url });
+    if (res.statusCode !== 200)
+      this.emit('error', { message: 'Could not read file', path: url });
   });
 
   return { content, url };
@@ -46,9 +47,11 @@ const defaultResolvers = [resolveHttpUrl, resolveLocalUrl, resolveString];
 //  - stream requires processing
 //  - string assumed fully processed
 export function resolveToReadableStream(link, resolvers = defaultResolvers) {
-  const { content, url } = _.reduce(resolvers,
+  const { content, url } = _.reduce(
+    resolvers,
     (memo, resolver) => memo || resolver(link.url, link.source),
-    null);
+    null
+  );
 
   let outputStream;
 

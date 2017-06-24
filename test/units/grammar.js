@@ -2,7 +2,7 @@ import test from 'ava';
 
 import { grammar } from '../../src/grammar';
 
-test('should parse simple link', (t) => {
+test('should parse simple link', t => {
   const link = 'test.md';
   const expect = {
     link: {
@@ -19,7 +19,7 @@ test('should parse simple link', (t) => {
   t.deepEqual(output, expect);
 });
 
-test('should parse link with fallback', (t) => {
+test('should parse link with fallback', t => {
   const link = 'animal || fox.md';
   const expect = {
     link: {
@@ -27,11 +27,13 @@ test('should parse link with fallback', (t) => {
       placeholder: 'animal',
       index: 0,
     },
-    scopeReferences: [{
-      url: 'fox.md',
-      placeholder: 'animal',
-      index: 10,
-    }],
+    scopeReferences: [
+      {
+        url: 'fox.md',
+        placeholder: 'animal',
+        index: 10,
+      },
+    ],
     descendantReferences: [],
   };
 
@@ -40,8 +42,9 @@ test('should parse link with fallback', (t) => {
   t.deepEqual(output, expect);
 });
 
-test('should parse link with references', (t) => {
-  const link = 'animal vulpis:fox.md reset: singlestring:\'foobar\' doublestring:"fizz-buzz"';
+test('should parse link with references', t => {
+  const link =
+    'animal vulpis:fox.md reset: singlestring:\'foobar\' doublestring:"fizz-buzz"';
   const expect = {
     link: {
       url: 'animal',
@@ -61,7 +64,7 @@ test('should parse link with references', (t) => {
         index: 27,
       },
       {
-        url: '\'foobar\'',
+        url: "'foobar'",
         placeholder: 'singlestring',
         index: 41,
       },
@@ -78,7 +81,7 @@ test('should parse link with references', (t) => {
   t.deepEqual(output, expect);
 });
 
-test('should parse link with fallback and references', (t) => {
+test('should parse link with fallback and references', t => {
   const link = 'animal || fox.md canine:dog.md';
   const expect = {
     link: {
@@ -86,16 +89,20 @@ test('should parse link with fallback and references', (t) => {
       placeholder: 'animal',
       index: 0,
     },
-    scopeReferences: [{
-      url: 'fox.md',
-      placeholder: 'animal',
-      index: 10,
-    }],
-    descendantReferences: [{
-      url: 'dog.md',
-      placeholder: 'canine',
-      index: 24,
-    }],
+    scopeReferences: [
+      {
+        url: 'fox.md',
+        placeholder: 'animal',
+        index: 10,
+      },
+    ],
+    descendantReferences: [
+      {
+        url: 'dog.md',
+        placeholder: 'canine',
+        index: 24,
+      },
+    ],
   };
 
   const output = grammar.parse(link);

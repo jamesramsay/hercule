@@ -1,8 +1,7 @@
 import test from 'ava';
 import Sourcemap from '../../src/sourcemap';
 
-
-test.cb('should handle no input', (t) => {
+test.cb('should handle no input', t => {
   const testStream = new Sourcemap();
 
   testStream.on('readable', function read() {
@@ -17,7 +16,7 @@ test.cb('should handle no input', (t) => {
   testStream.end();
 });
 
-test.cb('should not modify input', (t) => {
+test.cb('should not modify input', t => {
   const input = {
     content: 'The quick brown fox jumps over the lazy dog.',
     source: 'foo.md',
@@ -43,7 +42,7 @@ test.cb('should not modify input', (t) => {
   testStream.end();
 });
 
-test.cb('should emit a sourcemap', (t) => {
+test.cb('should emit a sourcemap', t => {
   const input = {
     content: 'The quick brown fox jumps over the lazy dog.',
     source: 'foo.md',
@@ -58,7 +57,7 @@ test.cb('should emit a sourcemap', (t) => {
     }
   });
 
-  testStream.on('sourcemap', (sourcemap) => {
+  testStream.on('sourcemap', sourcemap => {
     t.deepEqual(sourcemap, {
       version: 3,
       sources: ['foo.md'],

@@ -4,7 +4,7 @@ import getStream from 'get-stream';
 
 import Indent from '../../src/indent';
 
-test.cb('should not modify input without whitespace or newline', (t) => {
+test.cb('should not modify input without whitespace or newline', t => {
   const input = [
     {
       content: 'The quick brown fox ',
@@ -22,13 +22,13 @@ test.cb('should not modify input without whitespace or newline', (t) => {
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
-  getStream.array(testStream).then((output) => {
+  getStream.array(testStream).then(output => {
     t.deepEqual(output, input);
     t.end();
   });
 });
 
-test.cb('should indent text after each new line', (t) => {
+test.cb('should indent text after each new line', t => {
   const input = [
     {
       indent: '',
@@ -85,7 +85,7 @@ test.cb('should indent text after each new line', (t) => {
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
-  getStream.array(testStream).then((output) => {
+  getStream.array(testStream).then(output => {
     t.deepEqual(output, expect);
     t.end();
   });

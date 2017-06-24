@@ -6,8 +6,8 @@ import { TranscludeStream } from '../../src/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 
-_.forEach((fixtures.fixtures), (fixture) => {
-  test.cb(`should transclude ${fixture.name}`, (t) => {
+_.forEach(fixtures.fixtures, fixture => {
+  test.cb(`should transclude ${fixture.name}`, t => {
     const config = fixture.expectedConfig;
     const options = config.options || {};
 
@@ -28,7 +28,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
           outputString += content;
         }
       })
-      .on('error', (err) => {
+      .on('error', err => {
         // Error should be emitted no more than once
         t.falsy(errored);
         errored += 1;
@@ -36,7 +36,7 @@ _.forEach((fixtures.fixtures), (fixture) => {
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
       })
-      .on('sourcemap', (outputSourcemap) => {
+      .on('sourcemap', outputSourcemap => {
         sourcemap = outputSourcemap;
       })
       .on('end', () => {

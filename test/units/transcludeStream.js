@@ -2,7 +2,7 @@ import test from 'ava';
 
 import { TranscludeStream } from '../../src/hercule';
 
-test.cb('should handle no input', (t) => {
+test.cb('should handle no input', t => {
   const testStream = new TranscludeStream();
 
   testStream.on('readable', function read() {
@@ -17,7 +17,7 @@ test.cb('should handle no input', (t) => {
   testStream.end();
 });
 
-test.cb('should return input without link unmodified', (t) => {
+test.cb('should return input without link unmodified', t => {
   const input = 'The quick brown fox jumps over the lazy dog./n';
   const testStream = new TranscludeStream();
   let output = '';
@@ -40,8 +40,9 @@ test.cb('should return input without link unmodified', (t) => {
   testStream.end();
 });
 
-test.cb('should emit error and end on syntax error', (t) => {
-  const input = 'The quick brown :[](animal.md foo:bar:"exception!") jumps over the lazy dog.';
+test.cb('should emit error and end on syntax error', t => {
+  const input =
+    'The quick brown :[](animal.md foo:bar:"exception!") jumps over the lazy dog.';
   const testStream = new TranscludeStream();
 
   t.plan(1);
