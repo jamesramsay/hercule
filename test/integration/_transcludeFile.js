@@ -5,8 +5,8 @@ import { transcludeFile } from '../../src/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 
-_.forEach((fixtures.fixtures), (fixture) => {
-  test.cb(`should transclude ${fixture.name}`, (t) => {
+_.forEach(fixtures.fixtures, fixture => {
+  test.cb(`should transclude ${fixture.name}`, t => {
     const config = fixture.expectedConfig;
 
     transcludeFile(fixture.inputFile, (err, output, sourcemap) => {

@@ -4,7 +4,7 @@ import getStream from 'get-stream';
 
 import Trim from '../../src/trim';
 
-test.cb('should not modify input stream from a single source', (t) => {
+test.cb('should not modify input stream from a single source', t => {
   const input = [
     {
       content: 'The quick brown\n',
@@ -27,16 +27,16 @@ test.cb('should not modify input stream from a single source', (t) => {
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
-  getStream.array(testStream)
-    .then((output) => {
+  getStream
+    .array(testStream)
+    .then(output => {
       t.deepEqual(output, input);
       t.end();
     })
     .catch(err => t.fail(err));
 });
 
-
-test.cb('should handle advanced scenario', (t) => {
+test.cb('should handle advanced scenario', t => {
   const input = [
     {
       content: 'The quick brown fox ',
@@ -110,15 +110,16 @@ test.cb('should handle advanced scenario', (t) => {
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
-  getStream.array(testStream)
-    .then((output) => {
+  getStream
+    .array(testStream)
+    .then(output => {
       t.deepEqual(output, expect);
       t.end();
     })
     .catch(err => t.fail(err));
 });
 
-test.cb('should handle multiple new line scenarios', (t) => {
+test.cb('should handle multiple new line scenarios', t => {
   const input = [
     {
       content: 'The quick brown fox\n',
@@ -177,8 +178,9 @@ test.cb('should handle multiple new line scenarios', (t) => {
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
-  getStream.array(testStream)
-    .then((output) => {
+  getStream
+    .array(testStream)
+    .then(output => {
       t.deepEqual(output, expect);
       t.end();
     })

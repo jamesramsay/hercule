@@ -15,7 +15,7 @@ const SYNTAX = {
     LINK_GROUP: 2,
   },
   aglio: {
-    REGEXP: /( *)?(<!-- include\((.*?)\) -->)/gmi,
+    REGEXP: /( *)?(<!-- include\((.*?)\) -->)/gim,
     MATCH_GROUP: 0,
     INDENT_GROUP: 1,
     LINK_GROUP: 3,
@@ -39,7 +39,7 @@ function shiftCursor(content, { line, column }) {
   const newColumns = content.match(/.*$/g)[0].length;
 
   const newLine = line + newLines;
-  const newColumn = (newLines > 0) ? newColumns : column + newColumns;
+  const newColumn = newLines > 0 ? newColumns : column + newColumns;
 
   return { line: newLine, column: newColumn };
 }
@@ -49,15 +49,22 @@ function applyReferences(chunk) {
   const transclusionLink = chunk.link;
   const inheritedReferences = chunk.references;
 
-  const { contentLink, scopeReferences, descendantReferences } =
-    parseContent(transclusionLink, { source, line, column });
+  const {
+    contentLink,
+    scopeReferences,
+    descendantReferences,
+  } = parseContent(transclusionLink, { source, line, column });
 
   // Inherited reference take precendence over fallback reference
   const contextReferences = [...inheritedReferences, ...scopeReferences];
-  const link = _.find(contextReferences, { placeholder: contentLink.url }) || contentLink;
+  const link =
+    _.find(contextReferences, { placeholder: contentLink.url }) || contentLink;
 
   // Prefer nearest inherited reference
-  const nextReferences = _.uniqBy([...descendantReferences, ...inheritedReferences], 'placeholder');
+  const nextReferences = _.uniqBy(
+    [...descendantReferences, ...inheritedReferences],
+    'placeholder'
+  );
 
   return { link, nextReferences };
 }
@@ -70,7 +77,9 @@ export default function Transclude(source = 'string', options = {}) {
     inheritedIndent = '',
     resolvers,
   } = options;
-  const { REGEXP, MATCH_GROUP, INDENT_GROUP, LINK_GROUP } = SYNTAX[transclusionSyntax];
+  const { REGEXP, MATCH_GROUP, INDENT_GROUP, LINK_GROUP } = SYNTAX[
+    transclusionSyntax
+  ];
   const pattern = cloneRegExp(REGEXP);
   let inputBuffer = '';
   let line = 1;
@@ -96,16 +105,30 @@ export default function Transclude(source = 'string', options = {}) {
         out = applyReferences(chunk);
       } catch (error) {
         self.push(chunk.link);
-        return cb({ message: 'Link could not be parsed', path: source, error, line: sourceLine, column: sourceColumn });
+        return cb({
+          message: 'Link could not be parsed',
+          path: source,
+          error,
+          line: sourceLine,
+          column: sourceColumn,
+        });
       }
 
       const { link, nextReferences } = out;
       link.content = content;
 
-      const { contentStream, resolvedUrl } = resolveToReadableStream(link, resolvers);
+      const { contentStream, resolvedUrl } = resolveToReadableStream(
+        link,
+        resolvers
+      );
       if (_.includes(parents, resolvedUrl)) {
         self.push(link);
-        return cb({ message: 'Circular dependency detected', path: resolvedUrl, line: link.line, column: link.column });
+        return cb({
+          message: 'Circular dependency detected',
+          path: resolvedUrl,
+          line: link.line,
+          column: link.column,
+        });
       }
 
       // Resolved URL will be undefined for quoted strings: :[exmple](link || "fallback" reference:"string")
@@ -156,7 +179,7 @@ export default function Transclude(source = 'string', options = {}) {
     // Each line must be processed individually for correct sourcemap output
     let separators = leftsplit(separator, /(\r?\n)/);
 
-    separators = _.map(separators, (content) => {
+    separators = _.map(separators, content => {
       if (!content) return null;
 
       const output = { content, line, column };
@@ -193,7 +216,7 @@ export default function Transclude(source = 'string', options = {}) {
 
         // Next match must be after this match
         nextOffset = pattern.lastIndex;
-      // Match against bounds: [     xxx]
+        // Match against bounds: [     xxx]
       } else {
         // Next match will be the start of this match
         nextOffset = match.index;
@@ -217,20 +240,22 @@ export default function Transclude(source = 'string', options = {}) {
     async.eachSeries(
       tokenize(chunk.toString('utf8')),
       (output, next) => transclude.call(this, output, next),
-      (err) => {
+      err => {
         if (err) inputBuffer = '';
         cb(err);
-      });
+      }
+    );
   }
 
   function flush(cb) {
     async.eachSeries(
       tokenize(),
       (output, next) => transclude.call(this, output, next),
-      (err) => {
+      err => {
         this.push(null);
         cb(err);
-      });
+      }
+    );
   }
 
   return through2.obj(transform, flush);

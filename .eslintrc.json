@@ -5,17 +5,19 @@
   "extends": [
     "airbnb-base",
     "plugin:lodash/recommended",
-    "plugin:ava/recommended"
+    "plugin:ava/recommended",
+    "prettier"
   ],
   "plugins": [
     "ava",
-    "lodash"
+    "lodash",
+    "prettier"
   ],
   "rules": {
+    "arrow-parens": [2, "as-needed"],
     "id-length": [2, {"min": 2, "max": 25, "properties": "never", "exceptions": ["_"]}],
-    "max-len": [1, 120, 2],
     "no-cond-assign": [2, "except-parens"],
-    "valid-jsdoc": [2],
-    "lodash/import-scope": [2, "full"]
+    "lodash/import-scope": [2, "full"],
+    "prettier/prettier": [2, {"singleQuote": true, "trailingComma": "es5"}]
   }
 }

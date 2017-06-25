@@ -18,7 +18,8 @@
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
     "release:patch": "npm version patch && git push --follow-tags",
-    "benchmark": "./test/benchmark.js"
+    "benchmark": "./test/benchmark.js",
+    "precommit": "lint-staged"
   },
   "engines": {
     "node": ">=4.0.0"
@@ -32,6 +33,12 @@
       "node_modules",
       "lib/grammar/link.js",
       "test"
+    ]
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --single-quote --trailing-comma es5 --write",
+      "git add"
     ]
   },
   "bin": {
@@ -84,12 +91,17 @@
     "codecov": "^2.1.0",
     "eslint": "^4.1.0",
     "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-config-prettier": "^2.2.0",
     "eslint-plugin-ava": "^4.0.0",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-lodash": "^2.4.0",
+    "eslint-plugin-prettier": "^2.1.2",
+    "husky": "^0.14.0",
+    "lint-staged": "^4.0.0",
     "nock": "^9.0.0",
     "nyc": "^11.0.2",
     "pegjs": "^0.10.0",
+    "prettier": "^1.4.4",
     "semver": "^5.1.0",
     "shelljs": "^0.7.0",
     "sinon": "^2.0.0",

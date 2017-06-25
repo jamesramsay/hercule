@@ -15,13 +15,16 @@ var suite = new Benchmark.Suite();
 
 suite.add('hercule#transcludeFile', {
   defer: true,
-  fn: deferred => hercule.transcludeFile(inputPathAbsolute, () => deferred.resolve()),
+  fn: deferred =>
+    hercule.transcludeFile(inputPathAbsolute, () => deferred.resolve()),
 });
 
 suite.add('hercule#TranscludeStream', {
   defer: true,
-  fn: (deferred) => {
-    const inputStream = fs.createReadStream(inputPathAbsolute, { encoding: 'utf8' });
+  fn: deferred => {
+    const inputStream = fs.createReadStream(inputPathAbsolute, {
+      encoding: 'utf8',
+    });
     const transclude = new hercule.TranscludeStream(inputPathAbsolute);
     inputStream.pipe(transclude);
     getStream(transclude).then(() => deferred.resolve());
@@ -30,10 +33,13 @@ suite.add('hercule#TranscludeStream', {
 
 suite.add('hercule#transcludeString', {
   defer: true,
-  fn: deferred => hercule.transcludeString(inputString, { source: inputPathAbsolute }, () => deferred.resolve()),
+  fn: deferred =>
+    hercule.transcludeString(inputString, { source: inputPathAbsolute }, () =>
+      deferred.resolve()
+    ),
 });
 
-suite.on('cycle', (event) => {
+suite.on('cycle', event => {
   process.stdout.write(String(event.target) + '\n');
 });
 

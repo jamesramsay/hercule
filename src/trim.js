@@ -13,13 +13,20 @@ export default function Trim() {
     inputBuffer.push(chunk);
 
     while (inputBuffer.length > 1) {
-      const nextFileIsAncestor = inputBuffer[1].parents && _.includes(inputBuffer[0].parents, inputBuffer[1].source);
-      const isFileEdge = inputBuffer[0].source !== inputBuffer[1].source && memoSource !== inputBuffer[1].source;
+      const nextFileIsAncestor =
+        inputBuffer[1].parents &&
+        _.includes(inputBuffer[0].parents, inputBuffer[1].source);
+      const isFileEdge =
+        inputBuffer[0].source !== inputBuffer[1].source &&
+        memoSource !== inputBuffer[1].source;
 
       // EOF edge verify file is ending checking it isn't a parent of the next file
       if (isFileEdge && nextFileIsAncestor) {
-        if ((inputBuffer[0].content.slice(-1) === NEWLINE || memoContent === NEWLINE) &&
-        inputBuffer[1].content.slice(0, 1) === NEWLINE) {
+        if (
+          (inputBuffer[0].content.slice(-1) === NEWLINE ||
+            memoContent === NEWLINE) &&
+          inputBuffer[1].content.slice(0, 1) === NEWLINE
+        ) {
           // Scenario A: transclusion at end of line since both characters are a new line
           //    remove new line from next file
           //    Edge: still be inline, can't yet push
@@ -32,8 +39,11 @@ export default function Trim() {
             // The removed new line could either be EOF or mid-file
             inputBuffer.pop();
           }
-        } else if ((inputBuffer[0].content.slice(-1) === NEWLINE || memoContent === NEWLINE) &&
-        inputBuffer[1].content.slice(0, 1) !== NEWLINE) {
+        } else if (
+          (inputBuffer[0].content.slice(-1) === NEWLINE ||
+            memoContent === NEWLINE) &&
+          inputBuffer[1].content.slice(0, 1) !== NEWLINE
+        ) {
           // Scenario B: inline transclusion since next character is not a new line
           //   remove new line from end of file
           inputBuffer[0].content = inputBuffer[0].content.slice(0, -1);
