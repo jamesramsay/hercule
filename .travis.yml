@@ -9,11 +9,17 @@ cache:
   - $HOME/.yarn-cache
   - $HOME/.bats
 
-before_install: git clone https://github.com/sstephenson/bats.git .bats
+before_install:
+- git clone https://github.com/sstephenson/bats.git .bats
+- yarn global add greenkeeper-lockfile@1
 
-before_script: npm run compile
+before_script:
+- greenkeeper-lockfile-update
+- npm run compile
 
 script: npm test
+
+after_script: greenkeeper-lockfile-upload
 
 after_success: npm run codecov
 
