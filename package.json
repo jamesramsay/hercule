@@ -8,18 +8,18 @@
     "test-units": "nyc --cache ava --verbose test/units",
     "test-integration": "ava --verbose test/integration",
     "test-cli": "npm run compile && .bats/bin/bats test/bats",
-    "posttest": "npm run lint && npm run check-commit",
+    "posttest": "npm run lint",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "babel src --out-dir lib --source-maps && npm run compile-grammars",
     "compile-grammars": "mkdir -p ./lib/grammar && pegjs -o lib/grammar/link.js src/grammar/link.pegjs",
     "lint": "eslint ./src ./test",
-    "check-commit": "./scripts/commit-msg",
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
     "release:patch": "npm version patch && git push --follow-tags",
     "benchmark": "./test/benchmark.js",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "commitmsg": "validate-commit-msg"
   },
   "engines": {
     "node": ">=4.0.0"
@@ -40,6 +40,23 @@
       "prettier --single-quote --trailing-comma es5 --write",
       "git add"
     ]
+  },
+  "config": {
+    "validate-commit-msg": {
+      "types": [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "build",
+        "ci",
+        "chore",
+        "revert"
+      ]
+    }
   },
   "bin": {
     "hercule": "./bin/hercule"
@@ -102,9 +119,8 @@
     "nyc": "^11.0.2",
     "pegjs": "^0.10.0",
     "prettier": "^1.4.4",
-    "semver": "^5.1.0",
-    "shelljs": "^0.7.0",
     "sinon": "^2.0.0",
-    "stream-spigot": "^3.0.5"
+    "stream-spigot": "^3.0.5",
+    "validate-commit-msg": "^2.12.2"
   }
 }
