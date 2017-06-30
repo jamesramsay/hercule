@@ -1,4 +1,11 @@
+examples
+scripts
 src
 test
-examples
-*.png
+.babelrc
+.bats
+.eslintrc.json
+.eslintignore
+.nyc_output
+*.lcov
+*.yml
