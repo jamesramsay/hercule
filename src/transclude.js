@@ -119,7 +119,8 @@ export default function Transclude(source = 'string', options = {}) {
 
       const { contentStream, resolvedUrl } = resolveToReadableStream(
         link,
-        resolvers
+        resolvers,
+        content
       );
       if (_.includes(parents, resolvedUrl)) {
         self.push(link);

@@ -295,6 +295,7 @@ __Arguments__
 
 1. `url` - A relative url from the input being processed.
 2. `source` - The absolute source url of the url being resolved.
+3. `placeholder` - The transclusion link that was resolved to the url.
 
 __Returns__
 
@@ -308,7 +309,7 @@ __Examples__
 ```javascript
 import { trancludeFile, resolveHttpUrl, resolveLocalUrl, resolveString } from 'hercule';
 
-function myResolver(url, source) {
+function myResolver(url, source, placeholder) {
   // Add your implementation here
   // Return null to try next resolver
   return null;
