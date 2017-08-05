@@ -13,39 +13,33 @@
 
 Write large markdown documents, including [API Blueprint](http://apiblueprint.org), while keeping things DRY (don't repeat yourself).
 
-Hercule is a command-line tool and library for transcluding markdown, [API Blueprint](http://apiblueprint.org), and plaintext. This allows complex and repetitive documents to be written as smaller logical documents, for improved consistency, reuse, and separation of concerns.
+Hercule is a command-line tool and library for transcluding markdown, [API Blueprint](http://apiblueprint.org), and plain text. This allows complex and repetitive documents to be written as smaller logical documents, for improved consistency, reuse, and separation of concerns.
 
-- Simple extension of markdown link syntax `:[Title](link.md)` (preceding colon `:`)
-- Transclude local files
-- Transclude remote (HTTP) files
-- Transclude strings
+- Extends markdown link syntax with preceding colon `:` (e.g. `:[Title](link.md)`)
+- Transclude local and remote (HTTP) files
 - Smart indentation
 
------
+## Contents
 
-## Installation
-
-Install Hercule using [npm](http://npmjs.org):
-
-```bash
-$ npm install -g hercule
-```
+- [Usage](#usage)
+- [Syntax](#syntax)
+- [API](#api)
 
 ## Usage
 
-You can use Hercule as a command-line utility:
+Install Hercule using [npm](http://npmjs.org):
 
-```bash
-hercule src/blueprint.md -o output.md
+```console
+$ npm install -g hercule
 ```
 
-Hercule supports processing input from stdin, and writing to stdout:
+Use Hercule as a command-line utility:
 
-```
-cat src/blueprint.md | hercule - | less
+```console
+$ hercule src/blueprint.md -o output.md
 ```
 
-Or you can use Hercule as a library:
+Or, use Hercule as a library:
 
 ```javascript
 import { trancludeString } from 'hercule';
@@ -56,126 +50,149 @@ trancludeString('# Title\n\n:[abstract](abstract.md)', (err, output) => {
 });
 ```
 
-## Transclusion Syntax
+## Syntax
 
-### Basic transclusion (local files and remote HTTP files)
-
-Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should transcluded.
-
-```javascript
-import { trancludeString } from 'hercule';
-
-trancludeString('This is an :[example link](foo.md).', (err, output) => {
-  if (err) console.log(err)
-  console.log(output);
-  // This is an example transclusion.
-});
-```
-
-Extending the standard Markdown link syntax means most markdown parsers will treat Hercule's transclusion links as standard Markdown links.
-For example, Github handles transclusion links in this manner.
-
-Hercule is also able to transclude HTTP links.
-
-```javascript
-import { trancludeString } from 'hercule';
-
-input = 'Jackdaws love my :[size](https://raw.githubusercontent.com/jamesramsay/hercule/master/test/fixtures/basic/size.md) sphinx of quartz.';
-
-trancludeString(input, (err, output) => {
-  if (err) console.log(err)
-  console.log(output);
-  // Jackdaws love my big sphinx of quartz.
-});
-```
-
-### Placeholders and overriding references
-
-Placeholders (e.g. `:[foo](bar)`) allow you create a target for transclusion without specifying the link in the document.
-A parent document can then override the placeholder with the desired link.
-
-Placeholders and references can be helpful for increasing the _'dryness'_ of your source documents,
-or allowing environmental variables to be passed into the document during processing.
-
-```javascript
-import { transcludeString } from 'hercule';
-
-const input = ':[foo](bar)';
-const options = {
-  references: [{
-    placeholder: 'bar',
-    href: 'fizz buzz',
-    hrefType: 'string'
-  }]
-};
-
-trancludeString(input, (err, output) => {
-  if (err) console.log(err)
-  console.log(output);
-  // fizz buzz
-});
-```
-
-References are passed down to any nested transclusion links.
-
-### Default placeholders
-
-Sometimes a file might be used in multiple contexts, some contexts requiring references and others not.
-Default placeholders help handle this situation more conveniently.
-
-The following example uses Apiary's [Markdown Syntax for Object Notation (MSON)](https://github.com/apiaryio/mson).
-
-```mson
-## Ingredient (object)
-
-- id: 1 (number, required)
-- name: Cucumber (string, required)
-- description: Essential for tzatziki (string, :[is required](required || "optional"))
-```
-
-```javascript
-import { transcludeString } from 'hercule';
-
-const inputRequired = ':[Required Ingredient](cucmber.mson required:"required")';
-const inputDefault = ':[Optional Ingredient](cucmber.mson)';
-
-trancludeString(inputRequired, (err, output) => {
-  if (err) console.log(err)
-  console.log(output);
-  // ## Recipe (object)
-  //
-  // - id: 1 (number, required)
-  // - name: Cucumber (string, required)
-  // - description: Essential for tzatziki (string, required)
-});
-
-
-trancludeString(inputDefault, (err, output) => {
-  if (err) console.log(err)
-  console.log(output);
-  // ## Recipe (object)
-  //
-  // - id: 1 (number, required)
-  // - name: Cucumber (string, required)
-  // - description: Essential for tzatziki (string, optional)
-});
-```
-
-### Whitespace sensitivity
-
-Leading whitespace is significant in Markdown.
-Hercule preserves whitespace at the beginning of each line.
+Hercule extends the Markdown inline link syntax with a leading colon (`:`) to denote the link should be transcluded. The content of the linked file will replace the transclusion link including nested transclusion links.
 
 ```markdown
-Binary sort example:
-
-  :[](snippet.c)
-
+The :[subject of sentence](fox.md) jumps over :[observer](dog.md).
 ```
 
-Each line of `snippet.c` will be indented with the whitespace preceding it.
+Markdown renderers ignore the leading colon and render transclusion links as HTML links with a preceding colon.
 
-## Documentation
+**Example 1: transclusion link**
+
+Prepend a colon (`:`) to a markdown link to transclude the files' content. Unauthenticated HTTP/S transclusion is also supported (e.g. `:[example link](https://foo.com/bar.md`).
+
+<table>
+<thead><tr>
+<th align="left">Input</th>
+<th align="left">Output (<code>$ hercule input.md</code>)</th>
+</tr></thead>
+<tbody><tr>
+<td align="left">input.md:
+<pre>This is an :[example link](foo.md).</pre>
+</td>
+<td align="left" rowspan="2">
+<pre>This is an example transclusion.</pre>
+</td>
+</tr>
+<tr>
+<td align="left">foo.md:
+<pre>example transclusion</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+**Example 2: whitespace sensitivity**
+
+Leading whitespace is significant in Markdown. Hercule preserves whitespace when a transclusion link is preceded with only whitespace by indenting each line of the transcluded file.
+
+Each line of `currency-usd.json` is indented with the whitespace preceding the transclusion link, where the transclusion link is preceded only by whitespace.
+
+<table>
+<thead><tr>
+<th align="left">Input</th>
+<th align="left">Output (<code>$ hercule input.md</code>)</th>
+</tr></thead>
+<tbody><tr>
+<td align="left">input.md:
+<pre>
+Currency object:<br><br>
+  :\[](currency-usd.json)
+</pre>
+</td>
+<td align="left" rowspan="2">
+<pre>
+Currency object:<br><br>
+  {
+    "code": "USD",
+    "currency": "United States dollar"
+  }
+</pre>
+</td>
+</tr>
+<tr>
+<td align="left">currency-usd.json:
+<pre>
+{
+  "code": "USD",
+  "currency": "United States dollar"
+}
+</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+**Example 3: passing context**
+
+Context can be passed through transclusion links to nested (descendent) transclusion links, and is passed by adding override arguments to the transclusion link and is scoped to the linked file and its descendants.
+
+Each override is denoted by a target link and an overriding link (e.g. `:[](foo.md BING:bar.md)`). The target link and overriding link are separated by a colon. The overriding link will override all descendant links that match the target link. The overriding link may also be a double quoted string (e.g. `:[](foo.md BOP:"fizz buzz"`).
+
+It is clearest for overrides to use a simple string for the target link that will not be confused for a real file path.
+
+The transclusion link `:[](CODE)` in `payment-terms.md` is targeted by the override in `input.md`.
+
+<table>
+<thead><tr>
+<th align="left">Input</th>
+<th align="left">Output (<code>$ hercule input.md</code>)</th>
+</tr></thead>
+<tbody><tr>
+<td align="left">input.md:
+<pre># Payment Terms<br><br>
+:[](payment-terms.md CODE:"USD")</pre>
+</td>
+<td align="left" rowspan="2">
+<pre># Payment Terms<br><br>
+Payment shall be made via direct
+deposit in USD.</pre>
+</td>
+</tr>
+<tr>
+<td align="left">payment-terms.md:
+<pre>Payment shall be made via direct
+deposit in :[](CODE).</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+**Example 4: default**
+
+A link or a string can also be specified as a default when no override is supplied.
+
+The default must immediately follow the link, is denoted by the double vertical bar (`||`) and may be followed by additional overrides (e.g. `:[](FOO || bar.md FIZZ:buzz.md BING:"bop")`.
+
+<table>
+<thead><tr>
+<th align="left">Input</th>
+<th align="left">Output (<code>$ hercule input.md</code>)</th>
+</tr></thead>
+<tbody><tr>
+<td align="left">input.md:
+<pre># Payment Terms<br><br>
+:[](payment-terms.md)</pre>
+</td>
+<td align="left" rowspan="2">
+<pre># Payment Terms<br><br>
+Payment shall be made via direct
+deposit in GBP.</pre>
+</td>
+</tr>
+<tr>
+<td align="left">payment-terms.md:
+<pre>Payment shall be made via direct
+deposit in :[](CODE || "GBP").</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+## API
 
 - [`TranscludeStream`](#transclude)
 - [`transcludeString`](#transcludeString)
@@ -295,7 +312,6 @@ __Arguments__
 
 1. `url` - A relative url from the input being processed.
 2. `source` - The absolute source url of the url being resolved.
-3. `placeholder` - The transclusion link that was resolved to the url.
 
 __Returns__
 
@@ -309,7 +325,7 @@ __Examples__
 ```javascript
 import { trancludeFile, resolveHttpUrl, resolveLocalUrl, resolveString } from 'hercule';
 
-function myResolver(url, source, placeholder) {
+function myResolver(url, source) {
   // Add your implementation here
   // Return null to try next resolver
   return null;
@@ -324,15 +340,3 @@ trancludeFile('foo.md', { resolvers }, (err, output) => {
   console.log(output);
 });
 ```
-
----------------------------------------
-
-<a name="customSyntax" />
-
-### Custom Transclusion Syntax
-
-Hercule also has basic support for alternative transclusion link syntax, including:
-
-- [aglio](https://github.com/danielgtaylor/aglio/): `<!-- include(foo.md) -->`
-- [Marked](http://marked2app.com/help/Multi-File_Documents.html): `<<[sections/section1.md]`
-- [MultiMarkdown](http://fletcher.github.io/MultiMarkdown-5/transclusion.html): `{{bar.md}}`
