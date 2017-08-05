@@ -46,10 +46,14 @@ const defaultResolvers = [resolveHttpUrl, resolveLocalUrl, resolveString];
 //  - resolvers is an array of synchronus functions that return null, string or stream.
 //  - stream requires processing
 //  - string assumed fully processed
-export function resolveToReadableStream(link, resolvers = defaultResolvers) {
+export function resolveToReadableStream(
+  link,
+  resolvers = defaultResolvers,
+  placeholder
+) {
   const { content, url } = _.reduce(
     resolvers,
-    (memo, resolver) => memo || resolver(link.url, link.source),
+    (memo, resolver) => memo || resolver(link.url, link.source, placeholder),
     null
   );
 

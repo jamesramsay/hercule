@@ -39,6 +39,18 @@ test('handles url resolved to stream', t => {
   t.truthy(isStream(contentStream));
 });
 
+test('calls resolvers with placeholder', t => {
+  const resolvers = [(url, source, placeholder) => ({ content: placeholder })];
+  const { contentStream, resolvedUrl } = resolver.resolveToReadableStream(
+    { url: '"foo.md"', source: 'bar.md' },
+    resolvers,
+    ':[](foo.md)'
+  );
+
+  t.falsy(resolvedUrl);
+  t.truthy(isStream(contentStream));
+});
+
 test('throws if not resolved', t => {
   const resolvers = [() => _.constant(null)];
   const error = t.throws(() =>
