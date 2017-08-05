@@ -33,13 +33,16 @@ jobs:
     - yarn install --production
     - npm pack
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - export TAG=`if [ -n "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; elif [ "$TRAVIS_BRANCH"
-      == "master" ]; then echo "latest"; else; fi`
+    - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [ -n "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; elif [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; fi`
     - docker build -t $TRAVIS_REPO_SLUG:$COMMIT .
-    - if [ -n "$TAG" ]; then docker tag $REPO:$COMMIT $REPO:$TAG && docker push $REPO; fi
+    - if [ -n "$TAG" ]; then echo "Tagging $TRAVIS_REPO_SLUG:$COMMIT $TRAVIS_REPO_SLUG:$TAG" && docker tag $TRAVIS_REPO_SLUG:$COMMIT $TRAVIS_REPO_SLUG:$TAG && docker push $TRAVIS_REPO_SLUG; fi
+    after_script: skip
+    after_success: skip
   - stage: npm release
     node_js: '6'
     script: echo 'Deploying to npm ...'
+    after_script: skip
+    after_success: skip
     deploy:
     - provider: npm
       email: git@jwr.vc
