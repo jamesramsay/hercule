@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [4.1.0] - 2017-08-05
+### Added
+
 - Add `placeholder` argument to resolver API allowing resolver functions to pass the unmodified content back and skip the link. This allows the default behaviour where unresolvable links throw an error to be overridden with a best-effort approach.
 
 ## [4.0.1] - 2017-05-27
