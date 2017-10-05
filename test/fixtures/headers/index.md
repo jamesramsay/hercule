@@ -1,0 +1,3 @@
+# Heading
+
+:[](sub-index.md)
