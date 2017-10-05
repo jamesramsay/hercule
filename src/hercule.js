@@ -6,6 +6,7 @@ import getStream from 'get-stream';
 
 import Transclude from './transclude';
 import Indent from './indent';
+import Header from './header';
 import Trim from './trim';
 import Sourcemap from './sourcemap';
 
@@ -17,6 +18,7 @@ export function TranscludeStream(source = 'input', options) {
 
   const transclude = new Transclude(source, options);
   const indenter = new Indent();
+  const header = new Header();
   const trim = new Trim();
   const sourcemap = new Sourcemap(outputFile);
   const stringify = get('content');
@@ -27,7 +29,12 @@ export function TranscludeStream(source = 'input', options) {
     generatedSourceMap => (sourceMap = generatedSourceMap)
   );
 
-  transclude.pipe(trim).pipe(indenter).pipe(sourcemap).pipe(stringify);
+  transclude
+    .pipe(trim)
+    .pipe(header)
+    .pipe(indenter)
+    .pipe(sourcemap)
+    .pipe(stringify);
 
   const transcluder = duplexer({ bubbleErrors: false }, transclude, stringify);
   transcluder.on('end', () => transcluder.emit('sourcemap', sourceMap));

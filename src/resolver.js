@@ -49,11 +49,13 @@ const defaultResolvers = [resolveHttpUrl, resolveLocalUrl, resolveString];
 export function resolveToReadableStream(
   link,
   resolvers = defaultResolvers,
-  placeholder
+  placeholder,
+  chunk
 ) {
   const { content, url } = _.reduce(
     resolvers,
-    (memo, resolver) => memo || resolver(link.url, link.source, placeholder),
+    (memo, resolver) =>
+      memo || resolver(link.url, link.source, placeholder, chunk),
     null
   );
 
