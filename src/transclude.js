@@ -9,15 +9,10 @@ import { parseContent } from './parse';
 
 const SYNTAX = {
   hercule: {
-    // REGEXP: /(^[\t ]*)?:\[.*?]\((.*?)\)/gm,
-    // MATCH_GROUP: 0,
-    // INDENT_GROUP: 1,
-    // LINK_GROUP: 2,
-    REGEXP: /(?:^(#+)(?=.*\n)[^#]+?)?((^[\t ]*)?:\[.*?]\((.*?)\))/gm,
-    MATCH_GROUP: 2,
-    INDENT_GROUP: 3,
-    LINK_GROUP: 4,
-    HEADER_GROUP: 1,
+    REGEXP: /(^[\t ]*)?:\[.*?]\((.*?)\)/gm,
+    MATCH_GROUP: 0,
+    INDENT_GROUP: 1,
+    LINK_GROUP: 2,
   },
   aglio: {
     REGEXP: /( *)?(<!-- include\((.*?)\) -->)/gim,
@@ -87,20 +82,15 @@ export default function Transclude(source = 'string', options = {}) {
     inheritedHeader = 0,
     resolvers,
   } = options;
-  const {
-    REGEXP,
-    MATCH_GROUP,
-    INDENT_GROUP,
-    LINK_GROUP,
-    HEADER_GROUP,
-  } = SYNTAX[transclusionSyntax];
+  const { REGEXP, MATCH_GROUP, INDENT_GROUP, LINK_GROUP } = SYNTAX[
+    transclusionSyntax
+  ];
   const pattern = cloneRegExp(REGEXP);
   let inputBuffer = '';
   let line = 1;
   let column = 0;
 
   function transclude(chunk, cb) {
-    // console.log('transclude(chunk)', chunk);
     const self = this;
 
     // eslint-disable-next-line consistent-return
@@ -179,7 +169,10 @@ export default function Transclude(source = 'string', options = {}) {
     const content = chunk[MATCH_GROUP];
     const link = chunk[LINK_GROUP];
     const indent = chunk[INDENT_GROUP] || '';
-    const level = chunk[HEADER_GROUP] ? chunk[HEADER_GROUP].length : 0;
+    const level = [...chunk.input.slice(0, chunk.index)]
+      .reverse()
+      .join('')
+      .match(/^[^\n|\r|\r\n]+ +(#+)$/m);
 
     const output = { content, line, column };
     output.link = link;
@@ -188,7 +181,7 @@ export default function Transclude(source = 'string', options = {}) {
     output.references = [...inheritedReferences];
     output.indent = inheritedIndent + indent;
     output.column += content.lastIndexOf(link);
-    output.header = inheritedHeader + level;
+    output.header = inheritedHeader + (level ? level[1].length : 0);
 
     ({ line, column } = shiftCursor(content, { line, column }));
 
@@ -225,12 +218,9 @@ export default function Transclude(source = 'string', options = {}) {
     if (chunk) inputBuffer += chunk;
 
     while ((match = pattern.exec(inputBuffer)) !== null) {
-      // console.log('match', match);
       // Content prior to match can be returned without transform
 
       const matchIndex = match.index + match[0].lastIndexOf(match[MATCH_GROUP]);
-
-      // console.log('matchIndex', matchIndex);
 
       if (matchIndex > nextOffset) {
         const separator = inputBuffer.slice(nextOffset, matchIndex);
@@ -239,7 +229,6 @@ export default function Transclude(source = 'string', options = {}) {
 
       // Match within bounds: [  xxxx  ]
       if (pattern.lastIndex < inputBuffer.length || lastChunk) {
-        // console.log('toToken(match)', toToken(match));
         tokens.push(toToken(match));
 
         // Next match must be after this match

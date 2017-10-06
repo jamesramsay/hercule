@@ -14,13 +14,11 @@ export default function Header() {
       let content = inputBuffer[0].content;
 
       if (header) {
-        // console.log('Header.content', content);
         content = _.replace(
           content,
-          /(#+)([^#|\n]*)/g,
+          /^(#+)([^#|\n]*)/g,
           `$1${'#'.repeat(header)}$2`
         );
-        // console.log('Header.content replaced', content);
         inputBuffer[0].content = content;
       }
       this.push(inputBuffer.shift());

@@ -31,8 +31,8 @@ export function TranscludeStream(source = 'input', options) {
 
   transclude
     .pipe(trim)
-    .pipe(header)
     .pipe(indenter)
+    .pipe(header)
     .pipe(sourcemap)
     .pipe(stringify);
 

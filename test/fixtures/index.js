@@ -8,7 +8,6 @@ module.exports.fixtures = fs
       file[0] !== '_' && fs.statSync(path.join(__dirname, file)).isDirectory()
     );
   })
-  // .filter(function(file) { return file.includes('invalid-link-fallback')})
   .map(function(file) {
     var expectedConfig = {};
     var expectedSourcemap = '';
