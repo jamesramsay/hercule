@@ -220,10 +220,8 @@ export default function Transclude(source = 'string', options = {}) {
     while ((match = pattern.exec(inputBuffer)) !== null) {
       // Content prior to match can be returned without transform
 
-      const matchIndex = match.index + match[0].lastIndexOf(match[MATCH_GROUP]);
-
-      if (matchIndex > nextOffset) {
-        const separator = inputBuffer.slice(nextOffset, matchIndex);
+      if (match.index > nextOffset) {
+        const separator = inputBuffer.slice(nextOffset, match.index);
         tokens = tokens.concat(toSeparators(separator));
       }
 
@@ -236,7 +234,7 @@ export default function Transclude(source = 'string', options = {}) {
         // Match against bounds: [     xxx]
       } else {
         // Next match will be the start of this match
-        nextOffset = matchIndex;
+        nextOffset = match.index;
       }
     }
 
