@@ -28,6 +28,7 @@ after_success: npm run codecov
 jobs:
   include:
   - stage: build docker image
+    if: type = push
     node_js: '6'
     script:
     - yarn install --production
@@ -39,6 +40,7 @@ jobs:
     after_script: skip
     after_success: skip
   - stage: npm release
+    if: type = push
     node_js: '6'
     script: echo 'Deploying to npm ...'
     after_script: skip
