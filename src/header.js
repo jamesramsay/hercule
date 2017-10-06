@@ -2,7 +2,6 @@ import through2 from 'through2';
 import _ from 'lodash';
 
 export default function Header() {
-  const NEWLINE = '\n';
   const inputBuffer = [];
 
   function transform(chunk, encoding, cb) {
@@ -17,7 +16,7 @@ export default function Header() {
         content = _.replace(
           content,
           /^(#+)([^#|\n]*)/g,
-          `$1${'#'.repeat(header)}$2`
+          `$1${_.repeat('#', header)}$2`
         );
         inputBuffer[0].content = content;
       }
