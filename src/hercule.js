@@ -22,10 +22,9 @@ export function TranscludeStream(source = 'input', options) {
   const stringify = get('content');
 
   transclude.on('error', () => transclude.end());
-  sourcemap.on(
-    'sourcemap',
-    generatedSourceMap => (sourceMap = generatedSourceMap)
-  );
+  sourcemap.on('sourcemap', generatedSourceMap => {
+    sourceMap = generatedSourceMap;
+  });
 
   transclude.pipe(trim).pipe(indenter).pipe(sourcemap).pipe(stringify);
 
@@ -44,7 +43,9 @@ export function transcludeString(...args) {
   const transclude = new TranscludeStream(source, options);
   let sourceMap;
 
-  transclude.on('sourcemap', srcmap => (sourceMap = srcmap));
+  transclude.on('sourcemap', srcmap => {
+    sourceMap = srcmap;
+  });
   transclude.write(input, 'utf8');
   transclude.end();
 
@@ -62,7 +63,9 @@ export function transcludeFile(...args) {
   const inputStream = fs.createReadStream(input, { encoding: 'utf8' });
   let sourceMap;
 
-  transclude.on('sourcemap', srcmap => (sourceMap = srcmap));
+  transclude.on('sourcemap', srcmap => {
+    sourceMap = srcmap;
+  });
   inputStream.on('error', err => cb(err));
   inputStream.pipe(transclude);
 

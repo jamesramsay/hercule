@@ -10,8 +10,8 @@ export default function Indent() {
 
     // The input buffer shouldn't have more than two items in it at a time
     while (inputBuffer.length > 1) {
-      const indent = inputBuffer[1].indent;
-      let content = inputBuffer[1].content;
+      const { indent } = inputBuffer[1];
+      let { content } = inputBuffer[1];
       const preceededNewLine = inputBuffer[0].content.slice(-1) === NEWLINE;
       const beginsNewLine = inputBuffer[1].content.slice(0, 1) === NEWLINE;
 
