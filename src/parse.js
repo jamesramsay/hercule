@@ -2,8 +2,7 @@ import _ from 'lodash';
 import { grammar } from './grammar';
 
 function extendWithSource(link, source, line, column) {
-  const url = link.url;
-  const placeholder = link.placeholder;
+  const { url, placeholder } = link;
   return { url, placeholder, source, line, column: column + link.index };
 }
 

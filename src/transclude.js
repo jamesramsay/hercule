@@ -95,10 +95,9 @@ export default function Transclude(source = 'string', options = {}) {
         return cb();
       }
 
-      const { parents, indent } = chunk;
+      const { parents, indent, content } = chunk;
       const sourceLine = chunk.line;
       const sourceColumn = chunk.column;
-      const content = chunk.content;
 
       let out;
       try {
