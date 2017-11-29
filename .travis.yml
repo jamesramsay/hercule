@@ -47,7 +47,7 @@ jobs:
     after_script: skip
     after_success: skip
     deploy:
-    - provider: npm
+      provider: npm
       email: git@jwr.vc
       api_key:
         secure: K/+dVjtCqesr5E5EMZo/qBdKlWwPpZ60yp1GtKoAhSZUtL4VY4A8LOJmcSeIeYvsPkK8PRSCyb2FTDfSTYEO4dWVfNPoLxWp7U48iIiHSfLdNixfTiBHyjdKdP/6oCz3TNfb9upPUb1lcb5h+rM2KJgCLT6s30Vbajka6STeDCs=
