@@ -15,7 +15,7 @@ const cli = meow(
     '  $ hercule [<input> ...]',
     '',
     'Options:',
-    '  --stdin, -                 Specifies input to be read from stdin.',
+    '  --stdin                    Specifies input to be read from stdin.',
     '  --output, -o path          Specifies the name and location of the output file.  If not specified, stdout is used.',
     '  --syntax, -s syntax_name   Specifies which transclusion link syntax (e.g. hercule, aglio, marked, multimarkdown).',
     '                             If not specifed, hercule is used.',
