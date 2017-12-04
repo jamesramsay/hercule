@@ -1,8 +1,8 @@
 /**
-* Hercule
-* A simple markdown transclusion tool
-* Author: James Ramsay
-*/
+ * Hercule
+ * A simple markdown transclusion tool
+ * Author: James Ramsay
+ */
 
 import fs from 'fs';
 import path from 'path';

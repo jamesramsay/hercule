@@ -49,11 +49,10 @@ function applyReferences(chunk) {
   const transclusionLink = chunk.link;
   const inheritedReferences = chunk.references;
 
-  const {
-    contentLink,
-    scopeReferences,
-    descendantReferences,
-  } = parseContent(transclusionLink, { source, line, column });
+  const { contentLink, scopeReferences, descendantReferences } = parseContent(
+    transclusionLink,
+    { source, line, column }
+  );
 
   // Inherited reference take precendence over fallback reference
   const contextReferences = [...inheritedReferences, ...scopeReferences];
