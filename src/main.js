@@ -10,37 +10,46 @@ import meow from 'meow';
 import { TranscludeStream } from './hercule';
 
 const cli = meow(
-  [
-    'Usage:',
-    '  $ hercule [<input> ...]',
-    '',
-    'Options:',
-    '  --stdin                    Specifies input to be read from stdin.',
-    '  --output, -o path          Specifies the name and location of the output file.  If not specified, stdout is used.',
-    '  --syntax, -s syntax_name   Specifies which transclusion link syntax (e.g. hercule, aglio, marked, multimarkdown).',
-    '                             If not specifed, hercule is used.',
-    '  --relative, -r path        Specifies the path to which links in input are relative',
-    '  --sourcemap, -m            Specifies a sourcemap should be gnerated. Only used if output is specified.',
-    '',
-    'Examples:',
-    '  $ hercule foo.md',
-    '    Processes the file foo.md and prints to stdout',
-    '  $ cat foo.md | hercule - --output bar.md',
-    '    Processes the input from stdin and writes output to bar.md',
-  ],
+  `Usage:
+  $ hercule [<input> ...]
+
+Options:
+  --stdin                    Specifies input to be read from stdin.
+  --output, -o path          Specifies the name and location of the output file.  If not specified, stdout is used.
+  --syntax, -s syntax_name   Specifies which transclusion link syntax (e.g. hercule, aglio, marked, multimarkdown).
+                             If not specifed, hercule is used.
+  --relative, -r path        Specifies the path to which links in input are relative.
+  --sourcemap, -m            Specifies a sourcemap should be gnerated. Only used if output is specified.
+
+Examples:
+  $ hercule foo.md
+    Processes the file foo.md and prints to stdout
+  $ cat foo.md | hercule - --output bar.md
+    Processes the input from stdin and writes output to bar.md
+  `,
   {
-    string: ['_', 'output', 'syntax', 'relative'],
-    boolean: ['sourcemap', 'stdin'],
-    default: {
-      syntax: 'hercule',
-      relative: '',
-    },
-    alias: {
-      o: 'output',
-      s: 'syntax',
-      r: 'relative',
-      m: 'sourcemap',
-      h: 'help',
+    flags: {
+      output: {
+        type: 'string',
+        alias: 'o',
+      },
+      syntax: {
+        type: 'string',
+        alias: 's',
+        default: 'hercule',
+      },
+      relative: {
+        type: 'string',
+        alias: 'r',
+        default: '',
+      },
+      sourcemap: {
+        type: 'boolean',
+        alias: 'm',
+      },
+      stdin: {
+        type: 'boolean',
+      },
     },
   }
 );
