@@ -10,11 +10,8 @@ services: docker
 cache:
   directories:
   - "$HOME/.yarn-cache"
-  - "$HOME/.bats"
 
-before_install:
-- git clone https://github.com/sstephenson/bats.git .bats
-- yarn global add greenkeeper-lockfile@1
+before_install: yarn global add greenkeeper-lockfile@1
 
 before_script:
 - greenkeeper-lockfile-update
