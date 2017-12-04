@@ -37,7 +37,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "prettier --single-quote --trailing-comma es5 --write",
+      "prettier",
       "git add"
     ]
   },
@@ -118,7 +118,7 @@
     "nock": "^9.0.0",
     "nyc": "^11.0.2",
     "pegjs": "^0.10.0",
-    "prettier": "^1.4.4",
+    "prettier": "^1.8.0",
     "sinon": "^4.0.0",
     "stream-spigot": "^3.0.5",
     "validate-commit-msg": "^2.12.2"
