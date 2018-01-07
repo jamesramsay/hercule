@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
-import got from 'got';
+import get from 'miniget';
 import { isReadable } from 'isstream';
 import through2 from 'through2';
 
@@ -10,7 +10,7 @@ export function resolveHttpUrl(url) {
   const isHttpUrl = /^https?:\/\//;
   if (!isHttpUrl.test(url)) return null;
 
-  const content = got.stream(url);
+  const content = get(url);
 
   // Manually trigger error since 2XX respsonse doesn't trigger error despite not having expected content
   content.on('response', function error(res) {
