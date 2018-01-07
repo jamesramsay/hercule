@@ -1,0 +1,46 @@
+{
+  "name": "hercule",
+  "version": "4.1.1",
+  "description": "Markdown, API Blueprint and string transclusion",
+  "main": "./lib/hercule",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "bin": {
+    "hercule": "./bin/hercule"
+  },
+  "repository": "https://github.com/jamesramsay/hercule/tree/master/packages/hercule",
+  "keywords": [
+    "markdown",
+    "transclude",
+    "transclusion",
+    "api",
+    "blueprint",
+    "documentation",
+    "apiary",
+    "preprocessor"
+  ],
+  "author": {
+    "name": "James Ramsay",
+    "url": "http://jramsay.com.au"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamesramsay/hercule/issues"
+  },
+  "homepage": "https://github.com/jamesramsay/hercule",
+  "dependencies": {
+    "async": "^2.1.4",
+    "clone-regexp": "^1.0.0",
+    "duplexer3": "^0.1.4",
+    "get-stream": "^3.0.0",
+    "got": "^8.0.0",
+    "isstream": "^0.1.2",
+    "left-split": "^1.0.0",
+    "lodash": "^4.0.0",
+    "meow": "^4.0.0",
+    "source-map": "^0.6.0",
+    "through2": "^2.0.0",
+    "through2-get": "^0.1.0"
+  }
+}

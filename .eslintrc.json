@@ -18,6 +18,10 @@
     "id-length": [2, {"min": 2, "max": 25, "properties": "never", "exceptions": ["_"]}],
     "no-cond-assign": [2, "except-parens"],
     "lodash/import-scope": [2, "full"],
-    "prettier/prettier": [2, {"singleQuote": true, "trailingComma": "es5"}]
+    "prettier/prettier": [2, {"singleQuote": true, "trailingComma": "es5"}],
+    "import/no-extraneous-dependencies": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "ava/no-ignored-test-files": 0
   }
 }

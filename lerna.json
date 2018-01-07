@@ -1,0 +1,11 @@
+{
+  "lerna": "2.5.1",
+  "version": "4.1.1",
+  "packages": [
+    "packages/*"
+  ],
+  "npmClient": "yarn",
+  "npmClientArgs": [
+    "--no-lockfile"
+  ]
+}

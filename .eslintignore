@@ -1,3 +1,5 @@
-test/fixtures/index.js
-test/integration/_mock.js
-test/benchmark.js
+packages/hercule/test/fixtures/index.js
+packages/hercule/test/integration/_mock.js
+packages/hercule/test/benchmark.js
+node_modules/
+lib/

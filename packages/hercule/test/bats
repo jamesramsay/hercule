@@ -1,20 +1,20 @@
 #!/usr/bin/env bats
 
 @test "accepts input from local file" {
-  run ./bin/hercule ./test/fixtures/local-link/index.md
+  run $BATS_TEST_DIRNAME/../bin/hercule $BATS_TEST_DIRNAME/fixtures/local-link/index.md
   [ "$status" -eq 0 ]
   [ "$output" == "Jackdaws love my big sphinx of quartz." ]
 }
 
 @test "accepts input from stdin" {
-  run bash -c "cat ./test/fixtures/local-link/index.md | ./bin/hercule --stdin --relative ./test/fixtures/local-link"
+  run bash -c "cat $BATS_TEST_DIRNAME/fixtures/local-link/index.md | $BATS_TEST_DIRNAME/../bin/hercule --stdin --relative $BATS_TEST_DIRNAME/fixtures/local-link"
   [ "$status" -eq 0 ]
   [ "$output" == "Jackdaws love my big sphinx of quartz." ]
 }
 
 @test "outputs to local file" {
   now=`date +%s`
-  ./bin/hercule ./test/fixtures/local-link/index.md -o $BATS_TMPDIR/test-$now.md
+  $BATS_TEST_DIRNAME/../bin/hercule $BATS_TEST_DIRNAME/fixtures/local-link/index.md -o $BATS_TMPDIR/test-$now.md
   run cat $BATS_TMPDIR/test-$now.md
   [ "$status" -eq 0 ]
   [ "$output" == "Jackdaws love my big sphinx of quartz." ]
@@ -22,18 +22,18 @@
 
 @test "outputs sourcemap" {
   now=`date +%s`
-  ./bin/hercule ./test/fixtures/local-link/index.md -o $BATS_TMPDIR/test-$now.md --sourcemap
+  $BATS_TEST_DIRNAME/../bin/hercule $BATS_TEST_DIRNAME/fixtures/local-link/index.md -o $BATS_TMPDIR/test-$now.md --sourcemap
   run [ -f $BATS_TMPDIR/test-$now.md.map ]
   [ "$status" -eq 0 ]
 }
 
 @test "processes input according to given syntax" {
-  run ./bin/hercule ./test/fixtures/syntax-aglio/index.md --syntax aglio
+  run $BATS_TEST_DIRNAME/../bin/hercule $BATS_TEST_DIRNAME/fixtures/syntax-aglio/index.md --syntax aglio
   [ "$status" -eq 0 ]
   [ "${lines[0]}" == "Jackdaws love my" ]
 }
 
 @test "exits with error on invalid input" {
-  run ./bin/hercule ./test/fixtures/local-link-ENOENT/index.md
+  run $BATS_TEST_DIRNAME/../bin/hercule $BATS_TEST_DIRNAME/fixtures/local-link-ENOENT/index.md
   [ "$status" -eq 1 ]
 }
