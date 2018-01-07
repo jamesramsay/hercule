@@ -6,9 +6,6 @@
   "engines": {
     "node": ">=4.0.0"
   },
-  "bin": {
-    "hercule": "./bin/hercule"
-  },
   "repository": "https://github.com/jamesramsay/hercule/tree/master/packages/hercule",
   "keywords": [
     "markdown",
@@ -38,7 +35,6 @@
     "isstream": "^0.1.2",
     "left-split": "^1.0.0",
     "lodash": "^4.0.0",
-    "meow": "^4.0.0",
     "source-map": "^0.6.0",
     "through2": "^2.0.0",
     "through2-get": "^0.1.0"

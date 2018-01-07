@@ -1,0 +1,35 @@
+{
+  "name": "hercule-cli",
+  "version": "4.1.1",
+  "description": "Markdown, API Blueprint and string transclusion cli",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "bin": {
+    "hercule": "./bin/hercule"
+  },
+  "repository": "https://github.com/jamesramsay/hercule/tree/master/packages/hercule-cli",
+  "keywords": [
+    "markdown",
+    "transclude",
+    "transclusion",
+    "api",
+    "blueprint",
+    "documentation",
+    "apiary",
+    "preprocessor"
+  ],
+  "author": {
+    "name": "James Ramsay",
+    "url": "http://jramsay.com.au"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamesramsay/hercule/issues"
+  },
+  "homepage": "https://github.com/jamesramsay/hercule",
+  "dependencies": {
+    "meow": "^4.0.0",
+    "hercule": "^4.1.1"
+  }
+}
