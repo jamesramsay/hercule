@@ -38,8 +38,7 @@ export function TranscludeStream(source = 'input', options) {
   return transcluder;
 }
 
-export function transcludeString(...args) {
-  const input = args.shift();
+export function transcludeString(input, ...args) {
   const cb = args.pop();
   const [options = {}] = args;
   const source = _.get(options, 'source') || 'string';
@@ -58,8 +57,7 @@ export function transcludeString(...args) {
     .catch(err => cb(err, err.bufferedData, sourceMap));
 }
 
-export function transcludeFile(...args) {
-  const input = args.shift();
+export function transcludeFile(input, ...args) {
   const cb = args.pop();
   const [options = {}] = args;
 
