@@ -62,6 +62,8 @@ test('throws if not resolved', t => {
 test('returns stream if http url', t => {
   const { content } = resolver.resolveHttpUrl('https://127.0.0.1');
   t.truthy(isStream(content));
+  // If we don't abort the request it will throw an exception
+  content.abort();
 });
 
 test('returns falsy if not http url', t => {
