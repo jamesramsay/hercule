@@ -1,5 +1,5 @@
-packages/hercule/test/fixtures/index.js
-packages/hercule/test/integration/_mock.js
-packages/hercule/test/benchmark.js
+packages/hercule-core/test/fixtures/index.js
+packages/hercule-core/test/integration/_mock.js
+packages/hercule-core/test/benchmark.js
 node_modules/
 lib/

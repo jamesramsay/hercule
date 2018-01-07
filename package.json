@@ -11,9 +11,9 @@
     "posttest": "npm run lint",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "benchmark": "./packages/hercule/test/benchmark.js",
+    "benchmark": "./packages/hercule-core/test/benchmark.js",
     "compile": "lerna-build && npm run compile-grammars",
-    "compile-grammars": "mkdir -p ./packages/hercule/lib/grammar && pegjs -o packages/hercule/lib/grammar/link.js packages/hercule/src/grammar/link.pegjs",
+    "compile-grammars": "mkdir -p ./packages/hercule-core/lib/grammar && pegjs -o packages/hercule-core/lib/grammar/link.js packages/hercule-core/src/grammar/link.pegjs",
     "lint": "eslint packages",
     "precommit": "lint-staged",
     "commitmsg": "validate-commit-msg"

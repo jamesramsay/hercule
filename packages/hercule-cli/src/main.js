@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import meow from 'meow';
-import { TranscludeStream } from 'hercule';
+import { TranscludeStream } from 'hercule-core';
 
 const cli = meow(
   `Usage:

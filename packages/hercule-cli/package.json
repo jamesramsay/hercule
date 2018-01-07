@@ -30,6 +30,6 @@
   "homepage": "https://github.com/jamesramsay/hercule",
   "dependencies": {
     "meow": "^4.0.0",
-    "hercule": "^4.1.1"
+    "hercule-core": "^4.1.1"
   }
 }
