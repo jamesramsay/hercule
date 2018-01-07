@@ -1,24 +1,22 @@
 {
-  "name": "hercule",
+  "name": "hercule-resolve-http",
   "version": "4.1.1",
-  "description": "Markdown, API Blueprint and string transclusion",
-  "main": "./lib/hercule",
-  "bin": {
-    "hercule": "./bin/hercule"
-  },
+  "description": "HTTP resolver for hercule",
+  "main": "./lib/resolve-http",
   "engines": {
     "node": ">=4.0.0"
   },
-  "repository": "https://github.com/jamesramsay/hercule/tree/master/packages/hercule",
+  "repository": "https://github.com/jamesramsay/hercule/tree/master/packages/hercule-resolve-http",
   "keywords": [
-    "markdown",
+    "hercule",
     "transclude",
     "transclusion",
     "api",
     "blueprint",
     "documentation",
     "apiary",
-    "preprocessor"
+    "preprocessor",
+    "http"
   ],
   "author": {
     "name": "James Ramsay",
@@ -30,8 +28,9 @@
   },
   "homepage": "https://github.com/jamesramsay/hercule",
   "dependencies": {
-    "hercule-cli": "^4.1.1",
-    "hercule-core": "^4.1.1",
-    "hercule-resolve-http-url": "^4.1.1"
+    "got": "^8.0.0"
+  },
+  "peerDependency": {
+    "hercule-core": "4.1.1"
   }
 }
