@@ -59,15 +59,6 @@ test('throws if not resolved', t => {
   t.is(error.message, "no readable stream or string, resolve 'foo'");
 });
 
-test('returns stream if http url', t => {
-  const { content } = resolver.resolveHttpUrl('https://127.0.0.1');
-  t.truthy(isStream(content));
-});
-
-test('returns falsy if not http url', t => {
-  t.falsy(resolver.resolveHttpUrl('foo.md'));
-});
-
 test('returns stream if local url', t => {
   t.context.sandbox.stub(global.fs, 'createReadStream');
   global.fs.createReadStream.returns(new Readable());

@@ -4,7 +4,6 @@ import fs from 'fs';
 
 import { TranscludeStream } from '../../src/hercule';
 import fixtures from '../fixtures';
-import './_mock';
 
 _.forEach(fixtures.fixtures, fixture => {
   test.cb(`should transclude ${fixture.name}`, t => {

@@ -1,25 +1,8 @@
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
-import got from 'got';
 import { isReadable } from 'isstream';
 import through2 from 'through2';
-
-export function resolveHttpUrl(url) {
-  // TODO: handle relative link in
-  const isHttpUrl = /^https?:\/\//;
-  if (!isHttpUrl.test(url)) return null;
-
-  const content = got.stream(url);
-
-  // Manually trigger error since 2XX respsonse doesn't trigger error despite not having expected content
-  content.on('response', function error(res) {
-    if (res.statusCode !== 200)
-      this.emit('error', { message: 'Could not read file', path: url });
-  });
-
-  return { content, url };
-}
 
 export function resolveLocalUrl(url, sourcePath) {
   const isLocalUrl = /^[^ ()"']+/;
@@ -40,7 +23,7 @@ export function resolveString(input) {
   return { content: input.slice(1, -1) };
 }
 
-const defaultResolvers = [resolveHttpUrl, resolveLocalUrl, resolveString];
+const defaultResolvers = [resolveLocalUrl, resolveString];
 
 // Resolves link to string or stream
 //  - resolvers is an array of synchronus functions that return null, string or stream.
