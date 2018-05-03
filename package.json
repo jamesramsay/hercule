@@ -86,7 +86,7 @@
   "homepage": "https://github.com/jamesramsay/hercule",
   "dependencies": {
     "async": "^2.1.4",
-    "clone-regexp": "^1.0.0",
+    "clone-regexp": "^2.0.0",
     "duplexer3": "^0.1.4",
     "get-stream": "^3.0.0",
     "got": "^8.0.0",
