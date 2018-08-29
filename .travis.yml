@@ -1,9 +1,8 @@
 language: node_js
 
 node_js:
+- '10'
 - '8'
-- '6'
-- '4'
 
 services: docker
 
@@ -27,7 +26,7 @@ jobs:
   include:
   - stage: build docker image
     if: branch = master AND type = push
-    node_js: '6'
+    node_js: '10'
     script:
     - yarn install --production
     - npm pack
@@ -39,7 +38,7 @@ jobs:
     after_success: skip
   - stage: npm release
     if: branch = master AND type = push
-    node_js: '6'
+    node_js: '10'
     script: echo 'Deploying to npm ...'
     after_script: skip
     after_success: skip
