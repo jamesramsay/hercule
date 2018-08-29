@@ -10,7 +10,7 @@ import * as parse from '../../src/parse';
 import * as pegjs from '../../src/grammar';
 
 test.beforeEach(t => {
-  t.context.sandbox = sinon.sandbox.create();
+  t.context.sandbox = sinon.createSandbox();
 });
 
 test.afterEach(t => {
