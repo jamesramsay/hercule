@@ -12,7 +12,7 @@
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "compile": "babel src --out-dir lib --source-maps && npm run compile-grammars",
-    "compile-grammars": "mkdir -p ./lib/grammar && pegjs -o lib/grammar/link.js src/grammar/link.pegjs",
+    "compile-grammars": "pegjs -o grammars/link.js grammars/link.pegjs",
     "lint": "eslint ./src ./test",
     "release:major": "npm version major && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
@@ -33,7 +33,7 @@
   "nyc": {
     "exclude": [
       "node_modules",
-      "lib/grammar/link.js",
+      "grammars",
       "test"
     ]
   },

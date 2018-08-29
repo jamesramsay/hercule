@@ -7,7 +7,7 @@ import getStream from 'get-stream';
 
 import transclude from '../../src/transclude';
 import * as parse from '../../src/parse';
-import grammar from '../../src/grammar/link';
+import grammar from '../../grammars/link';
 
 test.beforeEach(t => {
   t.context.sandbox = sinon.createSandbox();

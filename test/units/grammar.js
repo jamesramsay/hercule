@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import grammar from '../../src/grammar/link';
+import grammar from '../../grammars/link';
 
 test('should parse simple link', t => {
   const link = 'test.md';

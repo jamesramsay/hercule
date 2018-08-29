@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import grammar from './grammar/link';
+import grammar from '../grammars/link';
 
 function extendWithSource(link, source, line, column) {
   const { url, placeholder } = link;
