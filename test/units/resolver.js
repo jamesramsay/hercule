@@ -59,7 +59,7 @@ test('throws if not resolved', t => {
   t.is(error.message, "no readable stream or string, resolve 'foo'");
 });
 
-test('returns stream if http url', t => {
+test.skip('returns stream if http url', t => {
   const { content } = resolver.resolveHttpUrl('https://127.0.0.1');
   t.truthy(isStream(content));
 });
