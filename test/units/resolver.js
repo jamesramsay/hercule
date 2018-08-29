@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import _ from 'lodash';
 import { Readable } from 'stream';
 import isStream from 'isstream';
+import nock from 'nock';
 
 import * as resolver from '../../src/resolver';
 
@@ -59,8 +60,12 @@ test('throws if not resolved', t => {
   t.is(error.message, "no readable stream or string, resolve 'foo'");
 });
 
-test.skip('returns stream if http url', t => {
-  const { content } = resolver.resolveHttpUrl('https://127.0.0.1');
+test('returns stream if http url', t => {
+  nock('https://127.0.0.1')
+    .get('/')
+    .reply(200, 'Hello World!\n');
+
+  const { content } = resolver.resolveHttpUrl('https://127.0.0.1/');
   t.truthy(isStream(content));
 });
 
