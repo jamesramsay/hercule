@@ -3,13 +3,14 @@ import sinon from 'sinon';
 import _ from 'lodash';
 import { Readable } from 'stream';
 import isStream from 'isstream';
+import nock from 'nock';
 
 import * as resolver from '../../src/resolver';
 
 global.fs = require('fs');
 
 test.beforeEach(t => {
-  t.context.sandbox = sinon.sandbox.create();
+  t.context.sandbox = sinon.createSandbox();
 });
 
 test.afterEach(t => {
@@ -60,7 +61,11 @@ test('throws if not resolved', t => {
 });
 
 test('returns stream if http url', t => {
-  const { content } = resolver.resolveHttpUrl('https://127.0.0.1');
+  nock('https://127.0.0.1')
+    .get('/')
+    .reply(200, 'Hello World!\n');
+
+  const { content } = resolver.resolveHttpUrl('https://127.0.0.1/');
   t.truthy(isStream(content));
 });
 

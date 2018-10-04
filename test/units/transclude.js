@@ -7,10 +7,10 @@ import getStream from 'get-stream';
 
 import transclude from '../../src/transclude';
 import * as parse from '../../src/parse';
-import * as pegjs from '../../src/grammar';
+import grammar from '../../grammars/link';
 
 test.beforeEach(t => {
-  t.context.sandbox = sinon.sandbox.create();
+  t.context.sandbox = sinon.createSandbox();
 });
 
 test.afterEach(t => {
@@ -112,8 +112,8 @@ test.serial('should parse a simple link', t => {
   // link: 'animal.md'
   const source = '/foo/bar.md';
 
-  t.context.sandbox.stub(pegjs.grammar, 'parse');
-  pegjs.grammar.parse.returns({
+  t.context.sandbox.stub(grammar, 'parse');
+  grammar.parse.returns({
     link: {
       url: 'animal.md',
       placeholder: 'animal.md',
@@ -142,8 +142,8 @@ test.serial('should parse a complex link', t => {
   // link: 'animal || dog.md wolf:canis-lupus.md'
   const source = '/foo/bar.md';
 
-  t.context.sandbox.stub(pegjs.grammar, 'parse');
-  pegjs.grammar.parse.returns({
+  t.context.sandbox.stub(grammar, 'parse');
+  grammar.parse.returns({
     link: {
       url: 'animal',
       placeholder: 'animal',
