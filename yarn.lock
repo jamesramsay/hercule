@@ -2524,6 +2524,13 @@ get-stream@^4.0.0:
   dependencies:
     pump "^3.0.0"
 
+get-stream@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-5.0.0.tgz#7d1f137576da207fa83d843f44824a70ef999b5f"
+  integrity sha512-frc9F97ehylll1YI31eJRw5M21M86GCItj5U3S3hOEUa6JG6LtcvRKYDAtV/9E5lVasY8QJSPVsrMg/mbCSP5w==
+  dependencies:
+    pump "^3.0.0"
+
 get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
