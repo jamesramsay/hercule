@@ -98,7 +98,7 @@
     "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-ava": "^5.0.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-lodash": "^4.0.0",
+    "eslint-plugin-lodash": "^6.0.0",
     "eslint-plugin-prettier": "^3.0.0",
     "lint-staged": "^8.0.0",
     "nock": "^10.0.0",
