@@ -42,9 +42,9 @@ $ hercule src/blueprint.md -o output.md
 Or, use Hercule as a library:
 
 ```javascript
-import { trancludeString } from 'hercule';
+import { transcludeString } from 'hercule';
 
-trancludeString('# Title\n\n:[abstract](abstract.md)', (err, output) => {
+transcludeString('# Title\n\n:[abstract](abstract.md)', (err, output) => {
   if (err) console.log(err)
   console.log(output);
 });
@@ -224,7 +224,7 @@ __Examples__
 ```javascript
 import { TranscludeStream } from 'hercule';
 
-const trancluder = new TranscludeStream();
+const transcluder = new TranscludeStream();
 
 transcluder.on('error', (err) => {
   // Handle exceptions like dead links
@@ -258,9 +258,9 @@ __Arguments__
 __Examples__
 
 ```javascript
-import { trancludeString } from 'hercule';
+import { transcludeString } from 'hercule';
 
-trancludeString(':[foo](bar.md)', (err, output) => {
+transcludeString(':[foo](bar.md)', (err, output) => {
   // Handle exceptions like dead links
   if (err) console.log(err)
   console.log(output);
@@ -289,9 +289,9 @@ __Arguments__
 __Examples__
 
 ```javascript
-import { trancludeFile } from 'hercule';
+import { transcludeFile } from 'hercule';
 
-trancludeFile('foo.md', (err, output) => {
+transcludeFile('foo.md', (err, output) => {
   // Handle exceptions like dead links
   if (err) console.log(err)
   console.log(output);
@@ -323,7 +323,7 @@ __Returns__
 __Examples__
 
 ```javascript
-import { trancludeFile, resolveHttpUrl, resolveLocalUrl, resolveString } from 'hercule';
+import { transcludeFile, resolveHttpUrl, resolveLocalUrl, resolveString } from 'hercule';
 
 function myResolver(url, source) {
   // Add your implementation here
@@ -334,7 +334,7 @@ function myResolver(url, source) {
 // Resolvers are tried in order
 const resolvers = [myResolver, resolveHttpUrl, resolveLocalUrl, resolveString];
 
-trancludeFile('foo.md', { resolvers }, (err, output) => {
+transcludeFile('foo.md', { resolvers }, (err, output) => {
   // Handle exceptions like dead links
   if (err) console.log(err)
   console.log(output);
