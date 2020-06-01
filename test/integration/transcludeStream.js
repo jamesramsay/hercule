@@ -30,7 +30,7 @@ _.forEach(fixtures.fixtures, fixture => {
       })
       .on('error', err => {
         // Error should be emitted no more than once
-        t.falsy(errored);
+        t.is(errored, 0);
         errored += 1;
 
         t.regex(err.message, new RegExp(config.error.message));

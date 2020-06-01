@@ -5,8 +5,8 @@
   "main": "./lib/hercule",
   "scripts": {
     "test": "npm run test-units && npm run test-integration && npm run test-cli",
-    "test-units": "nyc --cache ava --verbose test/units",
-    "test-integration": "ava --verbose test/integration",
+    "test-units": "nyc --cache ava --verbose test/units/**/*.js",
+    "test-integration": "ava --verbose test/integration/**/*.js",
     "test-cli": "npm run compile && bats test/bats",
     "posttest": "npm run lint",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
