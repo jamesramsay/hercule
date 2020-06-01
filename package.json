@@ -10,7 +10,7 @@
     "test-cli": "npm run compile && bats test/bats",
     "posttest": "npm run lint",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
-    "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "codecov": "nyc report --reporter=text-lcov > coverage.lcov",
     "compile": "babel src --out-dir lib --source-maps && npm run compile-grammars",
     "compile-grammars": "pegjs -o grammars/link.js grammars/link.pegjs",
     "lint": "eslint ./src ./test",
