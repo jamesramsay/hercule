@@ -61,9 +61,7 @@ test('throws if not resolved', t => {
 });
 
 test('returns stream if http url', t => {
-  nock('https://127.0.0.1')
-    .get('/')
-    .reply(200, 'Hello World!\n');
+  nock('https://127.0.0.1').get('/').reply(200, 'Hello World!\n');
 
   const { content } = resolver.resolveHttpUrl('https://127.0.0.1/');
   t.truthy(isStream(content));

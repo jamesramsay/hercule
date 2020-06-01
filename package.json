@@ -44,6 +44,9 @@
       "git add"
     ]
   },
+  "prettier": {
+    "arrowParens": "avoid"
+  },
   "bin": {
     "hercule": "./bin/hercule"
   },
@@ -103,7 +106,7 @@
     "nock": "^12.0.3",
     "nyc": "^15.1.0",
     "pegjs": "^0.10.0",
-    "prettier": "^1.13.0",
+    "prettier": "^2.0.5",
     "sinon": "^9.0.2",
     "stream-spigot": "^3.0.5"
   }
