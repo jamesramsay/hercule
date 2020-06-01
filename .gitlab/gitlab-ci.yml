@@ -1,0 +1,7 @@
+image: node:10
+
+test:
+  before_script:
+    - npm install
+  script:
+    - npm test
