@@ -21,7 +21,7 @@
     "precommit": "lint-staged"
   },
   "engines": {
-    "node": ">=8.10.0"
+    "node": ">=10"
   },
   "publishConfig": {
     "tag": "next"
