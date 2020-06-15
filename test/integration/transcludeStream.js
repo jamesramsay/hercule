@@ -36,6 +36,7 @@ _.forEach(fixtures.fixtures, fixture => {
 
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
+        t.end();
       })
       .on('sourcemap', outputSourcemap => {
         sourcemap = outputSourcemap;
@@ -46,7 +47,10 @@ _.forEach(fixtures.fixtures, fixture => {
           t.deepEqual(sourcemap.mappings, fixture.expectedSourcemap.mappings);
           t.deepEqual(sourcemap.sources, fixture.expectedSourcemap.sources);
         }
-        t.end();
+
+        // Workadounrd for Node <14.x
+        // Node 14+ will only emit end if the stream is fully read
+        if (errored === 0) t.end();
       });
 
     input.pipe(transclude);
