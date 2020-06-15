@@ -26,11 +26,7 @@ export function TranscludeStream(source = 'input', options) {
     sourceMap = generatedSourceMap;
   });
 
-  transclude
-    .pipe(trim)
-    .pipe(indenter)
-    .pipe(sourcemap)
-    .pipe(stringify);
+  transclude.pipe(trim).pipe(indenter).pipe(sourcemap).pipe(stringify);
 
   const transcluder = duplexer({ bubbleErrors: false }, transclude, stringify);
   transcluder.on('end', () => transcluder.emit('sourcemap', sourceMap));

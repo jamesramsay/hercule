@@ -38,9 +38,7 @@ test.cb('should split strings after new lines', t => {
   const testStream = transclude();
   const stringify = get('content');
 
-  spigot({ objectMode: true }, input)
-    .pipe(testStream)
-    .pipe(stringify);
+  spigot({ objectMode: true }, input).pipe(testStream).pipe(stringify);
 
   getStream
     .array(stringify)
@@ -61,9 +59,7 @@ test.serial.cb('should locate link within content', t => {
   });
   const stringify = get('content');
 
-  spigot({ objectMode: true }, input)
-    .pipe(testStream)
-    .pipe(stringify);
+  spigot({ objectMode: true }, input).pipe(testStream).pipe(stringify);
 
   getStream
     .array(stringify)
