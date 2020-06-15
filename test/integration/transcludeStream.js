@@ -3,6 +3,7 @@ import _ from 'lodash';
 import fs from 'fs';
 
 import { TranscludeStream } from '../../src/hercule';
+// eslint-disable-next-line ava/no-import-test-files
 import fixtures from '../fixtures';
 import './_mock';
 

@@ -1,15 +1,18 @@
 import test from 'ava';
 import _ from 'lodash';
 
-import { transcludeFile } from '../../src/hercule';
+import { transcludeString } from '../../src/hercule';
+// eslint-disable-next-line ava/no-import-test-files
 import fixtures from '../fixtures';
 import './_mock';
 
 _.forEach(fixtures.fixtures, fixture => {
   test.cb(`should transclude ${fixture.name}`, t => {
     const config = fixture.expectedConfig;
+    const options = config.options || {};
+    options.source = fixture.inputFile;
 
-    transcludeFile(fixture.inputFile, (err, output, sourcemap) => {
+    transcludeString(fixture.input, options, (err, output, sourcemap) => {
       if (err) {
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
