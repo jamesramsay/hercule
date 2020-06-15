@@ -50,8 +50,10 @@ test.cb('should emit error and end on syntax error', t => {
     .on('readable', function read() {
       this.read();
     })
-    .on('error', () => t.pass())
-    .on('end', () => t.end());
+    .on('error', () => {
+      t.pass();
+      t.end();
+    });
 
   testStream.write(input);
   testStream.end();
