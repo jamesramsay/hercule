@@ -5,3 +5,12 @@ test:
     - npm install
   script:
     - npm test
+
+code_intelligence:
+  before_script:
+    - npm install
+  script:
+    - npm run lsif
+  artifacts:
+    reports:
+      lsif: dump.lsif
