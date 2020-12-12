@@ -85,8 +85,8 @@
     "lodash": "^4.0.0",
     "meow": "^7.0.1",
     "source-map": "^0.7.0",
-    "through2": "^4.0.1",
-    "through2-get": "^0.1.0"
+    "through2": "^4.0.2",
+    "through2-get": "^1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
