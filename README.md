@@ -198,6 +198,7 @@ deposit in :[](CODE || "GBP").</pre>
 - [`transcludeFile`](#transcludeFile)
 - [Resolvers](#resolvers)
 - [Custom Transclusion Syntax](#customSyntax)
+- [Promises](#promises)
 
 ---------------------------------------
 
@@ -338,4 +339,29 @@ transcludeFile('foo.md', { resolvers }, (err, output) => {
   if (err) console.log(err)
   console.log(output);
 });
+```
+
+---------------------------------------
+
+<a name="promises" />
+
+### Promises
+
+A promise interface for `transcludeString` and `transcludeFile` is available
+when requiring `hercule/promises`.
+
+```javascript
+import { transcludeString } from 'hercule/promises';
+
+transcludeString(':[foo](bar.md)')
+.then(({output}) => console.log(output))
+.catch(err => console.log(err));
+```
+
+```javascript
+import { transcludeFile } from 'hercule/promises';
+
+transcludeFile('foo.md')
+.then(({output}) => console.log(output))
+.catch(err => console.log(err));
 ```
