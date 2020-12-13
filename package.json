@@ -27,6 +27,12 @@
   "publishConfig": {
     "tag": "next"
   },
+  "files": [
+    "bin",
+    "lib/*.js",
+    "grammars/links.js",
+    "PURPOSE.md"
+  ],
   "ava": {
     "require": [
       "@babel/register"
