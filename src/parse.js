@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import grammar from '../grammars/link';
 
 function extendWithSource(link, source, line, column) {
@@ -12,10 +11,10 @@ export function parseContent(content, { source, line, column }) {
 
   // Attach source information to all the url to be resolved
   const contentLink = extendWithSource(args.link, source, line, column);
-  const scopeReferences = _.map(args.scopeReferences, ref =>
+  const scopeReferences = args.scopeReferences.map(ref =>
     extendWithSource(ref, source, line, column)
   );
-  const descendantReferences = _.map(args.descendantReferences, ref =>
+  const descendantReferences = args.descendantReferences.map(ref =>
     extendWithSource(ref, source, line, column)
   );
 

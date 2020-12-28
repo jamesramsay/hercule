@@ -1,5 +1,4 @@
 import fs from 'fs';
-import _ from 'lodash';
 import duplexer from 'duplexer3';
 import get from 'through2-get';
 import getStream from 'get-stream';
@@ -11,8 +10,8 @@ import Sourcemap from './sourcemap';
 
 export { resolveHttpUrl, resolveLocalUrl, resolveString } from './resolver';
 
-export function TranscludeStream(source = 'input', options) {
-  const outputFile = _.get(options, 'outputFile');
+export function TranscludeStream(source = 'input', options = {}) {
+  const { outputFile } = options;
   let sourceMap;
 
   const transclude = new Transclude(source, options);
@@ -37,7 +36,7 @@ export function TranscludeStream(source = 'input', options) {
 export function transcludeString(input, ...args) {
   const cb = args.pop();
   const [options = {}] = args;
-  const source = _.get(options, 'source') || 'string';
+  const source = options.source || 'string';
 
   const transclude = new TranscludeStream(source, options);
   let sourceMap;
