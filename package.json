@@ -11,7 +11,7 @@
     "posttest": "npm run lint",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov",
-    "compile": "babel src --out-dir lib --source-maps && npm run compile-grammars",
+    "compile": "babel src --out-dir lib && npm run compile-grammars",
     "compile-grammars": "pegjs -o grammars/link.js grammars/link.pegjs",
     "lint": "eslint ./src ./test",
     "lsif": "lsif-tsc src/**/*.js test/**/*.js --AllowJs --checkJs",
@@ -27,6 +27,12 @@
   "publishConfig": {
     "tag": "next"
   },
+  "files": [
+    "bin",
+    "lib/*.js",
+    "grammars/links.js",
+    "PURPOSE.md"
+  ],
   "ava": {
     "require": [
       "@babel/register"
