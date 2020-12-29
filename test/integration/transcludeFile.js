@@ -16,7 +16,7 @@ _.forEach(fixtures.fixtures, fixture => {
         t.regex(err.message, new RegExp(config.error.message));
         t.regex(err.path, new RegExp(config.error.path));
       } else {
-        t.deepEqual(err, null);
+        t.is(err, null);
         t.deepEqual(output, fixture.expectedOutput);
 
         if (fixture.expectedSourcemap) {
