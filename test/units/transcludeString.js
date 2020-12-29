@@ -7,8 +7,8 @@ test.cb('should transclude with only required arguments', t => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const expected = 'The quick brown fox jumps over the lazy dog.';
   transcludeString(input, (err, output) => {
-    t.deepEqual(err, null);
-    t.deepEqual(output, expected);
+    t.is(err, null);
+    t.is(output, expected);
     t.end();
   });
 });
@@ -17,8 +17,8 @@ test.cb('should transclude with optional source argument', t => {
   const input = 'The quick brown fox jumps over the lazy dog.';
   const expected = 'The quick brown fox jumps over the lazy dog.';
   transcludeString(input, { source: 'test' }, (err, output) => {
-    t.deepEqual(err, null);
-    t.deepEqual(output, expected);
+    t.is(err, null);
+    t.is(output, expected);
     t.end();
   });
 });
@@ -31,9 +31,9 @@ test.cb('returns sourcemap', t => {
   const expected = 'Jackdaws love my big sphinx of quartz.';
 
   transcludeString(input, options, (err, output, sourcemap) => {
-    t.deepEqual(err, null);
-    t.deepEqual(output, expected);
-    t.deepEqual(sourcemap.sources.length, 2);
+    t.is(err, null);
+    t.is(output, expected);
+    t.is(sourcemap.sources.length, 2);
     t.end();
   });
 });

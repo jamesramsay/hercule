@@ -7,8 +7,8 @@ test.cb('should transclude with only required arguments', t => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
   const expected = 'The quick brown fox jumps over the lazy dog.\n';
   transcludeFile(input, (err, output) => {
-    t.deepEqual(err, null);
-    t.deepEqual(output, expected);
+    t.is(err, null);
+    t.is(output, expected);
     t.end();
   });
 });
@@ -17,8 +17,8 @@ test.cb('should transclude with optional relativePath argument', t => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');
   const expected = 'The quick brown fox jumps over the lazy dog.\n';
   transcludeFile(input, { relativePath: 'test' }, (err, output) => {
-    t.deepEqual(err, null);
-    t.deepEqual(output, expected);
+    t.is(err, null);
+    t.is(output, expected);
     t.end();
   });
 });
@@ -27,7 +27,7 @@ test.cb("should return error if file doesn't exist", t => {
   const input = path.join('i-dont-exist.md');
   transcludeFile(input, err => {
     t.regex(err.message, /ENOENT/);
-    t.deepEqual(err.path, 'i-dont-exist.md');
+    t.is(err.path, 'i-dont-exist.md');
     t.end();
   });
 });
@@ -41,7 +41,7 @@ test.cb('should return one error if circular dependency found', t => {
     relativePath: path.join(__dirname, '../fixtures/circular-references'),
   };
   transcludeFile(input, options, err => {
-    t.deepEqual(err.message, 'Circular dependency detected');
+    t.is(err.message, 'Circular dependency detected');
     t.regex(err.path, /fox.md/);
     t.end();
   });
@@ -61,10 +61,10 @@ test.cb('should return sourceList', t => {
   const expected = 'Jackdaws love my big sphinx of quartz.\n';
 
   transcludeFile(input, (err, output, sourcemap) => {
-    t.deepEqual(err, null);
-    t.deepEqual(output, expected);
+    t.is(err, null);
+    t.is(output, expected);
     t.regex(sourcemap.sources[1], /size\.md/);
-    t.deepEqual(sourcemap.sources.length, 2);
+    t.is(sourcemap.sources.length, 2);
     t.end();
   });
 });
