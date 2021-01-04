@@ -17,7 +17,7 @@
     "arrow-parens": [2, "as-needed"],
     "id-length": [2, {"min": 2, "max": 25, "properties": "never", "exceptions": ["_"]}],
     "no-cond-assign": [2, "except-parens"],
-    "lodash/import-scope": [2, "full"],
+    "lodash/prefer-lodash-method": "off",
     "prettier/prettier": [2, {"singleQuote": true, "trailingComma": "es5"}]
   }
 }

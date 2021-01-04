@@ -1,6 +1,5 @@
 import path from 'path';
 
-import _ from 'lodash';
 import through2 from 'through2';
 import sourceMap from 'source-map';
 
@@ -48,7 +47,7 @@ export default function SourceMapStream(generatedFile = 'string') {
     const generator = new sourceMap.SourceMapGenerator({
       file: path.relative(__dirname, generatedFile),
     });
-    _.forEach(mappings, map => generator.addMapping(map));
+    mappings.forEach(map => generator.addMapping(map));
     this.emit('sourcemap', JSON.parse(generator.toString()));
     return cb();
   }

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import through2 from 'through2';
 
 export default function Trim() {
@@ -15,7 +14,7 @@ export default function Trim() {
     while (inputBuffer.length > 1) {
       const nextFileIsAncestor =
         inputBuffer[1].parents &&
-        _.includes(inputBuffer[0].parents, inputBuffer[1].source);
+        (inputBuffer[0].parents || []).includes(inputBuffer[1].source);
       const isFileEdge =
         inputBuffer[0].source !== inputBuffer[1].source &&
         memoSource !== inputBuffer[1].source;

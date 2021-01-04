@@ -1,5 +1,4 @@
 import test from 'ava';
-import _ from 'lodash';
 import fs from 'fs';
 
 import { TranscludeStream } from '../../src/hercule';
@@ -7,7 +6,7 @@ import { TranscludeStream } from '../../src/hercule';
 import fixtures from '../fixtures';
 import './_mock';
 
-_.forEach(fixtures.fixtures, fixture => {
+fixtures.fixtures.forEach(fixture => {
   test.cb(`should transclude ${fixture.name}`, t => {
     const config = fixture.expectedConfig;
     const options = config.options || {};

@@ -1,6 +1,7 @@
 import test from 'ava';
 import sinon from 'sinon';
-import _ from 'lodash';
+import isString from 'lodash/isString';
+import constant from 'lodash/constant';
 import { Readable } from 'stream';
 import isStream from 'isstream';
 import nock from 'nock';
@@ -53,7 +54,7 @@ test('calls resolvers with placeholder', t => {
 });
 
 test('throws if not resolved', t => {
-  const resolvers = [() => _.constant(null)];
+  const resolvers = [() => constant(null)];
   const error = t.throws(() =>
     resolver.resolveToReadableStream({ url: 'foo' }, resolvers)
   );
@@ -86,7 +87,7 @@ test('returns falsy if not local url', t => {
 
 test('returns string if quoted input', t => {
   const { content } = resolver.resolveString('"foo! bar!"');
-  t.truthy(_.isString(content));
+  t.truthy(isString(content));
 });
 
 test('returns falsy if unquoted input', t => {

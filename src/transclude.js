@@ -1,5 +1,6 @@
 import through2 from 'through2';
-import _ from 'lodash';
+import uniqBy from 'lodash/uniqBy';
+import isPlainObject from 'lodash/isPlainObject';
 import async from 'async';
 import cloneRegExp from 'clone-regexp';
 import leftsplit from 'left-split';
@@ -58,10 +59,12 @@ function applyReferences(chunk) {
   // Inherited reference take precendence over fallback reference
   const contextReferences = [...inheritedReferences, ...scopeReferences];
   const link =
-    _.find(contextReferences, { placeholder: contentLink.url }) || contentLink;
+    contextReferences.find(
+      ({ placeholder }) => placeholder === contentLink.url
+    ) || contentLink;
 
   // Prefer nearest inherited reference
-  const nextReferences = _.uniqBy(
+  const nextReferences = uniqBy(
     [...descendantReferences, ...inheritedReferences],
     'placeholder'
   );
@@ -121,7 +124,7 @@ export default function Transclude(source = 'string', options = {}) {
         resolvers,
         content
       );
-      if (_.includes(parents, resolvedUrl)) {
+      if (parents.includes(resolvedUrl)) {
         self.push(link);
         return cb({
           message: 'Circular dependency detected',
@@ -179,7 +182,7 @@ export default function Transclude(source = 'string', options = {}) {
     // Each line must be processed individually for correct sourcemap output
     let separators = leftsplit(separator, /(\r?\n)/);
 
-    separators = _.map(separators, content => {
+    separators = separators.map(content => {
       if (!content) return null;
 
       const output = { content, line, column };
@@ -192,7 +195,7 @@ export default function Transclude(source = 'string', options = {}) {
       return output;
     });
 
-    return _.without(separators, null);
+    return separators.filter(content => content !== null);
   }
 
   function tokenize(chunk) {
@@ -235,7 +238,7 @@ export default function Transclude(source = 'string', options = {}) {
   // eslint-disable-next-line consistent-return
   function transform(chunk, encoding, cb) {
     // Allow objects straight through
-    if (_.isPlainObject(chunk)) return cb(null, chunk);
+    if (isPlainObject(chunk)) return cb(null, chunk);
 
     async.eachSeries(
       tokenize(chunk.toString('utf8')),

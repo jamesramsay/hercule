@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isString from 'lodash/isString';
 import fs from 'fs';
 import path from 'path';
 import got from 'got';
@@ -51,15 +51,14 @@ export function resolveToReadableStream(
   resolvers = defaultResolvers,
   placeholder
 ) {
-  const { content, url } = _.reduce(
-    resolvers,
+  const { content, url } = resolvers.reduce(
     (memo, resolver) => memo || resolver(link.url, link.source, placeholder),
     null
   );
 
   let outputStream;
 
-  if (_.isString(content)) {
+  if (isString(content)) {
     outputStream = through2({ objectMode: true });
 
     outputStream.push({
