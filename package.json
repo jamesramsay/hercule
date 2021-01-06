@@ -35,7 +35,8 @@
   "files": [
     "bin",
     "lib/*.js",
-    "grammars/links.js",
+    "promise.js",
+    "grammars/link.js",
     "PURPOSE.md"
   ],
   "ava": {
