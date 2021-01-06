@@ -35,7 +35,7 @@
   "files": [
     "bin",
     "lib/*.js",
-    "promise.js",
+    "promises.js",
     "grammars/link.js",
     "PURPOSE.md"
   ],
