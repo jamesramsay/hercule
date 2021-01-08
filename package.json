@@ -89,7 +89,7 @@
     "async": "^3.2.0",
     "clone-regexp": "^2.1.0",
     "duplexer3": "^0.1.4",
-    "get-stream": "^5.0.0",
+    "get-stream": "^6.0.0",
     "got": "^11.1.4",
     "isstream": "^0.1.2",
     "left-split": "^1.0.0",
