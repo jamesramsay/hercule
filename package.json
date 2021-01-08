@@ -9,19 +9,18 @@
     "./package.json": "./package.json"
   },
   "scripts": {
+    "pretest": "npm run compile-grammars",
     "test": "npm run test-units && npm run test-integration && npm run test-cli",
     "test-units": "nyc --cache ava --verbose test/units/**/*.js",
     "test-integration": "ava --verbose test/integration/**/*.js",
-    "test-cli": "npm run compile && bats test/bats",
+    "test-cli": "bats test/bats",
     "posttest": "npm run lint",
     "coverage": "nyc report --reporter=html && open coverage/lcov-report/index.html",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov",
-    "compile": "babel src --out-dir lib && npm run compile-grammars",
     "compile-grammars": "pegjs -o grammars/link.js grammars/link.pegjs",
-    "lint": "eslint ./src ./test",
-    "lsif": "lsif-tsc src/**/*.js test/**/*.js --AllowJs --checkJs",
+    "lint": "eslint ./lib ./test",
+    "lsif": "lsif-tsc lib/**/*.js test/**/*.js --AllowJs --checkJs",
     "preversion": "npm test",
-    "version": "rm -r ./lib && npm run compile",
     "postversion": "git push && git push --tags",
     "benchmark": "./test/benchmark.js",
     "precommit": "lint-staged"
@@ -100,10 +99,6 @@
     "through2-get": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.3.1",
-    "@babel/register": "^7.0.0",
     "@sourcegraph/lsif-tsc": "^0.6.4",
     "ava": "^3.8.2",
     "bats": "^1.0.0",

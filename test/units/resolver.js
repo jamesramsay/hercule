@@ -6,7 +6,7 @@ import { Readable } from 'stream';
 import isStream from 'isstream';
 import nock from 'nock';
 
-import * as resolver from '../../src/resolver';
+import * as resolver from '../../lib/resolver';
 
 global.fs = require('fs');
 

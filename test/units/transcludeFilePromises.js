@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeFile } from '../../src/promises';
+import { transcludeFile } from '../../lib/promises';
 
 test('should transclude with only required arguments', async t => {
   const input = path.join(__dirname, '../fixtures/no-link/index.md');

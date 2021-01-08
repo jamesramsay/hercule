@@ -1,5 +1,5 @@
 import test from 'ava';
-import Sourcemap from '../../src/sourcemap';
+import { Sourcemap } from '../../lib/sourcemap';
 
 test.cb('should handle no input', t => {
   const testStream = new Sourcemap();

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { transcludeString } from '../../src/hercule';
+import { transcludeString } from '../../lib/hercule';
 // eslint-disable-next-line ava/no-import-test-files
 import fixtures from '../fixtures';
 import './_mock';
