@@ -20,9 +20,9 @@
     "compile-grammars": "pegjs -o grammars/link.js grammars/link.pegjs",
     "lint": "eslint ./src ./test",
     "lsif": "lsif-tsc src/**/*.js test/**/*.js --AllowJs --checkJs",
-    "release:major": "npm version major && git push --follow-tags",
-    "release:minor": "npm version minor && git push --follow-tags",
-    "release:patch": "npm version patch && git push --follow-tags",
+    "preversion": "npm test",
+    "version": "rm -r ./lib && npm run compile",
+    "postversion": "git push && git push --tags",
     "benchmark": "./test/benchmark.js",
     "precommit": "lint-staged"
   },
