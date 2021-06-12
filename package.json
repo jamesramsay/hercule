@@ -115,7 +115,7 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-lodash": "^7.1.0",
     "eslint-plugin-prettier": "^3.0.0",
-    "lint-staged": "^10.2.9",
+    "lint-staged": "^11.0.0",
     "nock": "^13.0.5",
     "nyc": "^15.1.0",
     "pegjs": "^0.10.0",
