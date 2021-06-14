@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { TranscludeStream } from '../../src/hercule';
+import { TranscludeStream } from '../../lib/hercule';
 
 test.cb('should handle no input', t => {
   const testStream = new TranscludeStream();

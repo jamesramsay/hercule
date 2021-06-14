@@ -5,8 +5,8 @@ import spigot from 'stream-spigot';
 import get from 'through2-get';
 import getStream from 'get-stream';
 
-import transclude from '../../src/transclude';
-import * as parse from '../../src/parse';
+import { Transclude } from '../../lib/transclude';
+import * as parse from '../../lib/parse';
 import grammar from '../../grammars/link';
 
 test.beforeEach(t => {
@@ -19,7 +19,7 @@ test.afterEach(t => {
 
 test.cb('should pass through objects unmodified', t => {
   const input = [{ content: 'Hello world!' }];
-  const testStream = transclude();
+  const testStream = Transclude();
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
@@ -35,7 +35,7 @@ test.cb('should pass through objects unmodified', t => {
 test.cb('should split strings after new lines', t => {
   const input = ['The quick ', 'brown fox\r\njumps over', ' the lazy dog.\n'];
   const expected = ['The quick brown fox\r\n', 'jumps over the lazy dog.\n'];
-  const testStream = transclude();
+  const testStream = Transclude();
   const stringify = get('content');
 
   spigot({ objectMode: true }, input).pipe(testStream).pipe(stringify);
@@ -50,11 +50,9 @@ test.cb('should split strings after new lines', t => {
 });
 
 test.serial.cb('should locate link within content', t => {
-  t.context.sandbox.spy(parse, 'parseContent');
-
   const input = ['Fizz :[foo]', '(foo.md) bar\nbuzz :[bar](bar.md)\n'];
   const expected = ['Fizz ', 'zing', ' bar\n', 'buzz ', 'zing', '\n'];
-  const testStream = transclude('string', {
+  const testStream = Transclude('string', {
     resolvers: [() => ({ content: 'zing', url: 'baz.md' })],
   });
   const stringify = get('content');
@@ -64,8 +62,6 @@ test.serial.cb('should locate link within content', t => {
   getStream
     .array(stringify)
     .then(output => {
-      t.is(parse.parseContent.firstCall.args[0], 'foo.md');
-      t.is(parse.parseContent.secondCall.args[0], 'bar.md');
       t.deepEqual(output, expected);
       t.end();
     })
@@ -74,7 +70,7 @@ test.serial.cb('should locate link within content', t => {
 
 test.cb('throws on invalid link', t => {
   const input = [':[foo](foo .md)'];
-  const testStream = transclude();
+  const testStream = Transclude();
 
   spigot({ objectMode: true }, input).pipe(testStream);
 
@@ -89,7 +85,7 @@ test.cb('throws on invalid link', t => {
 
 test.cb('throws on circular reference', t => {
   const input = [':[foo](foo.md)'];
-  const testStream = transclude('foo.md', {
+  const testStream = Transclude('foo.md', {
     resolvers: [() => ({ content: new Readable(), url: 'foo.md' })],
   });
 

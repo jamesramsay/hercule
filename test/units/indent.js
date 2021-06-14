@@ -2,7 +2,7 @@ import test from 'ava';
 import spigot from 'stream-spigot';
 import getStream from 'get-stream';
 
-import Indent from '../../src/indent';
+import { Indent } from '../../lib/indent';
 
 test.cb('should not modify input without whitespace or newline', t => {
   const input = [

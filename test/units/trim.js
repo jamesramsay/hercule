@@ -2,7 +2,7 @@ import test from 'ava';
 import spigot from 'stream-spigot';
 import getStream from 'get-stream';
 
-import Trim from '../../src/trim';
+import { Trim } from '../../lib/trim';
 
 test.cb('should not modify input stream from a single source', t => {
   const input = [

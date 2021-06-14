@@ -1,7 +1,7 @@
 import test from 'ava';
 import fs from 'fs';
 
-import { TranscludeStream } from '../../src/hercule';
+import { TranscludeStream } from '../../lib/hercule';
 // eslint-disable-next-line ava/no-import-test-files
 import fixtures from '../fixtures';
 import './_mock';

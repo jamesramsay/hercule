@@ -1,5 +1,4 @@
 node_modules
-lib
 .bats
 .coveralls.yml
 coverage

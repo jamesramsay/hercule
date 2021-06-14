@@ -1,7 +1,7 @@
 import test from 'ava';
 import path from 'path';
 
-import { transcludeString } from '../../src/promises';
+import { transcludeString } from '../../lib/promises';
 
 test('should transclude with only required arguments', async t => {
   const input = 'The quick brown fox jumps over the lazy dog.';
